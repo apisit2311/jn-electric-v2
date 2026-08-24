@@ -6,6 +6,7 @@
     <title>ระบบคลังสินค้า - JN Electric</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <style>
         :root { --primary-color: #1e3a8a; --accent-color: #3b82f6; --text-main: #0f172a; --bg-color: #f8fafc; --border-color: #cbd5e1; }
@@ -16,16 +17,22 @@
         .btn { padding: 8px 16px; border: none; border-radius: 4px; font-family: 'Sarabun'; font-weight: 600; cursor: pointer; color: white; transition: 0.2s; text-decoration: none;}
         .btn-back { background-color: #64748b; }
         .btn-add { background-color: #10b981; }
+        .btn-scan { background: #e2e8f0; color: var(--text-main); border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; }
+        .btn-scan:hover { background: var(--accent-color); color: white; }
 
-        .container { display: flex; gap: 20px; flex-wrap: wrap; }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;}
         
         /* กล่องเพิ่มสินค้า */
-        .form-box { flex: 1; min-width: 300px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: fit-content;}
+        .form-box { flex: 1; min-width: 350px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 20px;}
         .form-box h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #475569; }
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-family: 'Sarabun'; font-size: 15px; box-sizing: border-box;}
         
+        .sn-dynamic-area { background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px dashed var(--border-color); margin-bottom: 15px; display: none;}
+        .sn-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .sn-row input { flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-family: 'Sarabun'; font-weight: 600; color: var(--primary-color);}
+
         /* ตารางสต็อก */
         .table-box { flex: 2; min-width: 500px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
@@ -33,19 +40,31 @@
         th { background-color: #f1f5f9; color: var(--primary-color); font-weight: 600; white-space: nowrap;}
         tr:hover { background-color: #f8fafc; }
         .qty-badge { background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; font-size: 14px; }
-        .qty-low { background: #ef4444; } /* สีแดงเตือนของใกล้หมด */
+        .qty-low { background: #ef4444; }
 
-        /* หน้าจอบังตอนยังไม่ล็อกอิน */
+        #scanner-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        .scanner-box { background: #fff; padding: 15px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
+        #reader { width: 100%; }
         #auth-guard { position: fixed; top:0; left:0; width:100%; height:100%; background: #fff; z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
 <body>
 
-<!-- ยามเฝ้าหน้าเว็บ -->
 <div id="auth-guard">
     <h2 style="color: var(--primary-color);">กำลังตรวจสอบสิทธิ์การเข้าถึง...</h2>
     <p>กรุณาล็อกอินที่หน้าออกบิลก่อนเข้าใช้งานคลังสินค้าครับ</p>
     <a href="index.html" class="btn btn-add">กลับไปหน้าออกบิล (ล็อกอิน)</a>
+</div>
+
+<!-- 🔥 ซ่อนรายชื่อสินค้าและรหัสไว้ให้ค้นหาง่ายๆ -->
+<datalist id="codeList"></datalist>
+
+<div id="scanner-modal">
+    <div class="scanner-box">
+        <h3 style="margin-top:0; color:var(--primary-color);">📷 สแกน S/N</h3>
+        <div id="reader"></div>
+        <button class="btn" style="margin-top: 15px; background: #ef4444; color:white;" onclick="closeScanner()">❌ ยกเลิก</button>
+    </div>
 </div>
 
 <div class="header">
@@ -59,7 +78,7 @@
         <h3>➕ เพิ่ม/รับเข้า สินค้า</h3>
         <div class="form-group">
             <label>รหัสสินค้า (ห้ามซ้ำ)</label>
-            <input type="text" id="p-code" placeholder="เช่น AIR-12000, INV-5KW">
+            <input type="text" id="p-code" list="codeList" placeholder="เช่น AIR-12000 (ค้นหาจากประวัติได้)" onchange="checkProductCode()">
         </div>
         <div class="form-group">
             <label>ชื่อสินค้า</label>
@@ -68,12 +87,13 @@
         <div style="display: flex; gap: 10px;">
             <div class="form-group" style="flex: 1;">
                 <label>จำนวนที่รับเข้า</label>
-                <input type="number" id="p-qty" value="1" min="0">
+                <input type="number" id="p-qty" value="1" min="1" oninput="renderSnInputs()">
             </div>
             <div class="form-group" style="flex: 1;">
                 <label>หน่วย</label>
                 <select id="p-unit">
-                    <option>ตัว</option><option>ชุด</option><option>ม้วน</option><option>เมตร</option>
+                    <option>ตัว</option><option>ชิ้น</option><option>ชุด</option><option>เครื่อง</option>
+                    <option>ม้วน</option><option>เมตร</option>
                 </select>
             </div>
         </div>
@@ -81,7 +101,22 @@
             <label>ราคาขาย (ตั้งต้น)</label>
             <input type="number" id="p-price" value="0" min="0">
         </div>
-        <button class="btn btn-add" style="width: 100%; padding: 12px; font-size: 16px;" onclick="saveProduct()">💾 บันทึกเข้าคลัง</button>
+
+        <!-- 🔥 ระบบเลือกการเก็บ S/N (Mode C - คุมกฎ) -->
+        <div class="form-group" style="border-top: 2px dashed var(--border-color); padding-top: 15px; margin-top: 15px;">
+            <label style="color: var(--primary-color);">🏷️ กฎการเก็บ Serial Number (S/N)</label>
+            <select id="p-sn-mode" onchange="renderSnInputs()">
+                <option value="none">1. ไม่เก็บ S/N (รับเข้าแค่จำนวน)</option>
+                <option value="lot">2. S/N แบบกลุ่ม (ยิง 1 เบอร์ = ได้หลายชิ้น)</option>
+                <option value="unique">3. S/N แบบเดี่ยว (ต้องสแกนตามจำนวนชิ้น)</option>
+            </select>
+            <div id="mode-warning" style="font-size: 13px; color: #ef4444; margin-top: 8px; font-weight: 600;">✨ สินค้าใหม่: กรุณาตั้งกฎการเก็บ S/N</div>
+        </div>
+
+        <!-- พื้นที่สร้างช่องกรอก S/N อัตโนมัติ -->
+        <div class="sn-dynamic-area" id="sn-area"></div>
+
+        <button class="btn btn-add" style="width: 100%; padding: 12px; font-size: 16px; margin-top: 10px;" id="btn-save-stock" onclick="saveProduct()">💾 บันทึกรับเข้าคลัง</button>
     </div>
 
     <!-- ตารางแสดงของในโกดัง -->
@@ -107,35 +142,52 @@
     const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let globalProducts = [];
 
-    // ⚡ ตรวจสอบว่าล็อกอินหรือยัง
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
             document.getElementById("auth-guard").style.display = "none";
-            loadStock(); // โหลดข้อมูลสต็อกมาโชว์
+            loadStock(); 
         }
     };
 
-    // ⚡ ฟังก์ชันดึงข้อมูลมาแสดงในตาราง
+    // 📷 ระบบกล้องสแกน
+    let html5QrcodeScanner; let targetSnInput = null;
+    function openScanner(btn) {
+        targetSnInput = btn.previousElementSibling; 
+        document.getElementById('scanner-modal').style.display = 'flex';
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+        html5QrcodeScanner.render((decodedText) => { targetSnInput.value = decodedText; closeScanner(); }, () => {});
+    }
+    function closeScanner() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
+
+    // ⚡ ดึงข้อมูลสินค้าทั้งหมดมาเก็บไว้ และอัปเดตตาราง
     async function loadStock() {
         const tbody = document.getElementById('stock-tbody');
         try {
-            const { data, error } = await supabaseClient
-                .from('products')
-                .select('*')
-                .order('created_at', { ascending: false });
-
+            const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
             if (error) throw error;
-
+            
+            globalProducts = data; // เก็บไว้ใช้ตรวจรหัสสินค้า
+            
+            // ใส่รหัสสินค้าลงใน Datalist เพื่อให้ค้นหาง่าย
+            const datalist = document.getElementById('codeList');
+            datalist.innerHTML = '';
+            
             tbody.innerHTML = '';
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8;">ยังไม่มีสินค้าในคลัง</td></tr>';
-                return;
-            }
+            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8;">ยังไม่มีสินค้าในคลัง</td></tr>'; return; }
 
             data.forEach(item => {
-                const isLow = item.qty_in_stock <= 2; // ถ้าเหลือน้อยกว่า 2 ชิ้นให้ขึ้นสีแดงเตือน
+                if(item.product_code) {
+                    const opt = document.createElement('option');
+                    opt.value = item.product_code;
+                    opt.text = item.product_name;
+                    datalist.appendChild(opt);
+                }
+
+                const isLow = item.qty_in_stock <= 2; 
                 tbody.innerHTML += `
                     <tr>
                         <td style="font-weight:600; color:#475569;">${item.product_code || '-'}</td>
@@ -146,56 +198,168 @@
                 `;
             });
         } catch (error) {
-            console.error("Error loading stock:", error);
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">โหลดข้อมูลล้มเหลว</td></tr>';
         }
     }
 
-    // ⚡ ฟังก์ชันเพิ่มสินค้าใหม่ หรืออัปเดตของเดิม
+    // 🔥 Mode C: ตรวจสอบรหัสสินค้า ถ้าระบบเจอของเก่า จะล็อกสเปคทันที!
+    function checkProductCode() {
+        const code = document.getElementById('p-code').value.trim();
+        const snModeSelect = document.getElementById('p-sn-mode');
+        const modeWarning = document.getElementById('mode-warning');
+        
+        if (!code) return;
+        
+        const p = globalProducts.find(x => x.product_code === code);
+        
+        if (p) {
+            // ดึงของเดิมมาเติมให้
+            document.getElementById('p-name').value = p.product_name;
+            document.getElementById('p-price').value = p.price;
+            
+            let unitSelect = document.getElementById('p-unit');
+            let optionExists = Array.from(unitSelect.options).some(opt => opt.value === p.unit);
+            if(!optionExists && p.unit) {
+                const newOpt = document.createElement('option');
+                newOpt.value = p.unit; newOpt.innerText = p.unit;
+                unitSelect.insertBefore(newOpt, unitSelect.options[unitSelect.options.length - 1]);
+            }
+            if(p.unit) unitSelect.value = p.unit;
+
+            // 🔒 ล็อกกฎ S/N ไม่ให้ลูกน้องเปลี่ยน
+            if (p.sn_mode) {
+                snModeSelect.value = p.sn_mode;
+                snModeSelect.disabled = true; // ล็อกปุ่ม
+                snModeSelect.style.backgroundColor = "#e2e8f0";
+                modeWarning.innerText = "🔒 กฎ S/N ของสินค้านี้ถูกล็อกไว้ (แก้ไขไม่ได้)";
+                modeWarning.style.color = "#1e3a8a";
+            }
+        } else {
+            // ปลดล็อกสำหรับสินค้าใหม่
+            snModeSelect.disabled = false;
+            snModeSelect.style.backgroundColor = "#fff";
+            modeWarning.innerText = "✨ สินค้าใหม่: กรุณาตั้งกฎการเก็บ S/N ให้ถูกต้อง";
+            modeWarning.style.color = "#ef4444";
+        }
+        
+        renderSnInputs();
+    }
+
+    // ⚡ สร้างช่องกรอก S/N อัตโนมัติ
+    function renderSnInputs() {
+        const mode = document.getElementById('p-sn-mode').value;
+        const qty = parseInt(document.getElementById('p-qty').value) || 1;
+        const snArea = document.getElementById('sn-area');
+        
+        snArea.innerHTML = ''; 
+
+        if (mode === 'none') {
+            snArea.style.display = 'none';
+        } 
+        else if (mode === 'lot') {
+            snArea.style.display = 'block';
+            snArea.innerHTML = `
+                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">📦 สแกน S/N ข้างกล่อง/พาเลท เพียง 1 ครั้ง (ระบบจะนับเป็น ${qty} ชิ้น)</div>
+                <div class="sn-row">
+                    <input type="text" class="sn-val-input" placeholder="สแกน S/N ล็อต (Lot Number)...">
+                    <button class="btn-scan" onclick="openScanner(this)">📷 สแกน</button>
+                </div>
+            `;
+        } 
+        else if (mode === 'unique') {
+            snArea.style.display = 'block';
+            let html = `<div style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">🔍 บังคับสแกน S/N ทีละชิ้นให้ครบ ${qty} ตัว</div>`;
+            for(let i = 1; i <= qty; i++) {
+                html += `
+                    <div class="sn-row">
+                        <span style="font-size:12px; font-weight:bold; width: 20px;">#${i}</span>
+                        <input type="text" class="sn-val-input" placeholder="สแกน S/N ชิ้นที่ ${i}...">
+                        <button class="btn-scan" onclick="openScanner(this)">📷 สแกน</button>
+                    </div>
+                `;
+            }
+            snArea.innerHTML = html;
+        }
+    }
+
+    // ⚡ ฟังก์ชันรับของเข้า + บันทึก S/N ลงตาราง
     async function saveProduct() {
+        const btnSave = document.getElementById('btn-save-stock');
         const code = document.getElementById('p-code').value.trim();
         const name = document.getElementById('p-name').value.trim();
         const qty = parseFloat(document.getElementById('p-qty').value) || 0;
         const unit = document.getElementById('p-unit').value;
         const price = parseFloat(document.getElementById('p-price').value) || 0;
+        const snMode = document.getElementById('p-sn-mode').value;
 
-        if (!name) { alert("กรุณาใส่ชื่อสินค้าครับ!"); return; }
+        if (!name || !code) { alert("กรุณาใส่รหัสและชื่อสินค้าให้ครบถ้วนครับ!"); return; }
+        
+        // ตรวจสอบการกรอก S/N ให้ครบก่อนเซฟ
+        const snInputs = document.querySelectorAll('.sn-val-input');
+        let serialsToSave = [];
+        if (snMode !== 'none') {
+            let hasEmpty = false;
+            snInputs.forEach(input => { 
+                if(!input.value.trim()) hasEmpty = true; 
+                else serialsToSave.push(input.value.trim());
+            });
+            if (hasEmpty) { alert("⚠️ กรุณาสแกนหรือกรอก S/N ให้ครบทุกช่องก่อนบันทึกครับ!"); return; }
+        }
+
+        btnSave.innerText = "กำลังบันทึก..."; btnSave.disabled = true;
 
         try {
-            // เช็กว่ามีรหัสสินค้านี้อยู่แล้วไหม (ถ้ามีให้บวกจำนวนเพิ่ม, ถ้าไม่มีให้สร้างใหม่)
-            let existingProduct = null;
-            if (code) {
-                const { data } = await supabaseClient.from('products').select('*').eq('product_code', code);
-                if (data && data.length > 0) existingProduct = data[0];
-            }
+            let productId = null;
+            let existingProduct = globalProducts.find(x => x.product_code === code);
 
             if (existingProduct) {
-                // อัปเดตบวกยอดสต็อกเพิ่มเข้าไป
+                // บวกสต็อกเพิ่ม (ใช้กฎ S/N เดิมที่จำไว้)
                 const newQty = parseFloat(existingProduct.qty_in_stock) + qty;
-                const { error } = await supabaseClient
-                    .from('products')
-                    .update({ qty_in_stock: newQty, price: price })
-                    .eq('id', existingProduct.id);
+                const { error } = await supabaseClient.from('products').update({ qty_in_stock: newQty, price: price }).eq('id', existingProduct.id);
                 if (error) throw error;
-                alert(`✅ อัปเดตสต็อกเรียบร้อย!\nเพิ่ม ${name} อีก ${qty} ${unit}\n(รวมมีของในคลัง ${newQty} ${unit})`);
+                productId = existingProduct.id;
             } else {
-                // สร้างสินค้าใหม่
-                const { error } = await supabaseClient
-                    .from('products')
-                    .insert([{ product_code: code, product_name: name, qty_in_stock: qty, unit: unit, price: price }]);
+                // สร้างสินค้าใหม่ (และจำกฎ S/N Mode ไว้ตลอดกาล)
+                const { data: newProd, error } = await supabaseClient.from('products')
+                    .insert([{ product_code: code, product_name: name, qty_in_stock: qty, unit: unit, price: price, sn_mode: snMode }]).select();
                 if (error) throw error;
-                alert("✅ เพิ่มสินค้าใหม่เข้าคลังสำเร็จ!");
+                productId = newProd[0].id;
             }
 
-            // ล้างฟอร์มและโหลดตารางใหม่
+            // จัดการเซฟ S/N ลงประวัติ
+            if (serialsToSave.length > 0) {
+                const serialData = [];
+                if (snMode === 'lot') {
+                    serialData.push({ product_id: productId, sn: serialsToSave[0], qty: qty });
+                } else if (snMode === 'unique') {
+                    serialsToSave.forEach(sn => {
+                        serialData.push({ product_id: productId, sn: sn, qty: 1 });
+                    });
+                }
+                const { error: snError } = await supabaseClient.from('product_serials').insert(serialData);
+                if (snError) throw snError;
+            }
+
+            alert(`✅ รับสินค้าเข้าคลัง และบันทึกประวัติเรียบร้อยแล้ว!`);
+            
+            // ล้างฟอร์ม
             document.getElementById('p-code').value = '';
             document.getElementById('p-name').value = '';
             document.getElementById('p-qty').value = '1';
+            
+            // ปลดล็อกฟอร์มให้พร้อมรับของใหม่
+            document.getElementById('p-sn-mode').disabled = false;
+            document.getElementById('p-sn-mode').style.backgroundColor = "#fff";
+            document.getElementById('p-sn-mode').value = 'none';
+            document.getElementById('mode-warning').innerText = "";
+            renderSnInputs(); 
             loadStock();
 
         } catch (error) {
             console.error(error);
             alert("❌ บันทึกไม่สำเร็จ: " + error.message);
+        } finally {
+            btnSave.innerText = "💾 บันทึกรับเข้าคลัง"; btnSave.disabled = false;
         }
     }
 </script>
