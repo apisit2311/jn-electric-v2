@@ -78,14 +78,12 @@
 </div>
 
 <script>
-    // ==========================================
-    // กุญแจ Supabase
-    // ==========================================
+    // ฝังกุญแจของ JN Electric
     const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let allDocs = []; // เก็บเอกสารทั้งหมดไว้ในตัวแปรเพื่อค้นหา
+    let allDocs = []; 
 
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -95,11 +93,9 @@
         }
     };
 
-    // ⚡ ฟังก์ชันดึงประวัติเอกสารทั้งหมด
     async function loadHistory() {
         const tbody = document.getElementById('history-tbody');
         try {
-            // ดึงข้อมูลเอกสาร พร้อมกับ join ข้อมูลชื่อลูกค้าจากตาราง customers
             const { data, error } = await supabaseClient
                 .from('documents')
                 .select('*, customers(customer_name)')
@@ -110,12 +106,10 @@
             renderTable(allDocs);
 
         } catch (error) {
-            console.error("Error loading history:", error);
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">โหลดข้อมูลล้มเหลว</td></tr>';
         }
     }
 
-    // ⚡ ฟังก์ชันสร้างตาราง
     function renderTable(docs) {
         const tbody = document.getElementById('history-tbody');
         document.getElementById('doc-count').innerText = `พบเอกสาร ${docs.length} รายการ`;
@@ -146,7 +140,6 @@
         });
     }
 
-    // 🔍 ฟังก์ชันค้นหาและกรอง
     function filterTable() {
         const searchText = document.getElementById('searchInput').value.toLowerCase();
         const filterType = document.getElementById('typeFilter').value;
@@ -160,22 +153,18 @@
             
             return typeMatch && searchMatch;
         });
-
         renderTable(filtered);
     }
 
-    // 🚀 ฟังก์ชันเด็ด: ดึงข้อมูลเพื่อส่งกลับไปหน้า index.html
+    // 🚀 อัปเกรด 1: แอบส่ง docId กลับไปให้หน้าหลัก
     async function openDocument(docId) {
         try {
-            // 1. ดึงข้อมูลบิลหลัก และ ลูกค้า
             const { data: docData, error: docError } = await supabaseClient
                 .from('documents')
                 .select('*, customers(customer_name, address)')
-                .eq('id', docId)
-                .single();
+                .eq('id', docId).single();
             if (docError) throw docError;
 
-            // 2. ดึงรายการสินค้าทั้งหมดในบิลนี้
             const { data: itemsData, error: itemsError } = await supabaseClient
                 .from('document_items')
                 .select('*')
@@ -183,8 +172,8 @@
                 .order('created_at', { ascending: true });
             if (itemsError) throw itemsError;
 
-            // 3. จัดรูปแบบให้เหมือนไฟล์ JSON แบบที่ V1 ต้องการ
             const cloudData = {
+                docId: docData.id, // 🔥 ส่งรหัสลับของบิลนี้ไปด้วย!
                 docType: docData.doc_type,
                 docNum: docData.doc_num,
                 docDate: docData.doc_date,
@@ -203,29 +192,49 @@
                 }))
             };
 
-            // 4. แอบบันทึกใส่ความจำเครื่อง แล้วเด้งกลับไปหน้าหลัก
             localStorage.setItem("jn_selected_cloud_doc", JSON.stringify(cloudData));
             window.location.href = "index.html";
 
         } catch (error) {
-            console.error(error);
             alert("❌ เปิดเอกสารไม่สำเร็จ: " + error.message);
         }
     }
 
-    // 🗑️ ฟังก์ชันลบเอกสาร
+    // 🚀 อัปเกรด 2: ระบบคืนสต็อกอัตโนมัติเมื่อลบบิล
     async function deleteDocument(docId, docNum) {
-        if(!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบเอกสารเลขที่ ${docNum} ?\n(การลบนี้จะลบรายการสินค้าในบิลนี้ด้วย แต่ไม่คืนสต็อกอัตโนมัติครับ)`)) return;
+        if(!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบเอกสารเลขที่ ${docNum} ?\n\n💡 ระบบจะทำการ "คืนจำนวนสินค้า" กลับเข้าสต็อกให้อัตโนมัติครับ`)) return;
 
         try {
-            const { error } = await supabaseClient
+            // 1. ดึงรายการของในบิลนี้ เพื่อดูว่าต้องคืนอะไรบ้าง
+            const { data: itemsToRestock } = await supabaseClient
+                .from('document_items')
+                .select('product_id, qty')
+                .eq('document_id', docId);
+            
+            // 2. ลูปคืนของเข้าสต็อก (เฉพาะรายการที่มีรหัสสินค้า)
+            if (itemsToRestock && itemsToRestock.length > 0) {
+                for (let item of itemsToRestock) {
+                    if (item.product_id && item.qty > 0) {
+                        // ไปดูยอดคงเหลือปัจจุบัน
+                        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', item.product_id).single();
+                        if (currentStock) {
+                            // เอาของเดิม + ของที่คืน
+                            const newQty = parseFloat(currentStock.qty_in_stock) + parseFloat(item.qty);
+                            await supabaseClient.from('products').update({ qty_in_stock: newQty }).eq('id', item.product_id);
+                        }
+                    }
+                }
+            }
+
+            // 3. พอกดยืนยันคืนสต็อกเสร็จ ค่อยลบบิลทิ้ง (ระบบฐานข้อมูลจะลบรายการย่อยให้อัตโนมัติ)
+            const { error: deleteError } = await supabaseClient
                 .from('documents')
                 .delete()
                 .eq('id', docId);
             
-            if (error) throw error;
+            if (deleteError) throw deleteError;
             
-            alert(`✅ ลบเอกสาร ${docNum} เรียบร้อยแล้ว`);
+            alert(`✅ ลบเอกสาร ${docNum} และคืนสต็อกเรียบร้อยแล้วครับ!`);
             loadHistory(); // รีเฟรชตาราง
 
         } catch (error) {
