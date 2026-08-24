@@ -152,6 +152,10 @@
     <button class="btn btn-search-page" onclick="goToSearchPage()">📁 ค้นหา/ประวัติ</button>
     <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
     <!-- 🔥 เปลี่ยนชื่อปุ่มให้ชัดเจนว่ามันอัปเดตได้ด้วย -->
+    <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
+    
+    <!-- 🔥 ก๊อปปี้ปุ่มด้านล่างนี้ ไปวางแทรกตรงนี้ได้เลยครับ -->
+    <button class="btn btn-load" style="background-color: #8b5cf6;" onclick="duplicateDocument()">📋 นำไปสร้างใบใหม่ (Copy)</button>
     <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึก / อัปเดตข้อมูล</button>
     <a href="stock.html" class="btn btn-stock">📦 คลังสินค้า</a>
     
@@ -419,7 +423,22 @@
         isDirty = false;
         fetchNextDocNumber();
     }
-
+// 📋 ฟังก์ชันก๊อปปี้บิลเดิม ไปสร้างเป็นใบใหม่ (ไม่เซฟทับของเก่า)
+    function duplicateDocument() {
+        if (!currentDocId) {
+            alert("ตอนนี้คุณกำลังอยู่ในโหมด 'สร้างเอกสารใหม่' อยู่แล้วครับ!\nสามารถเปลี่ยนประเภทเอกสารด้านบนซ้ายได้เลย");
+            return;
+        }
+        
+        if (!confirm("ต้องการนำข้อมูลทั้งหมดนี้ ไปสร้างเป็น 'เอกสารใบใหม่' ใช่หรือไม่?\n(เอกสารใบเก่าจะยังถูกเก็บไว้ในประวัติ ไม่ถูกลบทับ)")) {
+            return;
+        }
+        
+        currentDocId = null; // 🔥 ปลดรหัสบิลเก่าทิ้ง (ทำให้ระบบคิดว่านี่คือบิลใหม่)
+        document.getElementById('doc-date').value = getTodayThai(); // เปลี่ยนวันที่เป็นวันนี้
+        
+        alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
+    }
     // ==========================================
     // ☁️ ฟังก์ชันบันทึก / อัปเดตข้อมูล (ตัวท็อป!)
     // ==========================================
