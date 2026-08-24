@@ -151,10 +151,6 @@
 <div class="top-controls no-print" id="controls-panel" style="display: none;">
     <button class="btn btn-search-page" onclick="goToSearchPage()">📁 ค้นหา/ประวัติ</button>
     <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
-    <!-- 🔥 เปลี่ยนชื่อปุ่มให้ชัดเจนว่ามันอัปเดตได้ด้วย -->
-    <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
-    
-    <!-- 🔥 ก๊อปปี้ปุ่มด้านล่างนี้ ไปวางแทรกตรงนี้ได้เลยครับ -->
     <button class="btn btn-load" style="background-color: #8b5cf6;" onclick="duplicateDocument()">📋 นำไปสร้างใบใหม่ (Copy)</button>
     <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึก / อัปเดตข้อมูล</button>
     <a href="stock.html" class="btn btn-stock">📦 คลังสินค้า</a>
@@ -278,7 +274,7 @@
 
     let isDirty = false;
     let globalProducts = [];
-    let currentDocId = null; // 🔥 ตัวแปรเก็บรหัสบิล (ถ้ามีรหัสแปลว่าอัปเดต ถ้าไม่มีแปลว่าสร้างใหม่)
+    let currentDocId = null; 
 
     const unitDropdownHTML = `
         <select class="unit-select text-center" onchange="markDirty(); checkCustomUnit(this)">
@@ -405,7 +401,7 @@
 
     function createNewDocument() {
         if(isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการล้างหน้าจอหรือไม่?")) return;
-        currentDocId = null; // 🔥 รีเซ็ตรหัสบิลเป็นสร้างใหม่
+        currentDocId = null; 
         
         document.getElementById('customer-name').value = "";
         document.getElementById('customer-address').value = "";
@@ -423,7 +419,8 @@
         isDirty = false;
         fetchNextDocNumber();
     }
-// 📋 ฟังก์ชันก๊อปปี้บิลเดิม ไปสร้างเป็นใบใหม่ (ไม่เซฟทับของเก่า)
+
+    // 📋 ฟังก์ชันก๊อปปี้บิลเดิม ไปสร้างเป็นใบใหม่
     function duplicateDocument() {
         if (!currentDocId) {
             alert("ตอนนี้คุณกำลังอยู่ในโหมด 'สร้างเอกสารใหม่' อยู่แล้วครับ!\nสามารถเปลี่ยนประเภทเอกสารด้านบนซ้ายได้เลย");
@@ -434,20 +431,21 @@
             return;
         }
         
-        currentDocId = null; // 🔥 ปลดรหัสบิลเก่าทิ้ง (ทำให้ระบบคิดว่านี่คือบิลใหม่)
-        document.getElementById('doc-date').value = getTodayThai(); // เปลี่ยนวันที่เป็นวันนี้
+        currentDocId = null; // 🔥 ปลดรหัสบิลเก่าทิ้ง
+        document.getElementById('doc-date').value = getTodayThai(); 
         
         alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
     }
+
     // ==========================================
-    // ☁️ ฟังก์ชันบันทึก / อัปเดตข้อมูล (ตัวท็อป!)
+    // ☁️ ฟังก์ชันบันทึก / อัปเดตข้อมูล (อัปเกรดสมบูรณ์: เช็กสต็อก + แยกแยะใบเสนอราคา)
     // ==========================================
     async function saveToSupabase() {
         const btnSave = document.getElementById('btnSave');
         const docNum = document.getElementById('doc-num').value;
         if(!docNum) { alert("กรุณาระบุเลขที่เอกสารก่อนบันทึกครับ"); return; }
         
-        btnSave.innerText = "กำลังบันทึก..."; btnSave.disabled = true;
+        btnSave.innerText = "กำลังตรวจสอบสต็อก..."; btnSave.disabled = true;
 
         try {
             const docType = document.getElementById('docType').value;
@@ -464,7 +462,35 @@
             const rows = document.querySelectorAll('#items-body tr');
             if(rows.length === 0) throw new Error("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ");
 
-            // 1. บันทึกข้อมูลลูกค้า (สร้างเรคคอร์ดใหม่)
+            // 🔥 [1] กำหนดเงื่อนไข: เอกสารประเภทไหนที่ต้อง "ตัดสต็อก" บ้าง?
+            const cutStockTypes = ['ใบส่งงาน', 'ใบแจ้งหนี้/ใบส่งสินค้า', 'ใบส่งสินค้า', 'ใบแจ้งหนี้', 'ใบเสร็จรับเงิน'];
+            const shouldCutStock = cutStockTypes.includes(docType);
+
+            // 🔥 [2] เช็กสต็อกล่วงหน้า (เฉพาะบิลที่ต้องตัดสต็อก)
+            if (shouldCutStock) {
+                for (let row of rows) {
+                    const desc = row.querySelector('.item-desc').value.trim();
+                    const qtyToSell = parseFloat(row.querySelector('.qty').value) || 0;
+                    
+                    if (desc && qtyToSell > 0) {
+                        let p = globalProducts.find(x => x.product_name === desc);
+                        if (p) {
+                            const { data: liveStock } = await supabaseClient.from('products').select('qty_in_stock, product_name').eq('id', p.id).single();
+                            if (liveStock) {
+                                if (qtyToSell > liveStock.qty_in_stock) {
+                                    const confirmProceed = confirm(`⚠️ คำเตือน: สินค้าในคลังไม่พอ!\n\nสินค้า: "${liveStock.product_name}"\n- ในคลังเหลือ: ${liveStock.qty_in_stock}\n- ที่ต้องการขาย: ${qtyToSell}\n\nต้องการ "ยอมให้สต็อกติดลบ" เพื่อบันทึกต่อใช่หรือไม่?\n(กด Cancel เพื่อยกเลิกไปเช็กสต็อกก่อน)`);
+                                    if (!confirmProceed) {
+                                        btnSave.innerHTML = "☁️ บันทึก / อัปเดตข้อมูล"; btnSave.disabled = false;
+                                        return; 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 1. บันทึกข้อมูลลูกค้า
             const { data: customerData, error: custErr } = await supabaseClient
                 .from('customers').insert([{ customer_name: customerName, address: customerAddress }]).select();
             if (custErr) throw custErr;
@@ -472,35 +498,37 @@
 
             let documentIdToUse = null;
 
-            // 🔥 เช็กว่าเป็นการ อัปเดตบิลเก่า หรือ สร้างบิลใหม่
             if (currentDocId) {
-                // ------ โหมดอัปเดต (UPDATE) ------
-                // 1. อัปเดตข้อมูลบิล
+                // ------ โหมดอัปเดต (UPDATE บิลเดิม) ------
+                const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
+                const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
+
                 const { error: updateErr } = await supabaseClient.from('documents').update({
                     doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal 
                 }).eq('id', currentDocId);
                 if (updateErr) throw updateErr;
 
-                // 2. ดึงรายการของเก่าทั้งหมดมาคืนสต็อก
-                const { data: oldItems } = await supabaseClient.from('document_items').select('product_id, qty').eq('document_id', currentDocId);
-                if (oldItems && oldItems.length > 0) {
-                    for(let old of oldItems) {
-                        if(old.product_id && old.qty > 0) {
-                            const { data: cStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', old.product_id).single();
-                            if(cStock) {
-                                await supabaseClient.from('products').update({ qty_in_stock: parseFloat(cStock.qty_in_stock) + parseFloat(old.qty) }).eq('id', old.product_id);
+                // คืนสต็อกเก่า (คืนเฉพาะถ้าบิลเก่าเคยตัดสต็อกไป)
+                if (oldShouldCutStock) {
+                    const { data: oldItems } = await supabaseClient.from('document_items').select('product_id, qty').eq('document_id', currentDocId);
+                    if (oldItems && oldItems.length > 0) {
+                        for(let old of oldItems) {
+                            if(old.product_id && old.qty > 0) {
+                                const { data: cStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', old.product_id).single();
+                                if(cStock) {
+                                    await supabaseClient.from('products').update({ qty_in_stock: parseFloat(cStock.qty_in_stock) + parseFloat(old.qty) }).eq('id', old.product_id);
+                                }
                             }
                         }
                     }
                 }
 
-                // 3. ลบรายการของเก่าทิ้งให้หมดเตรียมใส่ของใหม่
                 await supabaseClient.from('document_items').delete().eq('document_id', currentDocId);
+                documentIdToUse = currentDocId; 
                 
-                documentIdToUse = currentDocId; // ใช้รหัสเดิมเพื่อเซฟรายการใหม่
             } else {
-                // ------ โหมดสร้างใหม่ (INSERT) ------
+                // ------ โหมดสร้างใหม่ (INSERT บิลใหม่) ------
                 const { data: docData, error: docErr } = await supabaseClient.from('documents').insert([{ 
                     doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal 
@@ -511,10 +539,10 @@
                     throw docErr;
                 }
                 documentIdToUse = docData[0].id; 
-                currentDocId = documentIdToUse; // เซ็ตให้รู้ว่าเพิ่งเซฟไป (เผื่อกดเซฟซ้ำ จะได้กลายเป็นอัปเดตแทน)
+                currentDocId = documentIdToUse; 
             }
 
-            // 4. บันทึกรายการใหม่ และ ตัดสต็อก (หักลบ)
+            // 4. บันทึกรายการใหม่ และ ตัดสต็อก (เฉพาะถ้าบิลนี้ควรตัดสต็อก)
             const itemsToInsert = [];
             for(let row of rows) {
                 const desc = row.querySelector('.item-desc').value;
@@ -523,7 +551,6 @@
                 const unit = row.querySelector('.unit-select').value;
                 const price = parseFloat(row.querySelector('.price').value) || 0;
                 
-                // ถ้ารหัสสินค้าไม่มี ให้ลองค้นหาจากชื่อเผื่อกรณีเปิดบิลเก่ามา
                 let productId = row.getAttribute('data-product-id');
                 if (!productId) {
                     const p = globalProducts.find(x => x.product_name === desc);
@@ -532,8 +559,8 @@
                 
                 if(desc.trim() !== "") {
                     itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: desc, sn: sn, qty: qty, unit: unit, price: price });
-                    // ตัดยอดสต็อก
-                    if(productId && qty > 0) {
+                    
+                    if(productId && qty > 0 && shouldCutStock) {
                         const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
                         if(currentStock) {
                             await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
@@ -541,14 +568,21 @@
                     }
                 }
             }
+            
             if(itemsToInsert.length > 0) {
                 const { error: itemsErr } = await supabaseClient.from('document_items').insert(itemsToInsert);
                 if (itemsErr) throw itemsErr;
             }
 
-            alert(`✅ บันทึกข้อมูลเรียบร้อยแล้ว!\n(อัปเดตสต็อกล่าสุดแล้ว)`);
+            // แจ้งเตือนผลลัพธ์แยกตามประเภท
+            if(shouldCutStock) {
+                alert(`✅ บันทึกข้อมูลและตัดสต็อกเรียบร้อยแล้ว!\n(เลขที่เอกสาร: ${docNum})`);
+            } else {
+                alert(`✅ บันทึกเอกสารเรียบร้อยแล้ว!\n(ข้อมูลบันทึกสำเร็จ และสต็อกยังไม่ถูกตัดครับ)`);
+            }
+            
             isDirty = false;
-            await fetchProducts(); // อัปเดตสต็อกใน Datalist ใหม่
+            await fetchProducts(); 
 
         } catch (error) {
             alert("❌ ข้อผิดพลาด: " + error.message);
@@ -756,7 +790,7 @@
     }
 
     function loadSelectedDoc(cloudData) {
-        currentDocId = cloudData.docId || null; // 🔥 รับรหัสบิล (ถ้ามี)
+        currentDocId = cloudData.docId || null; 
         
         const selectEl = document.getElementById('docType');
         const targetType = cloudData.docType || "ใบเสนอราคา";
@@ -782,7 +816,6 @@
         if(cloudData.items && cloudData.items.length > 0) { cloudData.items.forEach(item => addRow(item)); } else { addRow(); }
         
         updateDocTypeSync(false); calculateTotal(); isDirty = false;
-        // alert("🔓 โหลดข้อมูลเอกสารเลขที่ " + cloudData.docNum + " เข้าสู่หน้าจอเรียบร้อย!");
     }
 
     function exportToExcel() {
