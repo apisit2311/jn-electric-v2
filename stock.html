@@ -283,6 +283,7 @@
     }
 
     // ⚡ ฟังก์ชันรับของเข้า + บันทึก S/N ลงตาราง
+    // ⚡ ฟังก์ชันรับของเข้า + บันทึก S/N ลงตาราง (อัปเกรด: เช็ก DB ตรงๆ ก่อนเซฟ)
     async function saveProduct() {
         const btnSave = document.getElementById('btn-save-stock');
         const code = document.getElementById('p-code').value.trim();
@@ -310,18 +311,45 @@
 
         try {
             let productId = null;
-            let existingProduct = globalProducts.find(x => x.product_code === code);
+            
+            // 🔥 [จุดที่แก้ไข] ให้วิ่งไปเช็กในฐานข้อมูลตรงๆ (ใช้ ilike เพื่อให้ตัวพิมพ์เล็ก/ใหญ่ ก็ถือว่าตรงกัน)
+            const { data: checkData, error: checkErr } = await supabaseClient
+                .from('products')
+                .select('*')
+                .ilike('product_code', code); 
 
-            if (existingProduct) {
-                // บวกสต็อกเพิ่ม (ใช้กฎ S/N เดิมที่จำไว้)
+            if (checkErr) throw checkErr;
+
+            let finalSnMode = snMode; // โหมดที่จะใช้เซฟ
+
+            if (checkData && checkData.length > 0) {
+                // 🔄 โหมดอัปเดต (บวกสต็อกเพิ่ม)
+                const existingProduct = checkData[0];
                 const newQty = parseFloat(existingProduct.qty_in_stock) + qty;
-                const { error } = await supabaseClient.from('products').update({ qty_in_stock: newQty, price: price }).eq('id', existingProduct.id);
+                
+                const { error } = await supabaseClient.from('products').update({ 
+                    qty_in_stock: newQty, 
+                    price: price 
+                }).eq('id', existingProduct.id);
+                
                 if (error) throw error;
                 productId = existingProduct.id;
+                
+                // ใช้กฎ S/N เดิมที่เคยล็อกไว้
+                if(existingProduct.sn_mode) finalSnMode = existingProduct.sn_mode;
+
             } else {
-                // สร้างสินค้าใหม่ (และจำกฎ S/N Mode ไว้ตลอดกาล)
+                // 🆕 โหมดสร้างใหม่
                 const { data: newProd, error } = await supabaseClient.from('products')
-                    .insert([{ product_code: code, product_name: name, qty_in_stock: qty, unit: unit, price: price, sn_mode: snMode }]).select();
+                    .insert([{ 
+                        product_code: code, 
+                        product_name: name, 
+                        qty_in_stock: qty, 
+                        unit: unit, 
+                        price: price, 
+                        sn_mode: snMode 
+                    }]).select();
+                    
                 if (error) throw error;
                 productId = newProd[0].id;
             }
@@ -329,9 +357,9 @@
             // จัดการเซฟ S/N ลงประวัติ
             if (serialsToSave.length > 0) {
                 const serialData = [];
-                if (snMode === 'lot') {
+                if (finalSnMode === 'lot') {
                     serialData.push({ product_id: productId, sn: serialsToSave[0], qty: qty });
-                } else if (snMode === 'unique') {
+                } else if (finalSnMode === 'unique') {
                     serialsToSave.forEach(sn => {
                         serialData.push({ product_id: productId, sn: sn, qty: 1 });
                     });
@@ -353,7 +381,8 @@
             document.getElementById('p-sn-mode').value = 'none';
             document.getElementById('mode-warning').innerText = "";
             renderSnInputs(); 
-            loadStock();
+            
+            await loadStock(); // 🔥 โหลดตารางใหม่
 
         } catch (error) {
             console.error(error);
