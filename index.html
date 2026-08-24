@@ -116,7 +116,7 @@
         </div>
         <div class="meta-area">
             <table>
-                <tr><td>เลขที่เอกสาร</td><td><input type="text" id="doc-num" style="color: var(--primary-color);" placeholder="ระบบจะรันให้อัตโนมัติ"></td></tr>
+                <tr><td>เลขที่เอกสาร</td><td><input type="text" id="doc-num" style="color: var(--primary-color);" placeholder="ระบบรันให้อัตโนมัติ" readonly></td></tr>
                 <tr><td>วันที่</td><td><input type="text" id="doc-date" placeholder="ระบุวันที่"></td></tr>
             </table>
         </div>
@@ -160,15 +160,10 @@
 </div>
 
 <script>
-    // ==========================================
-    // ฝังกุญแจให้เรียบร้อย บอยไม่ต้องแก้ตรงนี้แล้วครับ!
-    // ==========================================
+    // ฝังกุญแจของ JN Electric เรียบร้อยครับ
     const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
-    
-    // 🔥 แก้ไขจุดที่ทำให้ระบบพังตรงนี้ครับ (เปลี่ยนชื่อตัวแปรไม่ให้ซ้ำกัน)
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ==========================================
 
     let html5QrcodeScanner;
     let targetSnInput = null;
@@ -225,7 +220,6 @@
         document.querySelectorAll('.row-number').forEach((el, i) => el.innerText = i + 1);
     }
 
-    // ฟังก์ชันเข้าสู่ระบบที่แก้ให้กดติดแล้ว
     function submitSupabaseLogin() {
         document.getElementById("login-overlay").style.display = "none";
         document.getElementById("controls-panel").style.display = "flex";
@@ -240,8 +234,74 @@
         document.getElementById("main-app").style.display = "none";
     }
 
-    function saveToSupabase() {
-        alert("เย้! เข้ามาได้แล้วครับ เดี๋ยวสเต็ปต่อไปเรามาทำปุ่มนี้ให้ส่งข้อมูลกันครับ");
+    // 🔥 โค้ดส่งข้อมูลเข้าฐานข้อมูลของจริง!
+    async function saveToSupabase() {
+        try {
+            // 1. ดึงข้อมูลจากหน้าจอมาเตรียมไว้
+            const docType = document.getElementById('docType').value;
+            const docDate = document.getElementById('docDate') ? document.getElementById('docDate').value : '24 ส.ค. 2569';
+            const customerName = document.getElementById('customer-name').value;
+            const customerAddress = document.getElementById('customer-address').value;
+            const subtotal = parseFloat(document.getElementById('subtotal').innerText.replace(/,/g, '')) || 0;
+
+            // เช็กว่ามีรายการสินค้าไหม
+            const rows = document.querySelectorAll('#items-body tr');
+            if(rows.length === 0) { alert("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการครับ"); return; }
+
+            // 2. เริ่มบันทึก: บันทึกข้อมูลลูกค้าลงตาราง customers
+            const { data: customerData, error: customerError } = await supabaseClient
+                .from('customers')
+                .insert([{ customer_name: customerName, address: customerAddress }])
+                .select();
+                
+            if (customerError) throw customerError;
+            const customerId = customerData[0].id; // ได้รหัสลูกค้ามาแล้ว
+
+            // 3. บันทึกข้อมูลบิลลงตาราง documents
+            const docNum = 'DOC-' + Date.now().toString().slice(-6); // สุ่มเลขบิลให้ก่อน
+            const { data: docData, error: docError } = await supabaseClient
+                .from('documents')
+                .insert([{
+                    doc_num: docNum,
+                    doc_type: docType,
+                    doc_date: docDate,
+                    customer_id: customerId,
+                    subtotal: subtotal,
+                    grand_total: subtotal
+                }])
+                .select();
+                
+            if (docError) throw docError;
+            const documentId = docData[0].id; // ได้รหัสบิลมาแล้ว
+
+            // 4. บันทึกรายการสินค้า + S/N ลงตาราง document_items
+            const itemsToInsert = [];
+            rows.forEach(row => {
+                const desc = row.querySelector('.editable-desc').innerText;
+                const sn = row.querySelector('.sn-input').value;
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const unit = row.querySelector('.unit-select').value;
+                const price = parseFloat(row.querySelector('.price').value) || 0;
+                
+                if(desc.trim() !== "") {
+                    itemsToInsert.push({ document_id: documentId, description: desc, sn: sn, qty: qty, unit: unit, price: price });
+                }
+            });
+
+            if(itemsToInsert.length > 0) {
+                const { error: itemsError } = await supabaseClient
+                    .from('document_items').insert(itemsToInsert);
+                if (itemsError) throw itemsError;
+            }
+
+            // เสร็จสมบูรณ์!
+            document.getElementById('doc-num').value = docNum;
+            alert("✅ บันทึกข้อมูลลง Supabase สำเร็จ!\nเลขที่เอกสาร: " + docNum);
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ เกิดข้อผิดพลาด: " + error.message);
+        }
     }
 </script>
 </body>
