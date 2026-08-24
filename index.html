@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JN Electric ERP (V2)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- ⚡ ดึงเครื่องมือ Supabase และไลบรารีสแกนบาร์โค้ดมาใช้งาน -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <style>
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        :root { --primary-color: #1e3a8a; --accent-color: #3b82f6; --text-main: #0f172a; --text-muted: #475569; --bg-color: #f8fafc; --border-color: #cbd5e1; }
+        body { font-family: 'Sarabun', sans-serif; color: var(--text-main); line-height: 1.5; background-color: var(--bg-color); padding: 85px 20px 30px; }
+        .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 20mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
+        
+        input[type="text"], input[type="number"], textarea, .editable-desc, select {
+            font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main); border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
+        }
+        input:hover, textarea:hover, .editable-desc:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
+        input:focus, textarea:focus, .editable-desc:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
+        textarea { resize: vertical; overflow: hidden; }
+        select.unit-select { cursor: pointer; text-align: center; text-align-last: center; }
+        .editable-desc { min-height: 30px; word-wrap: break-word; white-space: pre-wrap; padding-top: 8px;}
+        .editable-desc:empty:before { content: attr(data-placeholder); color: #94a3b8; }
+
+        .sn-container { display: flex; align-items: center; gap: 5px; margin-top: 5px; border-top: 1px dashed #e2e8f0; padding-top: 5px; }
+        .sn-label { font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+        .sn-input { border: 1px solid transparent; border-bottom: 1px solid var(--border-color) !important; padding: 2px 5px !important; font-size: 12px !important; color: var(--accent-color) !important; font-weight: 600; }
+        .btn-scan { background: #e2e8f0; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: 0.2s; }
+        .btn-scan:hover { background: var(--accent-color); color: white; }
+
+        .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 3px solid var(--primary-color); padding-bottom: 20px; }
+        .doc-title-editable { font-size: 38px !important; font-weight: 700; color: var(--primary-color); padding: 10px 10px 15px 0 !important; line-height: 1.5 !important; display: inline-block; outline: none; border: 1px dashed transparent; cursor: pointer; width: auto; max-width: 100%; height: auto !important; appearance: none; background: transparent; }
+        .meta-area table { width: 100%; border-spacing: 0 5px; text-align: right; }
+        .meta-area td:first-child { font-weight: 600; width: 45%; color: var(--text-muted); font-size: 13px; text-align: right;}
+        .meta-area input { text-align: right; font-weight: 600; font-size: 15px;}
+        .address-section { display: flex; justify-content: space-between; margin-bottom: 40px; }
+        .company-area, .customer-area { width: 48%; }
+        .section-label { font-size: 13px; color: var(--text-muted); font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 10px;}
+        .company-logo { max-width: 120px; margin-bottom: 5px; display: block; }
+        
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; border-bottom: 2px solid var(--primary-color); }
+        .items-table th { background-color: #fff; color: var(--primary-color); padding: 12px 8px; font-size: 14px; font-weight: 700; border-top: 2px solid var(--primary-color); border-bottom: 2px solid var(--primary-color); text-align: left; }
+        .items-table td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+        .row-number { font-weight: 600; color: var(--text-muted); padding-top: 15px !important; text-align: center;}
+        
+        .btn { padding: 8px 16px; cursor: pointer; font-family: 'Sarabun'; border: none; border-radius: 4px; font-weight: 600; transition: 0.2s; }
+        .btn-add { background-color: var(--primary-color); color: white; border-radius: 20px; padding: 8px 20px;}
+        .btn-del { background-color: #ef4444; color: white; padding: 4px 10px; font-size: 12px; border-radius: 4px; }
+        
+        .top-controls { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; display: flex; gap: 8px; justify-content: center; align-items: center; background: #1e3a8a; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); flex-wrap: wrap; }
+        .top-controls .btn { padding: 6px 12px; font-size: 13px; border-radius: 4px; color: white;}
+        .btn-cloud-save { background-color: #06b6d4; }
+        .btn-print { background-color: #3b82f6; }
+        .btn-logout { background-color: #64748b; }
+
+        .summary-section { display: flex; justify-content: flex-end; margin-bottom: 40px; margin-top: 10px; flex-direction: column; align-items: flex-end; }
+        .summary-table { width: 50%; border-collapse: collapse; }
+        .summary-table td { padding: 8px 12px; font-size: 15px; border-bottom: 1px solid var(--border-color); }
+        .summary-table tr.total td { font-weight: 700; color: var(--primary-color); font-size: 18px; border-top: 2px solid var(--primary-color); background-color: #f8fafc; border-bottom: none;}
+
+        .footer-signatures { display: flex; justify-content: space-between; margin-top: 60px; text-align: center; }
+        .signature-box { width: 35%; }
+        .signature-line { border-bottom: 1px solid var(--text-main); margin: 40px auto 10px; width: 100%; }
+        
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; }
+        .login-card { background: #fff; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; }
+        .login-card h2 { color: var(--primary-color); margin-bottom: 20px; font-size: 24px; }
+        .login-card input { border: 1px solid var(--border-color); background: #f8fafc; padding: 12px; border-radius: 6px; width: 100%; font-size: 16px; text-align: center; margin-bottom: 15px; font-family: 'Sarabun'; }
+        .login-card .btn-submit { background: var(--primary-color); color: #fff; width: 100%; padding: 12px; font-size: 16px; border-radius: 6px; }
+
+        #scanner-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        .scanner-box { background: #fff; padding: 15px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
+        #reader { width: 100%; }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .document-container { width: 100%; height: auto; box-shadow: none; padding: 0; margin: 0; }
+            .no-print, .btn-scan { display: none !important; }
+            .doc-title-editable, input, textarea, .editable-desc, select, .sn-input { border: none !important; background: transparent !important; padding: 0 !important; appearance: none; }
+            .sn-input:placeholder-shown { display: none !important; }
+            #login-overlay, #scanner-modal { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="scanner-modal" class="no-print">
+    <div class="scanner-box">
+        <h3 style="margin-top:0; color:var(--primary-color);">📷 สแกน S/N</h3>
+        <div id="reader"></div>
+        <button class="btn" style="margin-top: 15px; background: #ef4444; color:white;" onclick="closeScanner()">❌ ยกเลิก</button>
+    </div>
+</div>
+
+<div id="login-overlay">
+    <div class="login-card">
+        <h2>JN Electric (V2)</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">ทดสอบระบบ: กดปุ่มเข้าสู่ระบบได้เลยครับ</p>
+        <button class="btn btn-submit" onclick="submitSupabaseLogin()">🔓 เข้าสู่ระบบ</button>
+    </div>
+</div>
+
+<div class="top-controls no-print" id="controls-panel" style="display: none;">
+    <button class="btn btn-cloud-save" onclick="saveToSupabase()">☁️ บันทึกลง Supabase</button>
+    <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์ PDF</button>
+    <button class="btn btn-logout" onclick="logoutSupabase()">🚪 ออกระบบ</button>
+</div>
+
+<div class="document-container" id="main-app" style="display: none;">
+    <div class="top-section">
+        <div class="title-area">
+            <select class="doc-title-editable" id="docType">
+                <option value="ใบเสนอราคา">ใบเสนอราคา</option>
+                <option value="ใบส่งงาน">ใบส่งงาน</option>
+                <option value="ใบแจ้งหนี้">ใบแจ้งหนี้</option>
+            </select><br>
+            <input type="text" id="docSubTitle" style="text-align: left; font-weight: 600; border:none; color:var(--text-muted); font-size: 16px; padding: 0;" value="(QUOTATION)">
+        </div>
+        <div class="meta-area">
+            <table>
+                <tr><td>เลขที่เอกสาร</td><td><input type="text" id="doc-num" style="color: var(--primary-color);" placeholder="ระบบจะรันให้อัตโนมัติ"></td></tr>
+                <tr><td>วันที่</td><td><input type="text" id="doc-date" placeholder="ระบุวันที่"></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="address-section">
+        <div class="company-area">
+            <div class="section-label">ผู้ออกเอกสาร (FROM)</div>
+            <img src="logo.png" alt="JN Electric Logo" class="company-logo" onerror="this.style.display='none'">
+            <textarea rows="4" style="color: var(--text-muted); padding-left: 0;">101/1 ม.1 ต.หนองนาคำ อ.เมือง&#10;จ.อุดรธานี 41000&#10;โทร: 083-417-5143</textarea>
+        </div>
+        <div class="customer-area">
+            <div class="section-label">ลูกค้า (BILL TO)</div>
+            <input type="text" id="customer-name" value="บริษัท ลูกค้าทดสอบ จำกัด" style="font-weight: 700; font-size: 18px; padding-left: 0;">
+            <textarea id="customer-address" rows="3" style="padding-left: 0;">888 ถ.รัชดาภิเษก กรุงเทพฯ 10400</textarea>
+        </div>
+    </div>
+
+    <table class="items-table" id="invoice-table">
+        <thead>
+             <tr>
+                <th class="no-print" style="width: 5%; text-align: center;">ลบ</th>
+                <th style="width: 5%; text-align: center;">ลำดับ</th>
+                <th style="width: 50%;">รายการ</th> 
+                <th style="width: 10%; text-align: center;">จำนวน</th>
+                <th style="width: 10%; text-align: center;">หน่วย</th> 
+                <th style="width: 10%; text-align: right;">ราคา/หน่วย</th>
+                <th style="width: 10%; text-align: right;">จำนวนเงิน</th>
+            </tr>
+        </thead>
+        <tbody id="items-body"></tbody>
+    </table>
+    <button class="btn btn-add no-print" onclick="addRow()">+ เพิ่มรายการ</button>
+
+    <div class="summary-section">
+        <table class="summary-table">
+            <tr><td style="color: var(--text-muted);">รวมเป็นเงิน (SUBTOTAL)</td><td style="text-align: right;" id="subtotal">0.00</td></tr>
+            <tr class="total"><td>ยอดชำระสุทธิ (TOTAL)</td><td style="text-align: right;" id="grand-total">0.00</td></tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // 🔴 1. ตั้งค่า SUPABASE ตรงนี้ครับบอย! 🔴
+    // ==========================================
+    const SUPABASE_URL = 'ใส่_Project_URL_ที่นี่';
+    const SUPABASE_ANON_KEY = 'ใส่_Anon_Key_ที่นี่';
+    
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ==========================================
+
+    let html5QrcodeScanner;
+    let targetSnInput = null;
+
+    function openScanner(btnElement) {
+        targetSnInput = btnElement.previousElementSibling;
+        document.getElementById('scanner-modal').style.display = 'flex';
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+        html5QrcodeScanner.render(
+            (decodedText) => { targetSnInput.value = decodedText; closeScanner(); },
+            (error) => { /* กำลังสแกน */ }
+        );
+    }
+    function closeScanner() {
+        if(html5QrcodeScanner) html5QrcodeScanner.clear();
+        document.getElementById('scanner-modal').style.display = 'none';
+        targetSnInput = null;
+    }
+
+    function calculateTotal() {
+        let sub = 0;
+        document.querySelectorAll('#items-body tr').forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty').value) || 0;
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            const total = qty * price;
+            row.querySelector('.row-total').innerText = total.toLocaleString('th-TH', {minimumFractionDigits: 2});
+            sub += total;
+        });
+        document.getElementById('subtotal').innerText = sub.toLocaleString('th-TH', {minimumFractionDigits: 2});
+        document.getElementById('grand-total').innerText = sub.toLocaleString('th-TH', {minimumFractionDigits: 2});
+    }
+
+    function addRow() {
+        const tbody = document.getElementById('items-body');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="no-print text-center"><button class="btn btn-del" onclick="this.closest('tr').remove(); calculateTotal();">ลบ</button></td>
+            <td class="text-center row-number"></td>
+            <td>
+                <div contenteditable="true" class="editable-desc" data-placeholder="ระบุรายละเอียดสินค้า..."></div>
+                <div class="sn-container no-print">
+                    <span class="sn-label">S/N:</span>
+                    <input type="text" class="sn-input" placeholder="สแกน S/N หรือพิมพ์...">
+                    <button class="btn-scan" onclick="openScanner(this)">📷 สแกน</button>
+                </div>
+            </td>
+            <td><input type="number" class="qty text-center" value="1" min="1" oninput="calculateTotal()"></td>
+            <td><select class="unit-select text-center"><option>ตัว</option><option>งาน</option><option>ชุด</option></select></td>
+            <td><input type="number" class="price text-right" value="0" min="0" oninput="calculateTotal()"></td>
+            <td class="text-right row-total" style="padding-top: 14px;">0.00</td>
+        `;
+        tbody.appendChild(tr);
+        document.querySelectorAll('.row-number').forEach((el, i) => el.innerText = i + 1);
+    }
+
+    async function submitSupabaseLogin() {
+        document.getElementById("login-overlay").style.display = "none";
+        document.getElementById("controls-panel").style.display = "flex";
+        document.getElementById("main-app").style.display = "block";
+        document.getElementById('doc-date').value = "24 สิงหาคม 2569";
+        if(document.getElementById('items-body').children.length === 0) addRow();
+    }
+
+    function logoutSupabase() {
+        document.getElementById("login-overlay").style.display = "flex";
+        document.getElementById("controls-panel").style.display = "none";
+        document.getElementById("main-app").style.display = "none";
+    }
+
+    async function saveToSupabase() {
+        alert("เตรียมพร้อมเชื่อมต่อ Supabase ในสเต็ปถัดไป!");
+    }
+</script>
+</body>
+</html>
