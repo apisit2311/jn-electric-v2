@@ -15,15 +15,13 @@
         body { font-family: 'Sarabun', sans-serif; color: var(--text-main); line-height: 1.5; background-color: var(--bg-color); padding: 85px 20px 30px; }
         .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 20mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
         
-        input[type="text"], input[type="number"], textarea, .editable-desc, select {
-            font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main); border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
+        input[type="text"], input[type="number"], textarea, .item-desc, select {
+            font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main); border: 1px dashed transparent; border-radius: 2px; padding: 6px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
         }
-        input:hover, textarea:hover, .editable-desc:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
-        input:focus, textarea:focus, .editable-desc:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
+        input:hover, textarea:hover, .item-desc:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
+        input:focus, textarea:focus, .item-desc:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
         textarea { resize: vertical; overflow: hidden; }
         select.unit-select { cursor: pointer; text-align: center; text-align-last: center; }
-        .editable-desc { min-height: 30px; word-wrap: break-word; white-space: pre-wrap; padding-top: 8px;}
-        .editable-desc:empty:before { content: attr(data-placeholder); color: #94a3b8; }
 
         .sn-container { display: flex; align-items: center; gap: 5px; margin-top: 5px; border-top: 1px dashed #e2e8f0; padding-top: 5px; }
         .sn-label { font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
@@ -51,8 +49,9 @@
         .btn-del { background-color: #ef4444; color: white; padding: 4px 10px; font-size: 12px; border-radius: 4px; }
         
         .top-controls { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; display: flex; gap: 8px; justify-content: center; align-items: center; background: #1e3a8a; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); flex-wrap: wrap; }
-        .top-controls .btn { padding: 6px 12px; font-size: 13px; border-radius: 4px; color: white;}
-        .btn-cloud-save { background-color: #06b6d4; }
+        .top-controls .btn { padding: 6px 12px; font-size: 13px; border-radius: 4px; color: white; text-decoration: none;}
+        .btn-cloud-save { background-color: #10b981; }
+        .btn-stock { background-color: #f59e0b; }
         .btn-print { background-color: #3b82f6; }
         .btn-logout { background-color: #64748b; }
 
@@ -61,7 +60,6 @@
         .summary-table td { padding: 8px 12px; font-size: 15px; border-bottom: 1px solid var(--border-color); }
         .summary-table tr.total td { font-weight: 700; color: var(--primary-color); font-size: 18px; border-top: 2px solid var(--primary-color); background-color: #f8fafc; border-bottom: none;}
         
-        /* สไตล์หน้าจอล็อกอิน */
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 10000; display: flex; justify-content: center; align-items: center; }
         .login-card { background: #fff; padding: 40px 30px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .login-card h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 10px; font-size: 26px; }
@@ -76,13 +74,16 @@
             body { background: #fff; padding: 0; }
             .document-container { width: 100%; height: auto; box-shadow: none; padding: 0; margin: 0; }
             .no-print, .btn-scan { display: none !important; }
-            .doc-title-editable, input, textarea, .editable-desc, select, .sn-input { border: none !important; background: transparent !important; padding: 0 !important; appearance: none; }
+            .doc-title-editable, input, textarea, .item-desc, select, .sn-input { border: none !important; background: transparent !important; padding: 0 !important; appearance: none; }
             .sn-input:placeholder-shown { display: none !important; }
             #login-overlay, #scanner-modal { display: none !important; }
         }
     </style>
 </head>
 <body>
+
+<!-- 🗂️ รายการสินค้าที่ซ่อนไว้สำหรับระบบค้นหาอัตโนมัติ -->
+<datalist id="productList"></datalist>
 
 <div id="scanner-modal" class="no-print">
     <div class="scanner-box">
@@ -92,7 +93,6 @@
     </div>
 </div>
 
-<!-- 🔐 หน้าต่างล็อกอินของจริง -->
 <div id="login-overlay">
     <div class="login-card">
         <h2>JN Electric ERP</h2>
@@ -104,8 +104,9 @@
 </div>
 
 <div class="top-controls no-print" id="controls-panel" style="display: none;">
-    <button class="btn btn-cloud-save" onclick="saveToSupabase()">☁️ บันทึกลง Supabase</button>
-    <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์ PDF</button>
+    <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึกลง Supabase</button>
+    <a href="stock.html" class="btn btn-stock">📦 จัดการคลังสินค้า</a>
+    <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์</button>
     <button class="btn btn-logout" onclick="logoutSupabase()">🚪 ออกระบบ</button>
 </div>
 
@@ -122,7 +123,7 @@
         <div class="meta-area">
             <table>
                 <tr><td>เลขที่เอกสาร</td><td><input type="text" id="doc-num" style="color: var(--primary-color);" placeholder="ระบบรันให้อัตโนมัติ" readonly></td></tr>
-                <tr><td>วันที่</td><td><input type="text" id="doc-date" id="docDate" placeholder="ระบุวันที่"></td></tr>
+                <tr><td>วันที่</td><td><input type="text" id="doc-date" placeholder="ระบุวันที่"></td></tr>
             </table>
         </div>
     </div>
@@ -165,22 +166,71 @@
 </div>
 
 <script>
-    // กุญแจของ JN Electric 
     const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ⚡ ฟังก์ชันเช็กว่าเคยล็อกอินไว้แล้วหรือยัง (จะได้ไม่ต้องพิมพ์รหัสใหม่ทุกครั้ง)
+    let globalProducts = []; // ตัวแปรเก็บของในสต็อก
+
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
             document.getElementById("login-overlay").style.display = "none";
             document.getElementById("controls-panel").style.display = "flex";
             document.getElementById("main-app").style.display = "block";
-            document.getElementById('doc-date').value = "24 ส.ค. 2569";
+            
+            // ตั้งวันที่ปัจจุบัน
+            const today = new Date();
+            document.getElementById('doc-date').value = today.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            
+            // โหลดข้อมูลสต็อกมาเตรียมไว้
+            await fetchProducts();
+            
             if(document.getElementById('items-body').children.length === 0) addRow();
         }
     };
+
+    // ⚡ ดึงสต็อกมาใส่ในระบบค้นหา
+    async function fetchProducts() {
+        const { data } = await supabaseClient.from('products').select('*');
+        if (data) {
+            globalProducts = data;
+            const datalist = document.getElementById('productList');
+            datalist.innerHTML = '';
+            data.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.product_name; // ใช้ชื่อสินค้าเป็นคำค้นหา
+                datalist.appendChild(opt);
+            });
+        }
+    }
+
+    // ⚡ เมื่อเลือกสินค้า ให้ดึงราคาและหน่วยมาใส่ให้อัตโนมัติ
+    function handleProductSelect(inputEl) {
+        const row = inputEl.closest('tr');
+        const selectedName = inputEl.value;
+        const product = globalProducts.find(p => p.product_name === selectedName);
+        
+        if (product) {
+            row.querySelector('.price').value = product.price;
+            
+            // เพิ่ม Option หน่วยลงไปใน Select อัตโนมัติ (ถ้าไม่มี)
+            const unitSelect = row.querySelector('.unit-select');
+            let optionExists = Array.from(unitSelect.options).some(opt => opt.value === product.unit);
+            if(!optionExists) {
+                const newOpt = document.createElement('option');
+                newOpt.value = product.unit; newOpt.innerText = product.unit;
+                unitSelect.appendChild(newOpt);
+            }
+            unitSelect.value = product.unit;
+            
+            // แอบซ่อนรหัสสินค้าไว้ที่ Row เพื่อเอาไปใช้ตัดสต็อกตอนเซฟ
+            row.setAttribute('data-product-id', product.id);
+            calculateTotal();
+        } else {
+            row.removeAttribute('data-product-id'); // ถ้าพิมพ์ชื่อเองที่ไม่มีในสต็อก
+        }
+    }
 
     let html5QrcodeScanner;
     let targetSnInput = null;
@@ -191,7 +241,7 @@
         html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
         html5QrcodeScanner.render(
             (decodedText) => { targetSnInput.value = decodedText; closeScanner(); },
-            (error) => { /* กำลังสแกน */ }
+            (error) => {}
         );
     }
     
@@ -217,11 +267,12 @@
     function addRow() {
         const tbody = document.getElementById('items-body');
         const tr = document.createElement('tr');
+        // เปลี่ยนช่องพิมพ์ ให้กลายเป็นช่องที่มีระบบค้นหาค้นหา (list="productList")
         tr.innerHTML = `
             <td class="no-print text-center"><button class="btn btn-del" onclick="this.closest('tr').remove(); calculateTotal();">ลบ</button></td>
             <td class="text-center row-number"></td>
             <td>
-                <div contenteditable="true" class="editable-desc" data-placeholder="ระบุรายละเอียดสินค้า..."></div>
+                <input type="text" class="item-desc" list="productList" placeholder="พิมพ์เพื่อค้นหาสินค้าจากสต็อก หรือพิมพ์เอง..." onchange="handleProductSelect(this)" style="font-weight: 600; color: var(--primary-color);">
                 <div class="sn-container no-print">
                     <span class="sn-label">S/N:</span>
                     <input type="text" class="sn-input" placeholder="สแกน S/N หรือพิมพ์...">
@@ -229,7 +280,7 @@
                 </div>
             </td>
             <td><input type="number" class="qty text-center" value="1" min="1" oninput="calculateTotal()"></td>
-            <td><select class="unit-select text-center"><option>ตัว</option><option>งาน</option><option>ชุด</option></select></td>
+            <td><select class="unit-select text-center"><option>ตัว</option><option>งาน</option><option>ชุด</option><option>ม้วน</option><option>เมตร</option></select></td>
             <td><input type="number" class="price text-right" value="0" min="0" oninput="calculateTotal()"></td>
             <td class="text-right row-total" style="padding-top: 14px;">0.00</td>
         `;
@@ -237,114 +288,102 @@
         document.querySelectorAll('.row-number').forEach((el, i) => el.innerText = i + 1);
     }
 
-    // 🔐 ฟังก์ชันตรวจสอบรหัสผ่านของจริง
     async function submitSupabaseLogin() {
         const email = document.getElementById('email-input').value;
         const pass = document.getElementById('pass-input').value;
         const btn = document.querySelector('.btn-submit');
 
-        if(!email || !pass) {
-            alert("กรุณากรอกอีเมลและรหัสผ่านครับ!");
-            return;
-        }
-
+        if(!email || !pass) { alert("กรุณากรอกอีเมลและรหัสผ่านครับ!"); return; }
         btn.innerText = "กำลังตรวจสอบ...";
         
-        // ยิงไปถามยามที่ Supabase
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: pass
-        });
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
 
         if (error) {
             btn.innerText = "🔓 เข้าสู่ระบบ";
-            alert("❌ เข้าสู่ระบบไม่สำเร็จ: อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+            alert("❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง");
         } else {
-            // ถ้ารหัสถูก ให้ทะลุเข้าหน้าบิลได้
-            document.getElementById("login-overlay").style.display = "none";
-            document.getElementById("controls-panel").style.display = "flex";
-            document.getElementById("main-app").style.display = "block";
-            document.getElementById('doc-date').value = "24 ส.ค. 2569";
-            if(document.getElementById('items-body').children.length === 0) addRow();
-            
-            alert("✅ ยินดีต้อนรับเข้าสู่ระบบครับคุณบอย!");
+            window.location.reload(); // รีเฟรชเพื่อโหลดฟังก์ชันครบวงจร
         }
     }
 
-    // 🚪 ฟังก์ชันกดออกจากระบบ
     async function logoutSupabase() {
         await supabaseClient.auth.signOut();
-        document.getElementById('email-input').value = "";
-        document.getElementById('pass-input').value = "";
-        
-        document.getElementById("login-overlay").style.display = "flex";
-        document.getElementById("controls-panel").style.display = "none";
-        document.getElementById("main-app").style.display = "none";
-        
-        // รีเฟรชหน้าเพื่อเคลียร์ข้อมูลบนกระดาษออกให้หมด
         window.location.reload();
     }
 
+    // 📦 ฟังก์ชันเซฟและตัดสต็อก
     async function saveToSupabase() {
+        const btnSave = document.getElementById('btnSave');
+        btnSave.innerText = "กำลังบันทึก...";
+        btnSave.disabled = true;
+
         try {
             const docType = document.getElementById('docType').value;
-            const docDate = document.getElementById('doc-date').value || '24 ส.ค. 2569';
+            const docDate = document.getElementById('doc-date').value;
             const customerName = document.getElementById('customer-name').value;
             const customerAddress = document.getElementById('customer-address').value;
             const subtotal = parseFloat(document.getElementById('subtotal').innerText.replace(/,/g, '')) || 0;
 
             const rows = document.querySelectorAll('#items-body tr');
-            if(rows.length === 0) { alert("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการครับ"); return; }
+            if(rows.length === 0) { throw new Error("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ"); }
 
+            // 1. บันทึกข้อมูลลูกค้า
             const { data: customerData, error: customerError } = await supabaseClient
-                .from('customers')
-                .insert([{ customer_name: customerName, address: customerAddress }])
-                .select();
-                
+                .from('customers').insert([{ customer_name: customerName, address: customerAddress }]).select();
             if (customerError) throw customerError;
             const customerId = customerData[0].id; 
 
+            // 2. บันทึกบิลหลัก
             const docNum = 'DOC-' + Date.now().toString().slice(-6); 
             const { data: docData, error: docError } = await supabaseClient
                 .from('documents')
-                .insert([{
-                    doc_num: docNum,
-                    doc_type: docType,
-                    doc_date: docDate,
-                    customer_id: customerId,
-                    subtotal: subtotal,
-                    grand_total: subtotal
-                }])
+                .insert([{ doc_num: docNum, doc_type: docType, doc_date: docDate, customer_id: customerId, subtotal: subtotal, grand_total: subtotal }])
                 .select();
-                
             if (docError) throw docError;
             const documentId = docData[0].id; 
 
+            // 3. บันทึกรายการย่อย และ ตัดสต็อก!
             const itemsToInsert = [];
-            rows.forEach(row => {
-                const desc = row.querySelector('.editable-desc').innerText;
+            for(let row of rows) {
+                const desc = row.querySelector('.item-desc').value;
                 const sn = row.querySelector('.sn-input').value;
                 const qty = parseFloat(row.querySelector('.qty').value) || 0;
                 const unit = row.querySelector('.unit-select').value;
                 const price = parseFloat(row.querySelector('.price').value) || 0;
+                const productId = row.getAttribute('data-product-id'); // ดึงรหัสสินค้าที่ซ่อนไว้
                 
                 if(desc.trim() !== "") {
-                    itemsToInsert.push({ document_id: documentId, description: desc, sn: sn, qty: qty, unit: unit, price: price });
+                    // เตรียมข้อมูลบันทึกลงบิล
+                    itemsToInsert.push({ document_id: documentId, product_id: productId || null, description: desc, sn: sn, qty: qty, unit: unit, price: price });
+                    
+                    // ⚡ ถ้ามีรหัสสินค้า (แปลว่าดึงมาจากสต็อก) ให้วิ่งไปตัดยอด
+                    if(productId && qty > 0) {
+                        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
+                        if(currentStock) {
+                            const newQty = currentStock.qty_in_stock - qty;
+                            await supabaseClient.from('products').update({qty_in_stock: newQty}).eq('id', productId);
+                        }
+                    }
                 }
-            });
+            }
 
             if(itemsToInsert.length > 0) {
-                const { error: itemsError } = await supabaseClient
-                    .from('document_items').insert(itemsToInsert);
+                const { error: itemsError } = await supabaseClient.from('document_items').insert(itemsToInsert);
                 if (itemsError) throw itemsError;
             }
 
             document.getElementById('doc-num').value = docNum;
-            alert("✅ บันทึกข้อมูลลง Supabase สำเร็จ!\nเลขที่เอกสาร: " + docNum);
+            alert(`✅ บันทึกบิลสำเร็จ และตัดสต็อกเรียบร้อยแล้ว!\nเลขที่เอกสาร: ${docNum}`);
+            
+            // อัปเดตข้อมูลสต็อกใหม่หลังตัดของ
+            await fetchProducts();
 
         } catch (error) {
             console.error(error);
-            alert("❌ เกิดข้อผิดพลาด: " + error.message);
+            alert("❌ ข้อผิดพลาด: " + error.message);
+        } finally {
+            btnSave.innerText = "☁️ บันทึกลง Supabase";
+            btnSave.disabled = false;
         }
     }
 </script>
