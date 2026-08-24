@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบคลังสินค้า - JN Electric</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root { --primary-color: #1e3a8a; --accent-color: #3b82f6; --text-main: #0f172a; --bg-color: #f8fafc; --border-color: #cbd5e1; }
+        body { font-family: 'Sarabun', sans-serif; color: var(--text-main); background-color: var(--bg-color); margin: 0; padding: 20px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .header h1 { margin: 0; color: var(--primary-color); font-size: 24px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; font-family: 'Sarabun'; font-weight: 600; cursor: pointer; color: white; transition: 0.2s; text-decoration: none;}
+        .btn-back { background-color: #64748b; }
+        .btn-add { background-color: #10b981; }
+
+        .container { display: flex; gap: 20px; flex-wrap: wrap; }
+        
+        /* กล่องเพิ่มสินค้า */
+        .form-box { flex: 1; min-width: 300px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: fit-content;}
+        .form-box h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #475569; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-family: 'Sarabun'; font-size: 15px; box-sizing: border-box;}
+        
+        /* ตารางสต็อก */
+        .table-box { flex: 2; min-width: 500px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f1f5f9; color: var(--primary-color); font-weight: 600; white-space: nowrap;}
+        tr:hover { background-color: #f8fafc; }
+        .qty-badge { background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; font-size: 14px; }
+        .qty-low { background: #ef4444; } /* สีแดงเตือนของใกล้หมด */
+
+        /* หน้าจอบังตอนยังไม่ล็อกอิน */
+        #auth-guard { position: fixed; top:0; left:0; width:100%; height:100%; background: #fff; z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+<!-- ยามเฝ้าหน้าเว็บ -->
+<div id="auth-guard">
+    <h2 style="color: var(--primary-color);">กำลังตรวจสอบสิทธิ์การเข้าถึง...</h2>
+    <p>กรุณาล็อกอินที่หน้าออกบิลก่อนเข้าใช้งานคลังสินค้าครับ</p>
+    <a href="index.html" class="btn btn-add">กลับไปหน้าออกบิล (ล็อกอิน)</a>
+</div>
+
+<div class="header">
+    <h1>📦 คลังสินค้า (JN Electric Stock)</h1>
+    <a href="index.html" class="btn btn-back">⬅️ กลับหน้าออกบิล</a>
+</div>
+
+<div class="container">
+    <!-- ฟอร์มรับของเข้า -->
+    <div class="form-box">
+        <h3>➕ เพิ่ม/รับเข้า สินค้า</h3>
+        <div class="form-group">
+            <label>รหัสสินค้า (ห้ามซ้ำ)</label>
+            <input type="text" id="p-code" placeholder="เช่น AIR-12000, INV-5KW">
+        </div>
+        <div class="form-group">
+            <label>ชื่อสินค้า</label>
+            <input type="text" id="p-name" placeholder="แอร์ 12000 BTU, สายไฟ THW">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+                <label>จำนวนที่รับเข้า</label>
+                <input type="number" id="p-qty" value="1" min="0">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>หน่วย</label>
+                <select id="p-unit">
+                    <option>ตัว</option><option>ชุด</option><option>ม้วน</option><option>เมตร</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>ราคาขาย (ตั้งต้น)</label>
+            <input type="number" id="p-price" value="0" min="0">
+        </div>
+        <button class="btn btn-add" style="width: 100%; padding: 12px; font-size: 16px;" onclick="saveProduct()">💾 บันทึกเข้าคลัง</button>
+    </div>
+
+    <!-- ตารางแสดงของในโกดัง -->
+    <div class="table-box">
+        <h3 style="margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">📋 รายการสินค้าทั้งหมด</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>รหัส</th>
+                    <th>ชื่อสินค้า</th>
+                    <th>ราคาขาย</th>
+                    <th>จำนวนคงเหลือ</th>
+                </tr>
+            </thead>
+            <tbody id="stock-tbody">
+                <tr><td colspan="4" style="text-align: center; color: #94a3b8;">กำลังโหลดข้อมูล...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ⚡ ตรวจสอบว่าล็อกอินหรือยัง
+    window.onload = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            document.getElementById("auth-guard").style.display = "none";
+            loadStock(); // โหลดข้อมูลสต็อกมาโชว์
+        }
+    };
+
+    // ⚡ ฟังก์ชันดึงข้อมูลมาแสดงในตาราง
+    async function loadStock() {
+        const tbody = document.getElementById('stock-tbody');
+        try {
+            const { data, error } = await supabaseClient
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            tbody.innerHTML = '';
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8;">ยังไม่มีสินค้าในคลัง</td></tr>';
+                return;
+            }
+
+            data.forEach(item => {
+                const isLow = item.qty_in_stock <= 2; // ถ้าเหลือน้อยกว่า 2 ชิ้นให้ขึ้นสีแดงเตือน
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600; color:#475569;">${item.product_code || '-'}</td>
+                        <td>${item.product_name}</td>
+                        <td>${parseFloat(item.price).toLocaleString()}.-</td>
+                        <td><span class="qty-badge ${isLow ? 'qty-low' : ''}">${item.qty_in_stock} ${item.unit}</span></td>
+                    </tr>
+                `;
+            });
+        } catch (error) {
+            console.error("Error loading stock:", error);
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">โหลดข้อมูลล้มเหลว</td></tr>';
+        }
+    }
+
+    // ⚡ ฟังก์ชันเพิ่มสินค้าใหม่ หรืออัปเดตของเดิม
+    async function saveProduct() {
+        const code = document.getElementById('p-code').value.trim();
+        const name = document.getElementById('p-name').value.trim();
+        const qty = parseFloat(document.getElementById('p-qty').value) || 0;
+        const unit = document.getElementById('p-unit').value;
+        const price = parseFloat(document.getElementById('p-price').value) || 0;
+
+        if (!name) { alert("กรุณาใส่ชื่อสินค้าครับ!"); return; }
+
+        try {
+            // เช็กว่ามีรหัสสินค้านี้อยู่แล้วไหม (ถ้ามีให้บวกจำนวนเพิ่ม, ถ้าไม่มีให้สร้างใหม่)
+            let existingProduct = null;
+            if (code) {
+                const { data } = await supabaseClient.from('products').select('*').eq('product_code', code);
+                if (data && data.length > 0) existingProduct = data[0];
+            }
+
+            if (existingProduct) {
+                // อัปเดตบวกยอดสต็อกเพิ่มเข้าไป
+                const newQty = parseFloat(existingProduct.qty_in_stock) + qty;
+                const { error } = await supabaseClient
+                    .from('products')
+                    .update({ qty_in_stock: newQty, price: price })
+                    .eq('id', existingProduct.id);
+                if (error) throw error;
+                alert(`✅ อัปเดตสต็อกเรียบร้อย!\nเพิ่ม ${name} อีก ${qty} ${unit}\n(รวมมีของในคลัง ${newQty} ${unit})`);
+            } else {
+                // สร้างสินค้าใหม่
+                const { error } = await supabaseClient
+                    .from('products')
+                    .insert([{ product_code: code, product_name: name, qty_in_stock: qty, unit: unit, price: price }]);
+                if (error) throw error;
+                alert("✅ เพิ่มสินค้าใหม่เข้าคลังสำเร็จ!");
+            }
+
+            // ล้างฟอร์มและโหลดตารางใหม่
+            document.getElementById('p-code').value = '';
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-qty').value = '1';
+            loadStock();
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ บันทึกไม่สำเร็จ: " + error.message);
+        }
+    }
+</script>
+</body>
+</html>
