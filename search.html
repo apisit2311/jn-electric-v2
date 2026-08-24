@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ค้นหาและประวัติเอกสาร - JN Electric</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root { --primary-color: #1e3a8a; --accent-color: #3b82f6; --text-main: #0f172a; --bg-color: #f8fafc; --border-color: #cbd5e1; }
+        body { font-family: 'Sarabun', sans-serif; color: var(--text-main); background-color: var(--bg-color); margin: 0; padding: 20px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .header h1 { margin: 0; color: var(--primary-color); font-size: 24px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; font-family: 'Sarabun'; font-weight: 600; cursor: pointer; color: white; transition: 0.2s; text-decoration: none;}
+        .btn-back { background-color: #64748b; }
+        .btn-open { background-color: #10b981; padding: 4px 10px; font-size: 13px; }
+        .btn-del { background-color: #ef4444; padding: 4px 10px; font-size: 13px; }
+
+        .search-box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; gap: 10px; align-items: center;}
+        .search-box input, .search-box select { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-family: 'Sarabun'; font-size: 15px; width: 300px;}
+        .search-box select { width: 200px; }
+
+        .table-box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f1f5f9; color: var(--primary-color); font-weight: 600; white-space: nowrap;}
+        tr:hover { background-color: #f8fafc; }
+        
+        .type-badge { background: #e0e7ff; color: var(--primary-color); padding: 2px 8px; border-radius: 12px; font-size: 13px; font-weight: 600; }
+        
+        #auth-guard { position: fixed; top:0; left:0; width:100%; height:100%; background: #fff; z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+
+<div id="auth-guard">
+    <h2 style="color: var(--primary-color);">กำลังตรวจสอบสิทธิ์การเข้าถึง...</h2>
+    <p>กรุณาล็อกอินที่หน้าออกบิลก่อนเข้าใช้งานครับ</p>
+    <a href="index.html" class="btn btn-back">กลับไปหน้าออกบิล (ล็อกอิน)</a>
+</div>
+
+<div class="header">
+    <h1>📁 ค้นหาและประวัติเอกสาร (History)</h1>
+    <a href="index.html" class="btn btn-back">⬅️ กลับหน้าออกบิล</a>
+</div>
+
+<div class="search-box">
+    <input type="text" id="searchInput" placeholder="พิมพ์เลขที่เอกสาร, ชื่อลูกค้า หรือวันที่..." onkeyup="filterTable()">
+    <select id="typeFilter" onchange="filterTable()">
+        <option value="">-- ทุกประเภทเอกสาร --</option>
+        <option value="ใบเสนอราคา">ใบเสนอราคา</option>
+        <option value="ใบส่งงาน">ใบส่งงาน</option>
+        <option value="ใบแจ้งหนี้">ใบแจ้งหนี้</option>
+        <option value="ใบส่งสินค้า">ใบส่งสินค้า</option>
+        <option value="ใบเสร็จรับเงิน">ใบเสร็จรับเงิน</option>
+    </select>
+    <div style="color: var(--text-muted); font-size: 14px; margin-left: auto;" id="doc-count">พบเอกสาร 0 รายการ</div>
+</div>
+
+<div class="table-box">
+    <table>
+        <thead>
+            <tr>
+                <th>วันที่</th>
+                <th>เลขที่เอกสาร</th>
+                <th>ประเภท</th>
+                <th>ชื่อลูกค้า</th>
+                <th style="text-align: right;">ยอดสุทธิ</th>
+                <th style="text-align: center;">จัดการ</th>
+            </tr>
+        </thead>
+        <tbody id="history-tbody">
+            <tr><td colspan="6" style="text-align: center; color: #94a3b8;">กำลังโหลดข้อมูล...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // ==========================================
+    // กุญแจ Supabase
+    // ==========================================
+    const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let allDocs = []; // เก็บเอกสารทั้งหมดไว้ในตัวแปรเพื่อค้นหา
+
+    window.onload = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            document.getElementById("auth-guard").style.display = "none";
+            loadHistory();
+        }
+    };
+
+    // ⚡ ฟังก์ชันดึงประวัติเอกสารทั้งหมด
+    async function loadHistory() {
+        const tbody = document.getElementById('history-tbody');
+        try {
+            // ดึงข้อมูลเอกสาร พร้อมกับ join ข้อมูลชื่อลูกค้าจากตาราง customers
+            const { data, error } = await supabaseClient
+                .from('documents')
+                .select('*, customers(customer_name)')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            allDocs = data;
+            renderTable(allDocs);
+
+        } catch (error) {
+            console.error("Error loading history:", error);
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">โหลดข้อมูลล้มเหลว</td></tr>';
+        }
+    }
+
+    // ⚡ ฟังก์ชันสร้างตาราง
+    function renderTable(docs) {
+        const tbody = document.getElementById('history-tbody');
+        document.getElementById('doc-count').innerText = `พบเอกสาร ${docs.length} รายการ`;
+        tbody.innerHTML = '';
+
+        if (docs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #94a3b8;">ไม่พบประวัติเอกสาร</td></tr>';
+            return;
+        }
+
+        docs.forEach(doc => {
+            const customerName = doc.customers ? doc.customers.customer_name : 'ไม่ระบุลูกค้า';
+            const grandTotal = parseFloat(doc.grand_total).toLocaleString('th-TH', {minimumFractionDigits: 2});
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td>${doc.doc_date}</td>
+                    <td style="font-weight:700; color:var(--primary-color);">${doc.doc_num}</td>
+                    <td><span class="type-badge">${doc.doc_type}</span></td>
+                    <td>${customerName}</td>
+                    <td style="text-align: right; font-weight:600;">${grandTotal}.-</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-open" onclick="openDocument('${doc.id}')">📝 เปิดแก้ไข</button>
+                        <button class="btn btn-del" onclick="deleteDocument('${doc.id}', '${doc.doc_num}')">🗑️ ลบ</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // 🔍 ฟังก์ชันค้นหาและกรอง
+    function filterTable() {
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        const filterType = document.getElementById('typeFilter').value;
+
+        const filtered = allDocs.filter(doc => {
+            const customerName = (doc.customers ? doc.customers.customer_name : '').toLowerCase();
+            const docNum = (doc.doc_num || '').toLowerCase();
+            const docDate = (doc.doc_date || '').toLowerCase();
+            const typeMatch = filterType === "" || doc.doc_type === filterType;
+            const searchMatch = docNum.includes(searchText) || customerName.includes(searchText) || docDate.includes(searchText);
+            
+            return typeMatch && searchMatch;
+        });
+
+        renderTable(filtered);
+    }
+
+    // 🚀 ฟังก์ชันเด็ด: ดึงข้อมูลเพื่อส่งกลับไปหน้า index.html
+    async function openDocument(docId) {
+        try {
+            // 1. ดึงข้อมูลบิลหลัก และ ลูกค้า
+            const { data: docData, error: docError } = await supabaseClient
+                .from('documents')
+                .select('*, customers(customer_name, address)')
+                .eq('id', docId)
+                .single();
+            if (docError) throw docError;
+
+            // 2. ดึงรายการสินค้าทั้งหมดในบิลนี้
+            const { data: itemsData, error: itemsError } = await supabaseClient
+                .from('document_items')
+                .select('*')
+                .eq('document_id', docId)
+                .order('created_at', { ascending: true });
+            if (itemsError) throw itemsError;
+
+            // 3. จัดรูปแบบให้เหมือนไฟล์ JSON แบบที่ V1 ต้องการ
+            const cloudData = {
+                docType: docData.doc_type,
+                docNum: docData.doc_num,
+                docDate: docData.doc_date,
+                dueDate: docData.due_date || "",
+                customerName: docData.customers.customer_name,
+                customerAddress: docData.customers.address,
+                discountLabel: "ส่วนลด (DISCOUNT)",
+                discount: docData.discount || 0,
+                hasDiscount: docData.discount > 0,
+                items: itemsData.map(item => ({
+                    desc: item.description,
+                    sn: item.sn || "",
+                    qty: item.qty,
+                    unit: item.unit,
+                    price: item.price
+                }))
+            };
+
+            // 4. แอบบันทึกใส่ความจำเครื่อง แล้วเด้งกลับไปหน้าหลัก
+            localStorage.setItem("jn_selected_cloud_doc", JSON.stringify(cloudData));
+            window.location.href = "index.html";
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ เปิดเอกสารไม่สำเร็จ: " + error.message);
+        }
+    }
+
+    // 🗑️ ฟังก์ชันลบเอกสาร
+    async function deleteDocument(docId, docNum) {
+        if(!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบเอกสารเลขที่ ${docNum} ?\n(การลบนี้จะลบรายการสินค้าในบิลนี้ด้วย แต่ไม่คืนสต็อกอัตโนมัติครับ)`)) return;
+
+        try {
+            const { error } = await supabaseClient
+                .from('documents')
+                .delete()
+                .eq('id', docId);
+            
+            if (error) throw error;
+            
+            alert(`✅ ลบเอกสาร ${docNum} เรียบร้อยแล้ว`);
+            loadHistory(); // รีเฟรชตาราง
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ ไม่สามารถลบเอกสารได้: " + error.message);
+        }
+    }
+</script>
+</body>
+</html>
