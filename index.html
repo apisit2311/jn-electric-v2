@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JN electric&Technology (V2 สมบูรณ์แบบ)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- ⚡ เครื่องมือที่ต้องใช้ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -69,7 +67,7 @@
         .top-controls .btn { padding: 6px 12px; font-size: 13px; border-radius: 4px; }
         .btn-search-page { background-color: #3b82f6; color: white; border: 1px solid #93c5fd; }
         .btn-new-doc { background-color: #ec4899; color: white; }
-        .btn-cloud-save { background-color: #10b981; color: white; } /* เปลี่ยนสีให้เด่นขึ้น */
+        .btn-cloud-save { background-color: #10b981; color: white; }
         .btn-stock { background-color: #f59e0b; color: white; }
         .btn-save { background-color: #64748b; color: white; }
         .btn-load { background-color: #8b5cf6; color: white; }
@@ -96,7 +94,6 @@
         .discount-toggle-btn { background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 4px; padding: 2px 8px; font-size: 12px; cursor: pointer; font-family: 'Sarabun'; font-weight: 600; margin-bottom: 5px; float: right; }
         .discount-toggle-btn:hover { background: #eff6ff; }
 
-        /* V2 - Styles สำหรับกล้องและส่วน Login */
         .sn-container { display: flex; align-items: center; gap: 5px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e2e8f0; }
         .sn-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         .sn-input { border: 1px solid transparent; border-bottom: 1px solid var(--border-color) !important; padding: 2px 5px !important; font-size: 12px !important; color: var(--accent-color) !important; font-weight: 600; }
@@ -131,10 +128,8 @@
 </head>
 <body>
 
-<!-- 🗂️ รายการสินค้าที่ซ่อนไว้สำหรับระบบค้นหาอัตโนมัติ (V2) -->
 <datalist id="productList"></datalist>
 
-<!-- 📷 Modal สแกนกล้อง (V2) -->
 <div id="scanner-modal" class="no-print">
     <div class="scanner-box">
         <h3 style="margin-top:0; color:var(--primary-color);">📷 สแกน S/N</h3>
@@ -143,7 +138,6 @@
     </div>
 </div>
 
-<!-- 🔐 หน้าล็อกอิน Supabase (V2) -->
 <div id="login-overlay">
     <div class="login-card">
         <h2>JN Electric ERP</h2>
@@ -154,11 +148,11 @@
     </div>
 </div>
 
-<!-- 🎛️ ปุ่มควบคุมด้านบนรวมร่าง V1 + V2 -->
 <div class="top-controls no-print" id="controls-panel" style="display: none;">
     <button class="btn btn-search-page" onclick="goToSearchPage()">📁 ค้นหา/ประวัติ</button>
     <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
-    <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึกลง Supabase</button>
+    <!-- 🔥 เปลี่ยนชื่อปุ่มให้ชัดเจนว่ามันอัปเดตได้ด้วย -->
+    <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึก / อัปเดตข้อมูล</button>
     <a href="stock.html" class="btn btn-stock">📦 คลังสินค้า</a>
     
     <button class="btn btn-save" onclick="saveData()">💾 เซฟไฟล์ (JSON)</button>
@@ -274,15 +268,13 @@
 </div>
 
 <script>
-    // ==========================================
-    // 🔴 1. ตั้งค่า SUPABASE
-    // ==========================================
     const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let isDirty = false;
     let globalProducts = [];
+    let currentDocId = null; // 🔥 ตัวแปรเก็บรหัสบิล (ถ้ามีรหัสแปลว่าอัปเดต ถ้าไม่มีแปลว่าสร้างใหม่)
 
     const unitDropdownHTML = `
         <select class="unit-select text-center" onchange="markDirty(); checkCustomUnit(this)">
@@ -300,11 +292,10 @@
             document.getElementById("controls-panel").style.display = "flex";
             document.getElementById("main-app").style.display = "block";
             
-            await fetchProducts(); // โหลดสต็อกสำหรับระบบค้นหา
+            await fetchProducts(); 
             initializeDoc();
         }
 
-        // Event listener กด Enter ตอนล็อกอิน
         document.getElementById("pass-input").addEventListener("keypress", function(e){
             if(e.key === "Enter") submitSupabaseLogin();
         });
@@ -313,9 +304,8 @@
     function initializeDoc() {
         document.getElementById('doc-date').value = getTodayThai();
         document.getElementById('docType').value = "ใบเสนอราคา";
-        updateDocTypeSync(true); // รันเลขบิลอัตโนมัติ
+        updateDocTypeSync(true); 
         
-        // เช็กว่าโหลดบิลมาจากไฟล์ JSON หรือหน้า Search หรือไม่
         const pendingDoc = localStorage.getItem("jn_selected_cloud_doc");
         if (pendingDoc) {
             try {
@@ -329,12 +319,10 @@
         if(document.getElementById('items-body').children.length === 0) addRow();
         calculateTotal();
         isDirty = false;
-
         document.getElementById('customer-name').addEventListener('input', markDirty);
         document.getElementById('customer-address').addEventListener('input', markDirty);
     }
 
-    // ⚡ ฟังก์ชันโหลดข้อมูลสต็อกสำหรับ Datalist
     async function fetchProducts() {
         const { data } = await supabaseClient.from('products').select('*');
         if (data) {
@@ -349,7 +337,6 @@
         }
     }
 
-    // ⚡ ฟังก์ชันดึงราคา/หน่วยอัตโนมัติเมื่อเลือกของจากสต็อก
     function handleProductSelect(inputEl) {
         markDirty();
         const row = inputEl.closest('tr');
@@ -364,14 +351,13 @@
                 unitSelect.insertBefore(newOpt, unitSelect.options[unitSelect.options.length - 1]);
             }
             unitSelect.value = product.unit;
-            row.setAttribute('data-product-id', product.id); // แอบซ่อนรหัสไว้ตัดสต็อก
+            row.setAttribute('data-product-id', product.id); 
             calculateTotal();
         } else {
             row.removeAttribute('data-product-id');
         }
     }
 
-    // 🔐 ระบบเข้าสู่ระบบ Supabase
     async function submitSupabaseLogin() {
         const email = document.getElementById('email-input').value;
         const pass = document.getElementById('pass-input').value;
@@ -396,10 +382,9 @@
     function markDirty() { isDirty = true; }
     function goToSearchPage() {
         if (isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการเปลี่ยนหน้าใช่หรือไม่?")) return;
-        window.location.href = "search.html"; // ต้องมีไฟล์นี้แยกต่างหาก (หรือใช้ V1 เดิม)
+        window.location.href = "search.html"; 
     }
 
-    // 🔄 ระบบสร้างเลขเอกสารอัตโนมัติ (แทนที่ Apps Script)
     function fetchNextDocNumber() {
         const docText = document.getElementById('docType').value;
         let prefix = "QUO"; 
@@ -409,13 +394,15 @@
         else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) prefix = "DLV";
         else prefix = "INV";
 
-        const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, ''); // YYMMDD
-        const randomStr = Math.floor(1000 + Math.random() * 9000); // สุ่มเลข 4 หลัก
+        const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+        const randomStr = Math.floor(1000 + Math.random() * 9000); 
         document.getElementById('doc-num').value = `${prefix}-CO-${dateStr}-${randomStr}`;
     }
 
     function createNewDocument() {
         if(isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการล้างหน้าจอหรือไม่?")) return;
+        currentDocId = null; // 🔥 รีเซ็ตรหัสบิลเป็นสร้างใหม่
+        
         document.getElementById('customer-name').value = "";
         document.getElementById('customer-address').value = "";
         document.getElementById('due-date').value = "";
@@ -434,7 +421,7 @@
     }
 
     // ==========================================
-    // ☁️ ฟังก์ชันเซฟลง Supabase (ตัดสต็อกอัตโนมัติ)
+    // ☁️ ฟังก์ชันบันทึก / อัปเดตข้อมูล (ตัวท็อป!)
     // ==========================================
     async function saveToSupabase() {
         const btnSave = document.getElementById('btnSave');
@@ -458,25 +445,57 @@
             const rows = document.querySelectorAll('#items-body tr');
             if(rows.length === 0) throw new Error("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ");
 
-            // 1. บันทึกข้อมูลลูกค้า
+            // 1. บันทึกข้อมูลลูกค้า (สร้างเรคคอร์ดใหม่)
             const { data: customerData, error: custErr } = await supabaseClient
                 .from('customers').insert([{ customer_name: customerName, address: customerAddress }]).select();
             if (custErr) throw custErr;
             const customerId = customerData[0].id; 
 
-            // 2. บันทึกข้อมูลบิลหลัก
-            const { data: docData, error: docErr } = await supabaseClient
-                .from('documents').insert([{ 
+            let documentIdToUse = null;
+
+            // 🔥 เช็กว่าเป็นการ อัปเดตบิลเก่า หรือ สร้างบิลใหม่
+            if (currentDocId) {
+                // ------ โหมดอัปเดต (UPDATE) ------
+                // 1. อัปเดตข้อมูลบิล
+                const { error: updateErr } = await supabaseClient.from('documents').update({
+                    doc_type: docType, doc_date: docDate, due_date: dueDate,
+                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal 
+                }).eq('id', currentDocId);
+                if (updateErr) throw updateErr;
+
+                // 2. ดึงรายการของเก่าทั้งหมดมาคืนสต็อก
+                const { data: oldItems } = await supabaseClient.from('document_items').select('product_id, qty').eq('document_id', currentDocId);
+                if (oldItems && oldItems.length > 0) {
+                    for(let old of oldItems) {
+                        if(old.product_id && old.qty > 0) {
+                            const { data: cStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', old.product_id).single();
+                            if(cStock) {
+                                await supabaseClient.from('products').update({ qty_in_stock: parseFloat(cStock.qty_in_stock) + parseFloat(old.qty) }).eq('id', old.product_id);
+                            }
+                        }
+                    }
+                }
+
+                // 3. ลบรายการของเก่าทิ้งให้หมดเตรียมใส่ของใหม่
+                await supabaseClient.from('document_items').delete().eq('document_id', currentDocId);
+                
+                documentIdToUse = currentDocId; // ใช้รหัสเดิมเพื่อเซฟรายการใหม่
+            } else {
+                // ------ โหมดสร้างใหม่ (INSERT) ------
+                const { data: docData, error: docErr } = await supabaseClient.from('documents').insert([{ 
                     doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal 
                 }]).select();
-            if (docErr) {
-                if(docErr.code === '23505') throw new Error("เลขที่เอกสารซ้ำ! กรุณาเปลี่ยนเลขที่เอกสารครับ");
-                throw docErr;
+                
+                if (docErr) {
+                    if(docErr.code === '23505') throw new Error("เลขที่เอกสารซ้ำ! กรุณาเปลี่ยนเลขที่เอกสารครับ");
+                    throw docErr;
+                }
+                documentIdToUse = docData[0].id; 
+                currentDocId = documentIdToUse; // เซ็ตให้รู้ว่าเพิ่งเซฟไป (เผื่อกดเซฟซ้ำ จะได้กลายเป็นอัปเดตแทน)
             }
-            const documentId = docData[0].id; 
 
-            // 3. บันทึกรายการย่อย และ ตัดสต็อก!
+            // 4. บันทึกรายการใหม่ และ ตัดสต็อก (หักลบ)
             const itemsToInsert = [];
             for(let row of rows) {
                 const desc = row.querySelector('.item-desc').value;
@@ -484,16 +503,21 @@
                 const qty = parseFloat(row.querySelector('.qty').value) || 0;
                 const unit = row.querySelector('.unit-select').value;
                 const price = parseFloat(row.querySelector('.price').value) || 0;
-                const productId = row.getAttribute('data-product-id');
+                
+                // ถ้ารหัสสินค้าไม่มี ให้ลองค้นหาจากชื่อเผื่อกรณีเปิดบิลเก่ามา
+                let productId = row.getAttribute('data-product-id');
+                if (!productId) {
+                    const p = globalProducts.find(x => x.product_name === desc);
+                    if (p) productId = p.id;
+                }
                 
                 if(desc.trim() !== "") {
-                    itemsToInsert.push({ document_id: documentId, product_id: productId || null, description: desc, sn: sn, qty: qty, unit: unit, price: price });
+                    itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: desc, sn: sn, qty: qty, unit: unit, price: price });
                     // ตัดยอดสต็อก
                     if(productId && qty > 0) {
                         const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
                         if(currentStock) {
-                            const newQty = currentStock.qty_in_stock - qty;
-                            await supabaseClient.from('products').update({qty_in_stock: newQty}).eq('id', productId);
+                            await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
                         }
                     }
                 }
@@ -503,13 +527,14 @@
                 if (itemsErr) throw itemsErr;
             }
 
-            alert(`✅ บันทึกลง Supabase สำเร็จ และตัดสต็อกเรียบร้อย!\nเลขที่เอกสาร: ${docNum}`);
+            alert(`✅ บันทึกข้อมูลเรียบร้อยแล้ว!\n(อัปเดตสต็อกล่าสุดแล้ว)`);
             isDirty = false;
             await fetchProducts(); // อัปเดตสต็อกใน Datalist ใหม่
+
         } catch (error) {
             alert("❌ ข้อผิดพลาด: " + error.message);
         } finally {
-            btnSave.innerHTML = "☁️ บันทึกลง Supabase"; btnSave.disabled = false;
+            btnSave.innerHTML = "☁️ บันทึก / อัปเดตข้อมูล"; btnSave.disabled = false;
         }
     }
 
@@ -551,7 +576,7 @@
         else if (docText.includes("รับเงิน") || docText.includes("เสร็จ")) { subTitle.value = "(RECEIPT)"; sigLeft.value = "ผู้ชำระเงิน"; sigRight.value = "ผู้รับเงิน"; }
         else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) { subTitle.value = "(INVOICE / DELIVERY ORDER)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ส่งสินค้า / ผู้ออกเอกสาร"; }
         else { subTitle.value = "(INVOICE)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ออกเอกสาร"; }
-        if(shouldFetchNum) fetchNextDocNumber();
+        if(shouldFetchNum && !currentDocId) fetchNextDocNumber(); // ดึงเลขใหม่เฉพาะตอนสร้างบิลใหม่
     }
 
     function toggleDate() {
@@ -647,7 +672,6 @@
     function deleteRow(btn) { markDirty(); btn.closest('tr').remove(); updateRowNumbers(); calculateTotal(); }
     function updateRowNumbers() { document.querySelectorAll('#items-body tr').forEach((row, idx) => { row.querySelector('.row-number').innerText = idx + 1; }); }
 
-    // ฟังก์ชันลากสลับบรรทัด (Drag & Drop)
     let draggedRow = null;
     function attachDragEvents(tr) {
         const handle = tr.querySelector('.drag-handle');
@@ -677,7 +701,7 @@
     function closeScanner() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
 
     // ==========================================
-    // 💾 บันทึก/โหลดไฟล์ JSON & โหลด Excel (ฟังก์ชันเดิม V1)
+    // 💾 บันทึก/โหลดไฟล์ JSON & โหลด Excel
     // ==========================================
     function saveData() {
         const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
@@ -713,6 +737,8 @@
     }
 
     function loadSelectedDoc(cloudData) {
+        currentDocId = cloudData.docId || null; // 🔥 รับรหัสบิล (ถ้ามี)
+        
         const selectEl = document.getElementById('docType');
         const targetType = cloudData.docType || "ใบเสนอราคา";
         let exists = Array.from(selectEl.options).some(opt => opt.value === targetType);
@@ -737,7 +763,7 @@
         if(cloudData.items && cloudData.items.length > 0) { cloudData.items.forEach(item => addRow(item)); } else { addRow(); }
         
         updateDocTypeSync(false); calculateTotal(); isDirty = false;
-        alert("🔓 โหลดข้อมูลเอกสารเลขที่ " + cloudData.docNum + " เข้าสู่หน้าจอเรียบร้อย!");
+        // alert("🔓 โหลดข้อมูลเอกสารเลขที่ " + cloudData.docNum + " เข้าสู่หน้าจอเรียบร้อย!");
     }
 
     function exportToExcel() {
