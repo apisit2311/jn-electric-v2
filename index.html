@@ -17,14 +17,15 @@
         
         .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 20mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
         
-        input[type="text"], input[type="number"], select {
+        input[type="text"], input[type="number"], textarea, select {
             font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
             border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
         }
-        input:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
-        input:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
-        
-        /* 🔥 ปรับ CSS ช่องรายการให้เป็น Textarea ขยายออโต้ */
+        input:hover, textarea:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
+        input:focus, textarea:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
+        textarea { resize: vertical; overflow: hidden; }
+
+        /* เพิ่มเติมเฉพาะ CSS สำหรับช่องรายการให้ขยายบรรทัดออโต้ */
         textarea.item-desc {
             font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
             border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; 
@@ -32,8 +33,6 @@
         }
         textarea.item-desc:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
         textarea.item-desc:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
-
-        textarea { resize: vertical; overflow: hidden; }
 
         select.unit-select { cursor: pointer; text-align: center; text-align-last: center; }
         select.unit-select optgroup { text-align: left; font-weight: bold; background: #eee; }
@@ -559,7 +558,7 @@
                 if(desc !== "") {
                     itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: desc, sn: sn, qty: qty, unit: unit, price: price });
                     
-                    if (productId && qty > 0 && shouldCutStock) {
+                    if(productId && qty > 0 && shouldCutStock) {
                         const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
                         if(currentStock) {
                             await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
@@ -676,6 +675,7 @@
         document.getElementById('grand-total').innerText = (subtotal - discount).toLocaleString('th-TH', {minimumFractionDigits: 2});
     }
 
+    // 🔥 เปลี่ยนช่องรายการเป็น textarea และเพิ่มฟังก์ชัน autoResizeTextarea เฉพาะจุดนี้
     function addRow(data = null) {
         if(!data) markDirty();
         const tbody = document.getElementById('items-body');
@@ -688,7 +688,7 @@
             <td class="no-print text-center"><button class="btn btn-del" onclick="deleteRow(this)">ลบ</button></td>
             <td class="text-center row-number"></td>
             <td>
-                <textarea class="item-desc" list="productList" placeholder="ค้นหาสต็อก หรือพิมพ์รายการ / ค่าแรง..." rows="1" oninput="markDirty(); autoResizeTextarea(this); handleProductSelect(this)" style="font-weight: 600; color: var(--primary-color);">${desc}</textarea>
+                <textarea class="item-desc" list="productList" placeholder="ค้นหาสต็อก หรือพิมพ์เอง..." rows="1" oninput="markDirty(); autoResizeTextarea(this); handleProductSelect(this)" style="font-weight: 600; color: var(--primary-color);">${desc}</textarea>
                 <div class="sn-container no-print">
                     <span class="sn-label">S/N:</span>
                     <input type="text" class="sn-input" placeholder="สแกน S/N หรือพิมพ์..." value="${sn}" oninput="markDirty()">
@@ -753,7 +753,7 @@
         html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
         html5QrcodeScanner.render((decodedText) => { targetSnInput.value = decodedText; markDirty(); closeScanner(); }, () => {});
     }
-    function closeScanner() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
+    function closeScanner() { if(html5QrcodeScanner) html5Qncoder.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
 
     function saveData() {
         const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
