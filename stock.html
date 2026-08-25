@@ -21,6 +21,8 @@
         .btn-del { background-color: #ef4444; padding: 4px 8px; font-size: 12px; }
         .btn-scan { background: #e2e8f0; color: var(--text-main); border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; }
         .btn-scan:hover { background: var(--accent-color); color: white; }
+        .btn-link { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: var(--accent-color); text-decoration: none; font-weight: 600; padding: 2px 6px; background: #eff6ff; border-radius: 4px; border: 1px solid #bfdbfe; }
+        .btn-link:hover { background: #dbeafe; }
 
         .container { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;}
         
@@ -36,7 +38,6 @@
 
         .table-box { flex: 2; min-width: 600px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
         
-        /* 🔥 สไตล์ช่องค้นหา */
         .search-bar-container { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; }
         .search-bar-container input { flex: 1; padding: 10px 15px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Sarabun'; font-size: 15px; outline: none; transition: 0.2s; }
         .search-bar-container input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
@@ -63,6 +64,7 @@
 </div>
 
 <datalist id="codeList"></datalist>
+<datalist id="supplierList"></datalist>
 
 <div id="scanner-modal">
     <div class="scanner-box">
@@ -116,6 +118,22 @@
             </div>
         </div>
 
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+                <label>🏬 แหล่งที่ซื้อ / ร้านค้า</label>
+                <input type="text" id="p-supplier" list="supplierList" placeholder="เช่น Shopee, Lazada, Global House">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>🧾 เลขออเดอร์ / เลขบิล</label>
+                <input type="text" id="p-order-ref" placeholder="เช่น 240825XXXX, INV-001">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>🔗 ลิงก์สินค้า (URL สั่งซื้อ)</label>
+            <input type="url" id="p-url" placeholder="https://shopee.co.th/product/...">
+        </div>
+
         <div class="form-group" style="border-top: 2px dashed var(--border-color); padding-top: 15px; margin-top: 15px;">
             <label style="color: var(--primary-color);">🏷️ กฎการเก็บ Serial Number (S/N)</label>
             <select id="p-sn-mode" onchange="renderSnInputs()">
@@ -137,9 +155,8 @@
     <div class="table-box">
         <h3 style="margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">📋 รายการสินค้าทั้งหมด</h3>
         
-        <!-- 🔥 ช่องค้นหาสินค้า -->
         <div class="search-bar-container">
-            <input type="text" id="search-input" placeholder="🔍 พิมพ์ค้นหาด้วยรหัสสินค้า หรือ ชื่อสินค้า..." oninput="filterStock()">
+            <input type="text" id="search-input" placeholder="🔍 พิมพ์ค้นหาด้วยรหัส, ชื่อสินค้า หรือ ร้านค้า..." oninput="filterStock()">
         </div>
 
         <table>
@@ -147,12 +164,13 @@
                 <tr>
                     <th>รหัส / ชื่อสินค้า</th>
                     <th>ราคาทุน / ราคาขาย</th>
+                    <th>แหล่งที่ซื้อ / อ้างอิง</th>
                     <th>คงเหลือ</th>
                     <th style="text-align: center;">จัดการ</th>
                 </tr>
             </thead>
             <tbody id="stock-tbody">
-                <tr><td colspan="4" style="text-align: center; color: #94a3b8;">กำลังโหลดข้อมูล...</td></tr>
+                <tr><td colspan="5" style="text-align: center; color: #94a3b8;">กำลังโหลดข้อมูล...</td></tr>
             </tbody>
         </table>
     </div>
@@ -189,38 +207,53 @@
             if (error) throw error;
             
             globalProducts = data;
-            const datalist = document.getElementById('codeList');
-            datalist.innerHTML = '';
+            const codeDatalist = document.getElementById('codeList');
+            const supplierDatalist = document.getElementById('supplierList');
+            codeDatalist.innerHTML = '';
+            supplierDatalist.innerHTML = '';
             
-            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8;">ยังไม่มีสินค้าในคลัง</td></tr>'; return; }
+            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">ยังไม่มีสินค้าในคลัง</td></tr>'; return; }
 
+            const suppliersSet = new Set();
             data.forEach(item => {
                 if(item.product_code) {
                     const opt = document.createElement('option');
                     opt.value = item.product_code;
                     opt.text = item.product_name;
-                    datalist.appendChild(opt);
+                    codeDatalist.appendChild(opt);
                 }
+                if(item.supplier && item.supplier.trim() !== '') {
+                    suppliersSet.add(item.supplier.trim());
+                }
+            });
+
+            suppliersSet.forEach(sup => {
+                const opt = document.createElement('option');
+                opt.value = sup;
+                supplierDatalist.appendChild(opt);
             });
 
             renderTable(data);
         } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">โหลดข้อมูลล้มเหลว</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">โหลดข้อมูลล้มเหลว</td></tr>';
         }
     }
 
-    // 🔥 ฟังก์ชันเรนเดอร์ข้อมูลลงตาราง
     function renderTable(products) {
         const tbody = document.getElementById('stock-tbody');
         tbody.innerHTML = '';
         
         if (products.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8;">ไม่พบสินค้าที่ค้นหา</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">ไม่พบสินค้าที่ค้นหา</td></tr>';
             return;
         }
 
         products.forEach(item => {
-            const isLow = item.qty_in_stock <= 2; 
+            const isLow = item.qty_in_stock <= 2;
+            const supplierText = item.supplier ? `<span style="font-weight:600; color:var(--text-main);">${item.supplier}</span>` : '<span style="color:#94a3b8;">-</span>';
+            const orderRefText = item.order_ref ? `<div style="font-size:12px; color:#64748b;">บิล: ${item.order_ref}</div>` : '';
+            const linkBtn = item.product_url ? `<div style="margin-top:3px;"><a href="${item.product_url}" target="_blank" class="btn-link">🔗 เปิดลิงก์</a></div>` : '';
+
             tbody.innerHTML += `
                 <tr>
                     <td>
@@ -230,6 +263,11 @@
                     <td>
                         <div style="font-size:13px; color:#64748b;">ทุน: ${parseFloat(item.cost_price || 0).toLocaleString()}.-</div>
                         <div style="font-size:15px; font-weight:bold; color:#10b981;">ขาย: ${parseFloat(item.price || 0).toLocaleString()}.-</div>
+                    </td>
+                    <td>
+                        ${supplierText}
+                        ${orderRefText}
+                        ${linkBtn}
                     </td>
                     <td><span class="qty-badge ${isLow ? 'qty-low' : ''}">${item.qty_in_stock} ${item.unit}</span></td>
                     <td style="text-align: center; white-space: nowrap;">
@@ -241,7 +279,6 @@
         });
     }
 
-    // 🔥 ฟังก์ชันกรองข้อมูลแบบ Real-time ตามคำค้นหา
     function filterStock() {
         const keyword = document.getElementById('search-input').value.toLowerCase().trim();
         if (!keyword) {
@@ -252,7 +289,8 @@
         const filtered = globalProducts.filter(item => {
             const code = (item.product_code || '').toLowerCase();
             const name = (item.product_name || '').toLowerCase();
-            return code.includes(keyword) || name.includes(keyword);
+            const sup = (item.supplier || '').toLowerCase();
+            return code.includes(keyword) || name.includes(keyword) || sup.includes(keyword);
         });
 
         renderTable(filtered);
@@ -271,6 +309,9 @@
             document.getElementById('p-name').value = p.product_name;
             document.getElementById('p-cost').value = p.cost_price || 0;
             document.getElementById('p-price').value = p.price || 0;
+            document.getElementById('p-supplier').value = p.supplier || '';
+            document.getElementById('p-order-ref').value = p.order_ref || '';
+            document.getElementById('p-url').value = p.product_url || '';
             
             let unitSelect = document.getElementById('p-unit');
             if(p.unit) unitSelect.value = p.unit;
@@ -302,6 +343,9 @@
         document.getElementById('p-unit').value = p.unit || 'ตัว';
         document.getElementById('p-cost').value = p.cost_price || 0;
         document.getElementById('p-price').value = p.price || 0;
+        document.getElementById('p-supplier').value = p.supplier || '';
+        document.getElementById('p-order-ref').value = p.order_ref || '';
+        document.getElementById('p-url').value = p.product_url || '';
         document.getElementById('p-sn-mode').value = p.sn_mode || 'none';
         document.getElementById('p-sn-mode').disabled = true;
 
@@ -319,6 +363,9 @@
         document.getElementById('p-qty').value = 1;
         document.getElementById('p-cost').value = 0;
         document.getElementById('p-price').value = 0;
+        document.getElementById('p-supplier').value = '';
+        document.getElementById('p-order-ref').value = '';
+        document.getElementById('p-url').value = '';
         document.getElementById('p-sn-mode').disabled = false;
         document.getElementById('p-sn-mode').style.backgroundColor = "#fff";
         document.getElementById('form-title').innerText = "➕ เพิ่ม/รับเข้า สินค้า";
@@ -384,6 +431,9 @@
         const unit = document.getElementById('p-unit').value;
         const costPrice = parseFloat(document.getElementById('p-cost').value) || 0;
         const price = parseFloat(document.getElementById('p-price').value) || 0;
+        const supplier = document.getElementById('p-supplier').value.trim();
+        const orderRef = document.getElementById('p-order-ref').value.trim();
+        const productUrl = document.getElementById('p-url').value.trim();
         const snMode = document.getElementById('p-sn-mode').value;
 
         if (!name || !code) { alert("กรุณาใส่รหัสและชื่อสินค้าให้ครบถ้วนครับ!"); return; }
@@ -392,8 +442,7 @@
 
         try {
             if (editId) {
-                const targetProd = globalProducts.find(x => x.id === editId);
-                const updatedQty = qty; // ใช้ค่าที่พิมพ์ในช่องจำนวนตอนกดแก้ได้เลย
+                const updatedQty = qty;
 
                 const { error } = await supabaseClient.from('products').update({ 
                     product_code: code,
@@ -401,6 +450,9 @@
                     unit: unit,
                     cost_price: costPrice,
                     price: price,
+                    supplier: supplier,
+                    order_ref: orderRef,
+                    product_url: productUrl,
                     qty_in_stock: updatedQty
                 }).eq('id', editId);
                 
@@ -433,7 +485,10 @@
                     const { error } = await supabaseClient.from('products').update({ 
                         qty_in_stock: newQty, 
                         cost_price: costPrice,
-                        price: price 
+                        price: price,
+                        supplier: supplier,
+                        order_ref: orderRef,
+                        product_url: productUrl
                     }).eq('id', existingProduct.id);
                     if (error) throw error;
                     productId = existingProduct.id;
@@ -442,7 +497,9 @@
                     const { data: newProd, error } = await supabaseClient.from('products')
                         .insert([{ 
                             product_code: code, product_name: name, qty_in_stock: qty, 
-                            unit: unit, cost_price: costPrice, price: price, sn_mode: snMode 
+                            unit: unit, cost_price: costPrice, price: price,
+                            supplier: supplier, order_ref: orderRef, product_url: productUrl,
+                            sn_mode: snMode 
                         }]).select();
                     if (error) throw error;
                     productId = newProd[0].id;
