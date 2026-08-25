@@ -17,22 +17,13 @@
         
         .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 20mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
         
-        input[type="text"], input[type="number"], textarea, select {
+        input[type="text"], input[type="number"], textarea, select, .item-desc {
             font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
             border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
         }
-        input:hover, textarea:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
-        input:focus, textarea:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
+        input:hover, textarea:hover, select:hover, .item-desc:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
+        input:focus, textarea:focus, select:focus, .item-desc:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
         textarea { resize: vertical; overflow: hidden; }
-
-        /* เพิ่มเติมเฉพาะ CSS สำหรับช่องรายการให้ขยายบรรทัดออโต้ */
-        textarea.item-desc {
-            font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
-            border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; 
-            resize: none; overflow: hidden; min-height: 32px; line-height: 1.4; transition: all 0.2s ease;
-        }
-        textarea.item-desc:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
-        textarea.item-desc:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
 
         select.unit-select { cursor: pointer; text-align: center; text-align-last: center; }
         select.unit-select optgroup { text-align: left; font-weight: bold; background: #eee; }
@@ -332,23 +323,24 @@
         document.getElementById('customer-address').addEventListener('input', markDirty);
     }
 
-  async function fetchProducts() {
+    // 🔥 แสดงรหัสและชื่อเพื่อให้ค้นหาง่ายขึ้น
+    async function fetchProducts() {
         const { data } = await supabaseClient.from('products').select('*');
         if (data) {
             globalProducts = data;
             const datalist = document.getElementById('productList');
             datalist.innerHTML = '';
             data.forEach(p => {
-                // 🔥 ให้โชว์ทั้งรหัสและชื่อในตัวเลือก เพื่อให้ค้นหาง่ายขึ้น เช่น [AIR-120] แอร์ 12000 BTU
                 const opt = document.createElement('option');
-                opt.value = p.product_name;
-                opt.innerText = `[${p.product_code || 'NO-CODE'}] ${p.unit || 'ตัว'} | ${p.price || 0}.-`;
+                opt.value = p.product_name; 
+                opt.innerText = `[${p.product_code || '-'}] ${p.unit || 'ตัว'} | ${p.price || 0}.-`;
                 datalist.appendChild(opt);
             });
         }
     }
 
-function handleProductSelect(inputEl) {
+    // 🔥 ระบบค้นหาแบบยืดหยุ่นที่อัปเกรดแล้ว
+    function handleProductSelect(inputEl) {
         markDirty();
         const row = inputEl.closest('tr');
         const keyword = inputEl.value.trim().toLowerCase();
@@ -358,15 +350,13 @@ function handleProductSelect(inputEl) {
             return;
         }
 
-        // 🔥 ค้นหาแบบยืดหยุ่น (เช็กจาก ชื่อสินค้า หรือ รหัสสินค้า ที่มีคำใกล้เคียงกัน)
         const product = globalProducts.find(p => {
             const pName = (p.product_name || '').toLowerCase();
             const pCode = (p.product_code || '').toLowerCase();
-            return pName.includes(keyword) || pCode.includes(keyword) || keyword.includes(pName);
+            return pName === keyword || pName.includes(keyword) || pCode.includes(keyword) || keyword.includes(pName);
         });
 
         if (product) {
-            // ถ้าเจอสินค้าที่ใกล้เคียงที่สุด ดึงราคาและข้อมูลมาใส่ให้ทันที
             row.querySelector('.price').value = product.price;
             const unitSelect = row.querySelector('.unit-select');
             let optionExists = Array.from(unitSelect.options).some(opt => opt.value === product.unit);
@@ -379,7 +369,6 @@ function handleProductSelect(inputEl) {
             row.setAttribute('data-product-id', product.id); 
             calculateTotal();
         } else {
-            // ถ้าพิมพ์คำแปลกๆ ที่ไม่มีในคลังเลย (เช่น ค่าแรง, ค่าเดินทาง) ระบบจะเคลียร์ไอดีออก เพื่อให้บันทึกเป็นค่าแรง (ไม่ตัดสต็อก)
             row.removeAttribute('data-product-id');
         }
     }
@@ -692,7 +681,7 @@ function handleProductSelect(inputEl) {
         document.getElementById('grand-total').innerText = (subtotal - discount).toLocaleString('th-TH', {minimumFractionDigits: 2});
     }
 
-    // 🔥 เปลี่ยนช่องรายการเป็น textarea และเพิ่มฟังก์ชัน autoResizeTextarea เฉพาะจุดนี้
+    // 🔥 เปลี่ยนช่องรายการกลับเป็น input type="text" เพื่อให้ระบบค้นหา (Datalist) ทำงานได้!
     function addRow(data = null) {
         if(!data) markDirty();
         const tbody = document.getElementById('items-body');
@@ -705,7 +694,7 @@ function handleProductSelect(inputEl) {
             <td class="no-print text-center"><button class="btn btn-del" onclick="deleteRow(this)">ลบ</button></td>
             <td class="text-center row-number"></td>
             <td>
-                <textarea class="item-desc" list="productList" placeholder="ค้นหาสต็อก หรือพิมพ์เอง..." rows="1" oninput="markDirty(); autoResizeTextarea(this); handleProductSelect(this)" style="font-weight: 600; color: var(--primary-color);">${desc}</textarea>
+                <input type="text" class="item-desc" list="productList" placeholder="🔍 ค้นหาสต็อก หรือพิมพ์เอง..." value="${desc}" oninput="markDirty(); handleProductSelect(this)" style="font-weight: 600; color: var(--primary-color);">
                 <div class="sn-container no-print">
                     <span class="sn-label">S/N:</span>
                     <input type="text" class="sn-input" placeholder="สแกน S/N หรือพิมพ์..." value="${sn}" oninput="markDirty()">
@@ -728,18 +717,10 @@ function handleProductSelect(inputEl) {
             }
         }
         unitSelect.value = unit;
-        
-        const textareaEl = tr.querySelector('.item-desc');
-        autoResizeTextarea(textareaEl);
 
         attachDragEvents(tr);
         updateRowNumbers(); calculateTotal();
-        if(!data) textareaEl.focus();
-    }
-
-    function autoResizeTextarea(el) {
-        el.style.height = 'auto';
-        el.style.height = (el.scrollHeight) + 'px';
+        if(!data) tr.querySelector('.item-desc').focus();
     }
 
     function deleteRow(btn) { markDirty(); btn.closest('tr').remove(); updateRowNumbers(); calculateTotal(); }
@@ -770,7 +751,9 @@ function handleProductSelect(inputEl) {
         html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
         html5QrcodeScanner.render((decodedText) => { targetSnInput.value = decodedText; markDirty(); closeScanner(); }, () => {});
     }
-    function closeScanner() { if(html5QrcodeScanner) html5Qncoder.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
+    
+    // 🔥 แก้ไขคำสั่งที่พิมพ์ผิดจากของเดิมที่ทำให้ระบบกล้องรวนตอนปิด
+    function closeScanner() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
 
     function saveData() {
         const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
