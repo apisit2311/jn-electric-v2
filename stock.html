@@ -72,10 +72,9 @@
 </div>
 
 <div class="container">
-    <!-- ฟอร์มเพิ่ม/รับของ -->
     <div class="form-box">
         <h3 id="form-title">➕ เพิ่ม/รับเข้า สินค้า</h3>
-        <input type="hidden" id="edit-product-id"> <!-- ซ่อนไอดีไว้ใช้ตอนแก้ไข -->
+        <input type="hidden" id="edit-product-id"> 
 
         <div class="form-group">
             <label>รหัสสินค้า (ห้ามซ้ำ)</label>
@@ -129,7 +128,6 @@
         </div>
     </div>
 
-    <!-- ตารางสต็อก -->
     <div class="table-box">
         <h3 style="margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">📋 รายการสินค้าทั้งหมด</h3>
         <table>
@@ -223,7 +221,7 @@
         const modeWarning = document.getElementById('mode-warning');
         const editId = document.getElementById('edit-product-id').value;
         
-        if (!code || editId) return; // ถ้ากำลังโหมดแก้ไข ไม่ต้องเช็กอันนี้
+        if (!code || editId) return;
         
         const p = globalProducts.find(x => x.product_code === code);
         if (p) {
@@ -250,20 +248,19 @@
         renderSnInputs();
     }
 
-    // ✏️ โหมดแก้ไข: ดึงข้อมูลขึ้นมาบนฟอร์ม
     function editProduct(id) {
         const p = globalProducts.find(x => x.id === id);
-        if (!p) return;
+        if (!p) { alert("ไม่พบข้อมูลสินค้าที่ต้องการแก้ไข"); return; }
 
         document.getElementById('edit-product-id').value = p.id;
         document.getElementById('p-code').value = p.product_code || '';
         document.getElementById('p-name').value = p.product_name || '';
-        document.getElementById('p-qty').value = 0; // แก้ไขสต็อกทางตรงได้ หรือเพิ่มจำนวน
+        document.getElementById('p-qty').value = 0; 
         document.getElementById('p-unit').value = p.unit || 'ตัว';
         document.getElementById('p-cost').value = p.cost_price || 0;
         document.getElementById('p-price').value = p.price || 0;
         document.getElementById('p-sn-mode').value = p.sn_mode || 'none';
-        document.getElementById('p-sn-mode').disabled = true; // ล็อกโหมด S/N ตอนแก้
+        document.getElementById('p-sn-mode').disabled = true;
 
         document.getElementById('form-title').innerText = "✏️ แก้ไขข้อมูลสินค้า";
         document.getElementById('btn-save-stock').innerText = "💾 บันทึกการแก้ไข";
@@ -287,10 +284,8 @@
         renderSnInputs();
     }
 
-    // 🗑️ ลบสินค้า
     async function deleteProduct(id, name) {
-        if (!confirm(`⚠️ ต้องการลบสินค้า "${name}" ออกจากคลังใช่หรือไม่?\n(ข้อมูลสินค้าจะถูกลบถาวร)`)) return;
-        
+        if (!confirm(`⚠️ ต้องการลบสินค้า "${name}" ออกจากคลังใช่หรือไม่?`)) return;
         try {
             const { error } = await supabaseClient.from('products').delete().eq('id', id);
             if (error) throw error;
@@ -307,7 +302,7 @@
         const snArea = document.getElementById('sn-area');
         const editId = document.getElementById('edit-product-id').value;
 
-        if (editId) { snArea.style.display = 'none'; return; } // กำลังแก้ไข ไม่ต้องโชว์ช่อง S/N
+        if (editId) { snArea.style.display = 'none'; return; }
         
         snArea.innerHTML = ''; 
         if (mode === 'none') {
@@ -349,41 +344,45 @@
         const snMode = document.getElementById('p-sn-mode').value;
 
         if (!name || !code) { alert("กรุณาใส่รหัสและชื่อสินค้าให้ครบถ้วนครับ!"); return; }
-        
-        const snInputs = document.querySelectorAll('.sn-val-input');
-        let serialsToSave = [];
-        if (!editId && snMode !== 'none') {
-            let hasEmpty = false;
-            snInputs.forEach(input => { 
-                if(!input.value.trim()) hasEmpty = true; 
-                else serialsToSave.push(input.value.trim());
-            });
-            if (hasEmpty) { alert("⚠️ กรุณาสแกนหรือกรอก S/N ให้ครบทุกช่องก่อนบันทึกครับ!"); return; }
-        }
 
         btnSave.innerText = "กำลังบันทึก..."; btnSave.disabled = true;
 
         try {
-            let productId = null;
-
             if (editId) {
-                // ✏️ อัปเดตข้อมูลสินค้าเดิม
+                // ✏️ อัปเดตข้อมูลสินค้าเดิม (รวมการบวกเพิ่มสต็อกถ้ามีใส่จำนวนมา)
+                const targetProd = globalProducts.find(x => x.id === editId);
+                const updatedQty = targetProd ? parseFloat(targetProd.qty_in_stock) + (qty > 0 ? qty : 0) : qty;
+
                 const { error } = await supabaseClient.from('products').update({ 
                     product_code: code,
                     product_name: name, 
                     unit: unit,
                     cost_price: costPrice,
-                    price: price 
+                    price: price,
+                    qty_in_stock: updatedQty
                 }).eq('id', editId);
+                
                 if (error) throw error;
                 alert("✅ อัปเดตข้อมูลสินค้าเรียบร้อยแล้ว!");
                 resetForm();
             } else {
-                // ➕ เพิ่มสินค้าใหม่ / รับเข้าเพิ่ม
+                // ➕ เพิ่มสินค้าใหม่ / รับเข้าเพิ่มปกติ
+                const snInputs = document.querySelectorAll('.sn-val-input');
+                let serialsToSave = [];
+                if (snMode !== 'none') {
+                    let hasEmpty = false;
+                    snInputs.forEach(input => { 
+                        if(!input.value.trim()) hasEmpty = true; 
+                        else serialsToSave.push(input.value.trim());
+                    });
+                    if (hasEmpty) { alert("⚠️ กรุณาสแกนหรือกรอก S/N ให้ครบทุกช่องก่อนบันทึกครับ!"); btnSave.innerText = "💾 บันทึกรับเข้าคลัง"; btnSave.disabled = false; return; }
+                }
+
                 const { data: checkData, error: checkErr } = await supabaseClient
                     .from('products').select('*').ilike('product_code', code); 
                 if (checkErr) throw checkErr;
 
+                let productId = null;
                 let finalSnMode = snMode;
 
                 if (checkData && checkData.length > 0) {
