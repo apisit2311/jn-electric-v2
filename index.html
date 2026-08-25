@@ -17,12 +17,22 @@
         
         .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 20mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
         
-        input[type="text"], input[type="number"], textarea, .item-desc, select {
+        input[type="text"], input[type="number"], select {
             font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
             border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
         }
-        input:hover, textarea:hover, .item-desc:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
-        input:focus, textarea:focus, .item-desc:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
+        input:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
+        input:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
+        
+        /* 🔥 ปรับ CSS ช่องรายการให้เป็น Textarea ขยายออโต้ */
+        textarea.item-desc {
+            font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
+            border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; 
+            resize: none; overflow: hidden; min-height: 32px; line-height: 1.4; transition: all 0.2s ease;
+        }
+        textarea.item-desc:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
+        textarea.item-desc:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
+
         textarea { resize: vertical; overflow: hidden; }
 
         select.unit-select { cursor: pointer; text-align: center; text-align-last: center; }
@@ -394,13 +404,8 @@
         else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) prefix = "DLV";
         else prefix = "INV";
 
-        // สร้างวันที่แบบสั้นๆ เช่น 260824 (ปี/เดือน/วัน)
         const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
-        
-        // สุ่มเลขแค่ 3 หลัก (100 - 999) เพื่อให้สั้นจำง่าย
         const randomStr = Math.floor(100 + Math.random() * 900); 
-        
-        // รูปแบบใหม่: QUO-260824-123
         document.getElementById('doc-num').value = `${prefix}-${dateStr}-${randomStr}`;
     }
 
@@ -425,7 +430,6 @@
         fetchNextDocNumber();
     }
 
-    // 📋 ฟังก์ชันก๊อปปี้บิลเดิม ไปสร้างเป็นใบใหม่
     function duplicateDocument() {
         if (!currentDocId) {
             alert("ตอนนี้คุณกำลังอยู่ในโหมด 'สร้างเอกสารใหม่' อยู่แล้วครับ!\nสามารถเปลี่ยนประเภทเอกสารด้านบนซ้ายได้เลย");
@@ -436,15 +440,12 @@
             return;
         }
         
-        currentDocId = null; // 🔥 ปลดรหัสบิลเก่าทิ้ง
+        currentDocId = null; 
         document.getElementById('doc-date').value = getTodayThai(); 
         
         alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
     }
 
-    // ==========================================
-    // ☁️ ฟังก์ชันบันทึก / อัปเดตข้อมูล (อัปเกรดสมบูรณ์: เช็กสต็อก + แยกแยะใบเสนอราคา)
-    // ==========================================
     async function saveToSupabase() {
         const btnSave = document.getElementById('btnSave');
         const docNum = document.getElementById('doc-num').value;
@@ -467,11 +468,9 @@
             const rows = document.querySelectorAll('#items-body tr');
             if(rows.length === 0) throw new Error("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ");
 
-            // 🔥 [1] กำหนดเงื่อนไข: เอกสารประเภทไหนที่ต้อง "ตัดสต็อก" บ้าง?
             const cutStockTypes = ['ใบส่งงาน', 'ใบแจ้งหนี้/ใบส่งสินค้า', 'ใบส่งสินค้า', 'ใบแจ้งหนี้', 'ใบเสร็จรับเงิน'];
             const shouldCutStock = cutStockTypes.includes(docType);
 
-            // 🔥 [2] เช็กสต็อกล่วงหน้า (เฉพาะบิลที่ต้องตัดสต็อก)
             if (shouldCutStock) {
                 for (let row of rows) {
                     const desc = row.querySelector('.item-desc').value.trim();
@@ -495,7 +494,6 @@
                 }
             }
 
-            // 1. บันทึกข้อมูลลูกค้า
             const { data: customerData, error: custErr } = await supabaseClient
                 .from('customers').insert([{ customer_name: customerName, address: customerAddress }]).select();
             if (custErr) throw custErr;
@@ -504,7 +502,6 @@
             let documentIdToUse = null;
 
             if (currentDocId) {
-                // ------ โหมดอัปเดต (UPDATE บิลเดิม) ------
                 const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
                 const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
 
@@ -514,7 +511,6 @@
                 }).eq('id', currentDocId);
                 if (updateErr) throw updateErr;
 
-                // คืนสต็อกเก่า (คืนเฉพาะถ้าบิลเก่าเคยตัดสต็อกไป)
                 if (oldShouldCutStock) {
                     const { data: oldItems } = await supabaseClient.from('document_items').select('product_id, qty').eq('document_id', currentDocId);
                     if (oldItems && oldItems.length > 0) {
@@ -533,7 +529,6 @@
                 documentIdToUse = currentDocId; 
                 
             } else {
-                // ------ โหมดสร้างใหม่ (INSERT บิลใหม่) ------
                 const { data: docData, error: docErr } = await supabaseClient.from('documents').insert([{ 
                     doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal 
@@ -547,10 +542,9 @@
                 currentDocId = documentIdToUse; 
             }
 
-            // 4. บันทึกรายการใหม่ และ ตัดสต็อก (เฉพาะถ้าบิลนี้ควรตัดสต็อก)
             const itemsToInsert = [];
             for(let row of rows) {
-                const desc = row.querySelector('.item-desc').value;
+                const desc = row.querySelector('.item-desc').value.trim();
                 const sn = row.querySelector('.sn-input').value;
                 const qty = parseFloat(row.querySelector('.qty').value) || 0;
                 const unit = row.querySelector('.unit-select').value;
@@ -562,10 +556,10 @@
                     if (p) productId = p.id;
                 }
                 
-                if(desc.trim() !== "") {
+                if(desc !== "") {
                     itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: desc, sn: sn, qty: qty, unit: unit, price: price });
                     
-                    if(productId && qty > 0 && shouldCutStock) {
+                    if (productId && qty > 0 && shouldCutStock) {
                         const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
                         if(currentStock) {
                             await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
@@ -579,7 +573,6 @@
                 if (itemsErr) throw itemsErr;
             }
 
-            // แจ้งเตือนผลลัพธ์แยกตามประเภท
             if(shouldCutStock) {
                 alert(`✅ บันทึกข้อมูลและตัดสต็อกเรียบร้อยแล้ว!\n(เลขที่เอกสาร: ${docNum})`);
             } else {
@@ -596,9 +589,6 @@
         }
     }
 
-    // ==========================================
-    // UI, คำนวณ, ตาราง และ กล้อง
-    // ==========================================
     function getTodayThai() {
         const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const d = new Date(); return d.getDate() + ' ' + m[d.getMonth()] + ' ' + (d.getFullYear() + 543);
@@ -634,7 +624,7 @@
         else if (docText.includes("รับเงิน") || docText.includes("เสร็จ")) { subTitle.value = "(RECEIPT)"; sigLeft.value = "ผู้ชำระเงิน"; sigRight.value = "ผู้รับเงิน"; }
         else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) { subTitle.value = "(INVOICE / DELIVERY ORDER)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ส่งสินค้า / ผู้ออกเอกสาร"; }
         else { subTitle.value = "(INVOICE)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ออกเอกสาร"; }
-        if(shouldFetchNum && !currentDocId) fetchNextDocNumber(); // ดึงเลขใหม่เฉพาะตอนสร้างบิลใหม่
+        if(shouldFetchNum && !currentDocId) fetchNextDocNumber(); 
     }
 
     function toggleDate() {
@@ -698,7 +688,7 @@
             <td class="no-print text-center"><button class="btn btn-del" onclick="deleteRow(this)">ลบ</button></td>
             <td class="text-center row-number"></td>
             <td>
-                <input type="text" class="item-desc" list="productList" placeholder="ค้นหาสต็อก หรือพิมพ์เอง..." value="${desc}" oninput="markDirty()" onchange="handleProductSelect(this)" style="font-weight: 600; color: var(--primary-color);">
+                <textarea class="item-desc" list="productList" placeholder="ค้นหาสต็อก หรือพิมพ์รายการ / ค่าแรง..." rows="1" oninput="markDirty(); autoResizeTextarea(this); handleProductSelect(this)" style="font-weight: 600; color: var(--primary-color);">${desc}</textarea>
                 <div class="sn-container no-print">
                     <span class="sn-label">S/N:</span>
                     <input type="text" class="sn-input" placeholder="สแกน S/N หรือพิมพ์..." value="${sn}" oninput="markDirty()">
@@ -722,9 +712,17 @@
         }
         unitSelect.value = unit;
         
+        const textareaEl = tr.querySelector('.item-desc');
+        autoResizeTextarea(textareaEl);
+
         attachDragEvents(tr);
         updateRowNumbers(); calculateTotal();
-        if(!data) tr.querySelector('.item-desc').focus();
+        if(!data) textareaEl.focus();
+    }
+
+    function autoResizeTextarea(el) {
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight) + 'px';
     }
 
     function deleteRow(btn) { markDirty(); btn.closest('tr').remove(); updateRowNumbers(); calculateTotal(); }
@@ -749,7 +747,6 @@
         else document.getElementById('items-body').insertBefore(draggedRow, afterElement);
     });
 
-    // 📷 ระบบกล้องสแกน
     let html5QrcodeScanner; let targetSnInput = null;
     function openScanner(btn) {
         targetSnInput = btn.previousElementSibling; document.getElementById('scanner-modal').style.display = 'flex';
@@ -758,9 +755,6 @@
     }
     function closeScanner() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
 
-    // ==========================================
-    // 💾 บันทึก/โหลดไฟล์ JSON & โหลด Excel
-    // ==========================================
     function saveData() {
         const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
         const data = {
