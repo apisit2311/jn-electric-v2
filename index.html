@@ -332,25 +332,41 @@
         document.getElementById('customer-address').addEventListener('input', markDirty);
     }
 
-    async function fetchProducts() {
+  async function fetchProducts() {
         const { data } = await supabaseClient.from('products').select('*');
         if (data) {
             globalProducts = data;
             const datalist = document.getElementById('productList');
             datalist.innerHTML = '';
             data.forEach(p => {
+                // 🔥 ให้โชว์ทั้งรหัสและชื่อในตัวเลือก เพื่อให้ค้นหาง่ายขึ้น เช่น [AIR-120] แอร์ 12000 BTU
                 const opt = document.createElement('option');
                 opt.value = p.product_name;
+                opt.innerText = `[${p.product_code || 'NO-CODE'}] ${p.unit || 'ตัว'} | ${p.price || 0}.-`;
                 datalist.appendChild(opt);
             });
         }
     }
 
-    function handleProductSelect(inputEl) {
+function handleProductSelect(inputEl) {
         markDirty();
         const row = inputEl.closest('tr');
-        const product = globalProducts.find(p => p.product_name === inputEl.value);
+        const keyword = inputEl.value.trim().toLowerCase();
+        
+        if (!keyword) {
+            row.removeAttribute('data-product-id');
+            return;
+        }
+
+        // 🔥 ค้นหาแบบยืดหยุ่น (เช็กจาก ชื่อสินค้า หรือ รหัสสินค้า ที่มีคำใกล้เคียงกัน)
+        const product = globalProducts.find(p => {
+            const pName = (p.product_name || '').toLowerCase();
+            const pCode = (p.product_code || '').toLowerCase();
+            return pName.includes(keyword) || pCode.includes(keyword) || keyword.includes(pName);
+        });
+
         if (product) {
+            // ถ้าเจอสินค้าที่ใกล้เคียงที่สุด ดึงราคาและข้อมูลมาใส่ให้ทันที
             row.querySelector('.price').value = product.price;
             const unitSelect = row.querySelector('.unit-select');
             let optionExists = Array.from(unitSelect.options).some(opt => opt.value === product.unit);
@@ -363,6 +379,7 @@
             row.setAttribute('data-product-id', product.id); 
             calculateTotal();
         } else {
+            // ถ้าพิมพ์คำแปลกๆ ที่ไม่มีในคลังเลย (เช่น ค่าแรง, ค่าเดินทาง) ระบบจะเคลียร์ไอดีออก เพื่อให้บันทึกเป็นค่าแรง (ไม่ตัดสต็อก)
             row.removeAttribute('data-product-id');
         }
     }
