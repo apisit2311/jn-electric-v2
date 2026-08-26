@@ -128,14 +128,17 @@
         .scanner-box { background: #fff; padding: 15px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
         #reader { width: 100%; }
 
-        @media print {
+@media print {
             body { background: #fff; padding: 0; }
             .document-container { width: 100%; height: auto; min-height: auto; box-shadow: none; padding: 0; margin: 0; }
             .no-print { display: none !important; }
             input, textarea, select, .doc-title-editable, .sn-input { border: none !important; background: transparent !important; padding: 0 !important; box-shadow: none !important; appearance: none; -webkit-appearance: none; -moz-appearance: none; }
             .summary-table tr.total td { background-color: transparent; }
             select::-ms-expand { display: none; } 
-            textarea { height: auto !important; }
+            
+            /* 🔥 จุดที่แก้ไข: ลบ height: auto ออก และปล่อยให้ขยายตามข้อความจริง */
+            textarea { overflow: visible !important; white-space: pre-wrap !important; }
+            
             tr { page-break-inside: avoid; }
             ::-webkit-input-placeholder, ::placeholder { color: transparent !important; }
             .sn-input:placeholder-shown { display: none !important; }
