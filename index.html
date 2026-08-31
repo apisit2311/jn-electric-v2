@@ -23,7 +23,9 @@
         }
         input:hover, textarea:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
         input:focus, textarea:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
-        textarea { resize: vertical; overflow: hidden; }
+        
+        /* 🔥 ปิดขีดเฉียงๆ มุมขวาล่างแบบถาวร */
+        textarea { resize: none; overflow: hidden; }
 
         /* 🔥 สไตล์สำหรับ Textarea ให้ขยายบรรทัดได้ */
         textarea.item-desc {
@@ -132,7 +134,16 @@
             body { background: #fff; padding: 0; }
             .document-container { width: 100%; height: auto; min-height: auto; box-shadow: none; padding: 0; margin: 0; }
             .no-print { display: none !important; }
-            input, textarea, select, .doc-title-editable, .sn-input { border: none !important; background: transparent !important; padding: 0 !important; box-shadow: none !important; appearance: none; -webkit-appearance: none; -moz-appearance: none; }
+            input, textarea, select, .doc-title-editable, .sn-input { 
+                border: none !important; 
+                background: transparent !important; 
+                padding: 0 !important; 
+                box-shadow: none !important; 
+                appearance: none; 
+                -webkit-appearance: none; 
+                -moz-appearance: none; 
+                resize: none !important; /* 🔥 ปิดขีดเฉียงๆ ตอนปริ้นท์แบบเด็ดขาด */
+            }
             .summary-table tr.total td { background-color: transparent; }
             select::-ms-expand { display: none; } 
             
@@ -143,7 +154,7 @@
             ::-webkit-input-placeholder, ::placeholder { color: transparent !important; }
             .sn-input:placeholder-shown { display: none !important; }
             
-            /* 🔥 เพิ่มบรรทัดนี้: ซ่อนช่องข้อมูลลูกค้าเพิ่มเติม ถ้าไม่ได้พิมพ์อะไรลงไป */
+            /* 🔥 ซ่อนช่องข้อมูลลูกค้าเพิ่มเติม ถ้าไม่ได้พิมพ์อะไรลงไป */
             #customer-extra:placeholder-shown { display: none !important; }
             
             #login-overlay, #scanner-modal { display: none !important; }
