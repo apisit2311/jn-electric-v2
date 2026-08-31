@@ -142,6 +142,10 @@
             tr { page-break-inside: avoid; }
             ::-webkit-input-placeholder, ::placeholder { color: transparent !important; }
             .sn-input:placeholder-shown { display: none !important; }
+            
+            /* 🔥 เพิ่มบรรทัดนี้: ซ่อนช่องข้อมูลลูกค้าเพิ่มเติม ถ้าไม่ได้พิมพ์อะไรลงไป */
+            #customer-extra:placeholder-shown { display: none !important; }
+            
             #login-overlay, #scanner-modal { display: none !important; }
             .autocomplete-list { display: none !important; }
         }
