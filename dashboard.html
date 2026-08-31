@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         :root { --primary-color: #1e3a8a; --accent-color: #3b82f6; --text-main: #0f172a; --bg-color: #f8fafc; --border-color: #cbd5e1; }
@@ -17,13 +18,17 @@
         .btn { padding: 6px 12px; border: none; border-radius: 4px; font-family: 'Sarabun'; font-weight: 600; cursor: pointer; color: white; text-decoration: none; font-size: 13px;}
         .btn-back { background-color: #64748b; }
         .btn-stock { background-color: #f59e0b; }
+        .btn-excel { background-color: #10b981; border: 1px solid #059669; }
 
         .filter-bar { display: flex; justify-content: flex-end; margin-bottom: 15px; gap: 10px; }
         .filter-bar select { padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-family: 'Sarabun'; font-weight: 600; font-size: 14px; outline: none; background: #fff;}
         
-        /* 🔥 KPI Cards แบบกระชับ */
+        /* 🔥 KPI Cards (ปรับให้คลิกได้) */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .kpi-card { background: #fff; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px; border-left: 4px solid var(--primary-color);}
+        .kpi-card { background: #fff; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px; border-left: 4px solid var(--primary-color); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative;}
+        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .kpi-card::after { content: '🔍 คลิกดูรายละเอียด'; position: absolute; bottom: 5px; right: 10px; font-size: 10px; color: #94a3b8; font-weight: 600; opacity: 0; transition: 0.2s;}
+        .kpi-card:hover::after { opacity: 1; }
         .kpi-card.green { border-left-color: #10b981; }
         .kpi-card.orange { border-left-color: #f59e0b; }
         .kpi-card.purple { border-left-color: #8b5cf6; }
@@ -31,13 +36,26 @@
         .kpi-data h4 { margin: 0; font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;}
         .kpi-data h2 { margin: 2px 0 0; font-size: 22px; color: var(--text-main); }
 
-        /* 🔥 Charts แบบกระชับ */
+        /* 🔥 Modal Pop-up */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 9999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+        .modal-box { background: #fff; width: 90%; max-width: 800px; max-height: 85vh; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+        .modal-header h3 { margin: 0; color: var(--primary-color); font-size: 18px; }
+        .btn-close { background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: 'Sarabun'; }
+        .btn-close:hover { background: #dc2626; }
+        .modal-body { padding: 20px; overflow-y: auto; }
+        .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .modal-table th, .modal-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        .modal-table th { background: #f8fafc; color: #475569; position: sticky; top: 0; box-shadow: 0 1px 0 #e2e8f0;}
+
+        /* Charts */
         .chart-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px; }
         .chart-box { background: #fff; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .chart-box h3 { margin: 0 0 10px 0; color: var(--text-main); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 5px;}
         .chart-container { position: relative; height: 220px; width: 100%; }
 
-        /* 🔥 Widgets (Tables) แบบกระชับ */
+        /* Widgets */
         .widget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
         .widget-box { background: #fff; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .widget-box h3 { margin: 0 0 10px 0; color: var(--text-main); font-size: 14px; font-weight: 700; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
@@ -49,7 +67,6 @@
         .badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5;}
 
         #auth-guard { position: fixed; top:0; left:0; width:100%; height:100%; background: #fff; z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-        
         @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -61,6 +78,22 @@
     <a href="index.html" class="btn btn-back">กลับไปหน้าออกบิล</a>
 </div>
 
+<!-- Modal สำหรับเจาะดูรายละเอียด -->
+<div id="detail-modal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="modal-title">📄 รายละเอียด</h3>
+            <button class="btn-close" onclick="closeModal()">✖ ปิด</button>
+        </div>
+        <div class="modal-body">
+            <table class="modal-table" id="modal-table">
+                <thead><tr id="modal-thead"></tr></thead>
+                <tbody id="modal-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <div class="header">
     <h1>📊 ภาพรวมธุรกิจ (Dashboard)</h1>
     <div style="display: flex; gap: 8px;">
@@ -69,35 +102,36 @@
             <option value="month" selected>เดือนนี้ (This Month)</option>
             <option value="year">ปีนี้ (This Year)</option>
         </select>
+        <button class="btn btn-excel" onclick="exportDashboardExcel()">📊 โหลดรายงาน (Excel)</button>
         <a href="stock.html" class="btn btn-stock">📦 คลังสินค้า</a>
         <a href="index.html" class="btn btn-back">⬅️ หน้าออกบิล</a>
     </div>
 </div>
 
-<!-- 4 การ์ดสรุปยอด -->
+<!-- 4 การ์ดสรุปยอด (พร้อมปุ่มคลิกได้) -->
 <div class="kpi-grid">
-    <div class="kpi-card green">
+    <div class="kpi-card green" onclick="openModal('revenue')">
         <div class="kpi-icon">💰</div>
         <div class="kpi-data">
             <h4>ยอดขายรวม</h4>
             <h2 id="kpi-revenue">0.00</h2>
         </div>
     </div>
-    <div class="kpi-card">
+    <div class="kpi-card" onclick="openModal('profit')">
         <div class="kpi-icon">📈</div>
         <div class="kpi-data">
             <h4>กำไรขั้นต้น (ประมาณ)</h4>
             <h2 id="kpi-profit">0.00</h2>
         </div>
     </div>
-    <div class="kpi-card orange">
+    <div class="kpi-card orange" onclick="openModal('stock')">
         <div class="kpi-icon">📦</div>
         <div class="kpi-data">
             <h4>มูลค่าคลังสินค้า (ทุน)</h4>
             <h2 id="kpi-stock-value">0.00</h2>
         </div>
     </div>
-    <div class="kpi-card purple">
+    <div class="kpi-card purple" onclick="openModal('pending')">
         <div class="kpi-icon">⏳</div>
         <div class="kpi-data">
             <h4>งานรออนุมัติ / เสนอราคา</h4>
@@ -154,13 +188,14 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let allDocs = [];
-    let allDocItems = [];
-    let allProducts = [];
-    let allCustomers = [];
-    
-    let monthlyChartInst = null;
-    let typeChartInst = null;
+    let allDocs = []; let allDocItems = []; let allProducts = []; let allCustomers = [];
+    let monthlyChartInst = null; let typeChartInst = null;
+
+    // 🔥 ตัวแปรเก็บข้อมูลเจาะลึก (Drill-down) สำหรับ Pop-up และ Excel
+    let detailRevenue = [];
+    let detailProfit = [];
+    let detailStock = [];
+    let detailPending = [];
 
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -199,39 +234,72 @@
         const revenueDocIds = revenueDocs.map(d => d.id);
         const filteredItems = allDocItems.filter(item => revenueDocIds.includes(item.document_id));
 
-        // 1. KPI
-        const totalRevenue = revenueDocs.reduce((sum, doc) => sum + parseFloat(doc.grand_total || 0), 0);
-        document.getElementById('kpi-revenue').innerText = totalRevenue.toLocaleString('th-TH', {minimumFractionDigits: 2});
+        // เคลียร์ข้อมูลเจาะลึก
+        detailRevenue = []; detailProfit = []; detailStock = []; detailPending = [];
 
-        const totalQuotes = quoteDocs.reduce((sum, doc) => sum + parseFloat(doc.grand_total || 0), 0);
-        document.getElementById('kpi-pending').innerText = totalQuotes.toLocaleString('th-TH', {minimumFractionDigits: 2});
-
-        const stockValue = allProducts.reduce((sum, p) => (p.qty_in_stock > 0) ? sum + (p.qty_in_stock * (p.cost_price || 0)) : sum, 0);
-        document.getElementById('kpi-stock-value').innerText = stockValue.toLocaleString('th-TH', {minimumFractionDigits: 2});
-
+        // 1. KPI: Revenue & Profit
         let totalCost = 0; let productRevenue = 0; let serviceRevenue = 0; let productSalesMap = {};
-        filteredItems.forEach(item => {
-            const lineTotal = item.qty * item.price;
-            if (item.product_id) {
-                productRevenue += lineTotal;
-                const prod = allProducts.find(p => p.id === item.product_id);
-                if (prod) totalCost += (item.qty * (prod.cost_price || 0));
-                const name = prod ? prod.product_name : item.description;
-                productSalesMap[name] = (productSalesMap[name] || 0) + item.qty;
-            } else {
-                serviceRevenue += lineTotal;
-            }
-        });
         
+        revenueDocs.forEach(doc => {
+            let docCost = 0;
+            const itemsInDoc = filteredItems.filter(i => i.document_id === doc.id);
+            
+            itemsInDoc.forEach(item => {
+                const lineTotal = item.qty * item.price;
+                if (item.product_id) {
+                    productRevenue += lineTotal;
+                    const prod = allProducts.find(p => p.id === item.product_id);
+                    if (prod) docCost += (item.qty * (prod.cost_price || 0));
+                    const name = prod ? prod.product_name : item.description;
+                    productSalesMap[name] = (productSalesMap[name] || 0) + item.qty;
+                } else {
+                    serviceRevenue += lineTotal;
+                }
+            });
+
+            totalCost += docCost;
+            const docRev = parseFloat(doc.grand_total || 0);
+            
+            // หาชื่อลูกค้า
+            let cName = '-';
+            if(doc.customer_id) {
+                const c = allCustomers.find(x => x.id === doc.customer_id);
+                if(c) cName = c.customer_name;
+            }
+
+            // เก็บประวัติลง Drill-down
+            detailRevenue.push({ date: doc.doc_date, docNum: doc.doc_num, customer: cName, type: doc.doc_type, total: docRev });
+            detailProfit.push({ date: doc.doc_date, docNum: doc.doc_num, customer: cName, revenue: docRev, cost: docCost, profit: docRev - docCost });
+        });
+
+        const totalRevenue = revenueDocs.reduce((sum, doc) => sum + parseFloat(doc.grand_total || 0), 0);
         const grossProfit = totalRevenue - totalCost; 
+        document.getElementById('kpi-revenue').innerText = totalRevenue.toLocaleString('th-TH', {minimumFractionDigits: 2});
         document.getElementById('kpi-profit').innerText = grossProfit.toLocaleString('th-TH', {minimumFractionDigits: 2});
 
-        // 2. Tables
+        // 2. KPI: Pending
+        const totalQuotes = quoteDocs.reduce((sum, doc) => sum + parseFloat(doc.grand_total || 0), 0);
+        document.getElementById('kpi-pending').innerText = totalQuotes.toLocaleString('th-TH', {minimumFractionDigits: 2});
+        quoteDocs.forEach(doc => {
+            let cName = '-';
+            if(doc.customer_id) { const c = allCustomers.find(x => x.id === doc.customer_id); if(c) cName = c.customer_name; }
+            detailPending.push({ date: doc.doc_date, docNum: doc.doc_num, customer: cName, total: parseFloat(doc.grand_total||0) });
+        });
+
+        // 3. KPI: Stock Value
+        const stockValue = allProducts.reduce((sum, p) => (p.qty_in_stock > 0) ? sum + (p.qty_in_stock * (p.cost_price || 0)) : sum, 0);
+        document.getElementById('kpi-stock-value').innerText = stockValue.toLocaleString('th-TH', {minimumFractionDigits: 2});
+        allProducts.forEach(p => {
+            if(p.qty_in_stock > 0) {
+                detailStock.push({ code: p.product_code||'-', name: p.product_name, qty: p.qty_in_stock, cost: (p.cost_price||0), total: p.qty_in_stock * (p.cost_price||0) });
+            }
+        });
+
+        // Tables
         let clientMap = {};
         revenueDocs.forEach(doc => {
             if (doc.customer_id) {
-                const c = allCustomers.find(cust => cust.id === doc.customer_id);
-                const cName = c ? c.customer_name : 'ลูกค้าทั่วไป';
+                const cName = allCustomers.find(cust => cust.id === doc.customer_id)?.customer_name || 'ลูกค้าทั่วไป';
                 clientMap[cName] = (clientMap[cName] || 0) + parseFloat(doc.grand_total || 0);
             }
         });
@@ -250,65 +318,110 @@
         lowTbody.innerHTML = lowStock.length === 0 ? '<tr><td colspan="2" style="text-align:center; color:#10b981;">สินค้าเพียงพอ ไม่มียอดเตือน</td></tr>' : '';
         lowStock.forEach(p => { lowTbody.innerHTML += `<tr><td style="font-weight:500;">${p.product_name}</td><td style="text-align:right;"><span class="badge">${p.qty_in_stock} ${p.unit}</span></td></tr>`; });
 
-        // 3. Charts
+        // Charts
         drawTypeChart(productRevenue, serviceRevenue);
         drawMonthlyChart();
     }
 
+    // 🔥 ระบบเปิดปิด Modal
+    function openModal(type) {
+        const modal = document.getElementById('detail-modal');
+        const title = document.getElementById('modal-title');
+        const thead = document.getElementById('modal-thead');
+        const tbody = document.getElementById('modal-tbody');
+        tbody.innerHTML = '';
+
+        if(type === 'revenue') {
+            title.innerHTML = '💰 รายละเอียด: ยอดขายรวม';
+            thead.innerHTML = '<th>วันที่</th><th>เลขที่บิล</th><th>ลูกค้า</th><th>ประเภท</th><th style="text-align:right;">ยอดสุทธิ</th>';
+            detailRevenue.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(r => {
+                tbody.innerHTML += `<tr><td>${r.date}</td><td>${r.docNum}</td><td>${r.customer}</td><td>${r.type}</td><td style="text-align:right; color:#10b981; font-weight:bold;">${r.total.toLocaleString()}.-</td></tr>`;
+            });
+        } 
+        else if(type === 'profit') {
+            title.innerHTML = '📈 รายละเอียด: กำไรขั้นต้น';
+            thead.innerHTML = '<th>วันที่</th><th>เลขที่บิล</th><th>ยอดขาย</th><th>ต้นทุน</th><th style="text-align:right;">กำไร</th>';
+            detailProfit.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(r => {
+                tbody.innerHTML += `<tr><td>${r.date}</td><td>${r.docNum}</td><td style="color:#10b981;">${r.revenue.toLocaleString()}</td><td style="color:#ef4444;">${r.cost.toLocaleString()}</td><td style="text-align:right; color:var(--primary-color); font-weight:bold;">${r.profit.toLocaleString()}.-</td></tr>`;
+            });
+        }
+        else if(type === 'stock') {
+            title.innerHTML = '📦 รายละเอียด: มูลค่าคลังสินค้า';
+            thead.innerHTML = '<th>รหัส</th><th>ชื่อสินค้า</th><th style="text-align:center;">จำนวน</th><th style="text-align:right;">ทุน/ชิ้น</th><th style="text-align:right;">มูลค่ารวม</th>';
+            detailStock.sort((a,b) => b.total - a.total).forEach(r => {
+                tbody.innerHTML += `<tr><td>${r.code}</td><td>${r.name}</td><td style="text-align:center;">${r.qty}</td><td style="text-align:right;">${r.cost.toLocaleString()}</td><td style="text-align:right; color:#f59e0b; font-weight:bold;">${r.total.toLocaleString()}.-</td></tr>`;
+            });
+        }
+        else if(type === 'pending') {
+            title.innerHTML = '⏳ รายละเอียด: งานรออนุมัติ';
+            thead.innerHTML = '<th>วันที่</th><th>เลขที่บิล (เสนอราคา)</th><th>ลูกค้า</th><th style="text-align:right;">ยอดรวม</th>';
+            detailPending.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(r => {
+                tbody.innerHTML += `<tr><td>${r.date}</td><td>${r.docNum}</td><td>${r.customer}</td><td style="text-align:right; color:#8b5cf6; font-weight:bold;">${r.total.toLocaleString()}.-</td></tr>`;
+            });
+        }
+
+        if(tbody.innerHTML === '') tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">ไม่มีข้อมูล</td></tr>';
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('detail-modal').style.display = 'none'; }
+
+    // 🔥 ระบบโหลด Excel จัดเต็ม 4 Sheet
+    function exportDashboardExcel() {
+        if (typeof XLSX === 'undefined') { alert('กำลังเตรียมระบบโหลดไฟล์ กรุณารอสักครู่ครับ...'); return; }
+        
+        const wb = XLSX.utils.book_new();
+        const timeText = document.getElementById('time-filter').options[document.getElementById('time-filter').selectedIndex].text;
+
+        // Sheet 1: รายรับ
+        let ws1_data = [["รายงานยอดขายรวม", `(ช่วงเวลา: ${timeText})`], [], ["วันที่", "เลขที่เอกสาร", "ประเภท", "ลูกค้า", "ยอดสุทธิ (บาท)"]];
+        detailRevenue.forEach(r => ws1_data.push([r.date, r.docNum, r.type, r.customer, r.total]));
+        const ws1 = XLSX.utils.aoa_to_sheet(ws1_data);
+        XLSX.utils.book_append_sheet(wb, ws1, "1_ยอดขาย");
+
+        // Sheet 2: กำไร
+        let ws2_data = [["รายงานกำไรขั้นต้น", `(ช่วงเวลา: ${timeText})`], [], ["วันที่", "เลขที่เอกสาร", "ลูกค้า", "ยอดขาย (บาท)", "ต้นทุน (บาท)", "กำไรขั้นต้น (บาท)"]];
+        detailProfit.forEach(r => ws2_data.push([r.date, r.docNum, r.customer, r.revenue, r.cost, r.profit]));
+        const ws2 = XLSX.utils.aoa_to_sheet(ws2_data);
+        XLSX.utils.book_append_sheet(wb, ws2, "2_กำไรขั้นต้น");
+
+        // Sheet 3: มูลค่าสต็อก
+        let ws3_data = [["รายงานมูลค่าสินค้าคงเหลือ", "(อัปเดต ณ ปัจจุบัน)"], [], ["รหัสสินค้า", "ชื่อสินค้า", "จำนวนคงเหลือ", "ราคาทุน/ชิ้น (บาท)", "มูลค่ารวม (บาท)"]];
+        detailStock.forEach(r => ws3_data.push([r.code, r.name, r.qty, r.cost, r.total]));
+        const ws3 = XLSX.utils.aoa_to_sheet(ws3_data);
+        XLSX.utils.book_append_sheet(wb, ws3, "3_มูลค่าสต็อก");
+
+        // Sheet 4: งานรออนุมัติ
+        let ws4_data = [["รายงานงานเสนอราคาค้างอนุมัติ", `(ช่วงเวลา: ${timeText})`], [], ["วันที่", "เลขที่เอกสาร", "ลูกค้า", "มูลค่างาน (บาท)"]];
+        detailPending.forEach(r => ws4_data.push([r.date, r.docNum, r.customer, r.total]));
+        const ws4 = XLSX.utils.aoa_to_sheet(ws4_data);
+        XLSX.utils.book_append_sheet(wb, ws4, "4_งานรออนุมัติ");
+
+        XLSX.writeFile(wb, `JN_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+    // ฟังก์ชันวาดกราฟเดิม
     function drawTypeChart(productVal, serviceVal) {
         const ctx = document.getElementById('typeChart').getContext('2d');
         if (typeChartInst) typeChartInst.destroy();
         if (productVal === 0 && serviceVal === 0) productVal = 1; 
-
-        typeChartInst = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['ค่าของ', 'ค่าแรง/บริการ'],
-                datasets: [{ data: [productVal, serviceVal], backgroundColor: ['#3b82f6', '#f59e0b'], borderWidth: 0, hoverOffset: 4 }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: {family: 'Sarabun'} } } },
-                cutout: '70%'
-            }
-        });
+        typeChartInst = new Chart(ctx, { type: 'doughnut', data: { labels: ['ค่าของ', 'ค่าแรง/บริการ'], datasets: [{ data: [productVal, serviceVal], backgroundColor: ['#3b82f6', '#f59e0b'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: {family: 'Sarabun'} } } }, cutout: '70%' }});
     }
 
     function drawMonthlyChart() {
         const ctx = document.getElementById('monthlyChart').getContext('2d');
         if (monthlyChartInst) monthlyChartInst.destroy();
-
         const monthNames = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
         let labels = []; let data = [0,0,0,0,0,0];
-        
         const d = new Date();
-        for(let i = 5; i >= 0; i--) {
-            let tempDate = new Date(d.getFullYear(), d.getMonth() - i, 1);
-            labels.push(monthNames[tempDate.getMonth()]);
-        }
-
+        for(let i = 5; i >= 0; i--) { let tempDate = new Date(d.getFullYear(), d.getMonth() - i, 1); labels.push(monthNames[tempDate.getMonth()]); }
         const revenueDocs = allDocs.filter(doc => doc.doc_type !== 'ใบเสนอราคา');
         revenueDocs.forEach(doc => {
             const docDate = new Date(doc.created_at);
             const diffMonths = (d.getFullYear() - docDate.getFullYear()) * 12 + (d.getMonth() - docDate.getMonth());
             if(diffMonths >= 0 && diffMonths < 6) data[5 - diffMonths] += parseFloat(doc.grand_total || 0);
         });
-
-        monthlyChartInst = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{ label: 'ยอดขาย (บาท)', data: data, backgroundColor: '#1e3a8a', borderRadius: 4, barPercentage: 0.6 }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: {family: 'Sarabun'} } },
-                    x: { grid: { display: false }, ticks: { font: {family: 'Sarabun'} } }
-                }
-            }
-        });
+        monthlyChartInst = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'ยอดขาย (บาท)', data: data, backgroundColor: '#1e3a8a', borderRadius: 4, barPercentage: 0.6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: {family: 'Sarabun'} } }, x: { grid: { display: false }, ticks: { font: {family: 'Sarabun'} } } } }});
     }
 </script>
 </body>
