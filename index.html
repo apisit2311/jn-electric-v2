@@ -128,7 +128,7 @@
         .scanner-box { background: #fff; padding: 15px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
         #reader { width: 100%; }
 
-@media print {
+        @media print {
             body { background: #fff; padding: 0; }
             .document-container { width: 100%; height: auto; min-height: auto; box-shadow: none; padding: 0; margin: 0; }
             .no-print { display: none !important; }
@@ -136,14 +136,13 @@
             .summary-table tr.total td { background-color: transparent; }
             select::-ms-expand { display: none; } 
             
-            /* 🔥 จุดที่แก้ไข: ลบ height: auto ออก และปล่อยให้ขยายตามข้อความจริง */
+            /* ปล่อยให้ขยายตามข้อความจริง ไม่โดนตัดขอบ */
             textarea { overflow: visible !important; white-space: pre-wrap !important; }
             
             tr { page-break-inside: avoid; }
             ::-webkit-input-placeholder, ::placeholder { color: transparent !important; }
             .sn-input:placeholder-shown { display: none !important; }
             #login-overlay, #scanner-modal { display: none !important; }
-            /* ซ่อนกล่องค้นหาตอนพิมพ์ */
             .autocomplete-list { display: none !important; }
         }
     </style>
@@ -174,7 +173,7 @@
     <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
     <button class="btn btn-load" style="background-color: #8b5cf6;" onclick="duplicateDocument()">📋 นำไปสร้างใบใหม่ (Copy)</button>
     <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึก / อัปเดตข้อมูล</button>
-    <a href="stock.html" class="btn btn-stock">📦 คลังสินค้า</a>
+    <a href="stock.html" class="btn btn-stock" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าคลังสินค้าไหม?')) return false;">📦 คลังสินค้า</a>
     
     <button class="btn btn-save" onclick="saveData()">💾 เซฟไฟล์ (JSON)</button>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">📂 เปิดไฟล์</button>
@@ -228,7 +227,9 @@
         <div class="customer-area">
             <div class="section-label">ลูกค้า (BILL TO)</div>
             <input type="text" id="customer-name" value="บริษัท ลูกค้าองค์กร จำกัด" style="font-weight: 700; font-size: 18px; padding-left: 0;">
-            <textarea id="customer-address" rows="6" style="padding-left: 0;">888 ถนนรัชดาภิเษก แขวงดินแดง&#10;เขตดินแดง กรุงเทพฯ 10400&#10;เลขประจำตัวผู้เสียภาษี: 0104444444444&#10;โทร: 02-888-9999</textarea>
+            <textarea id="customer-address" rows="5" style="padding-left: 0; margin-bottom: 0;">888 ถนนรัชดาภิเษก แขวงดินแดง&#10;เขตดินแดง กรุงเทพฯ 10400&#10;โทร: 02-888-9999</textarea>
+            <!-- 🔥 ช่องกรอกข้อมูลเพิ่มเติมใต้ที่อยู่ลูกค้า -->
+            <textarea id="customer-extra" rows="2" placeholder="เลขประจำตัวผู้เสียภาษี / สาขา / โครงการ..." style="font-weight: 700; padding-left: 0; border-top: 1px dashed var(--border-color);"></textarea>
         </div>
     </div>
 
@@ -342,9 +343,10 @@
         isDirty = false;
         document.getElementById('customer-name').addEventListener('input', markDirty);
         document.getElementById('customer-address').addEventListener('input', markDirty);
+        document.getElementById('customer-extra').addEventListener('input', markDirty);
     }
 
-    // โหลดรายชื่อสินค้ามาเก็บในตัวแปรอย่างเดียว (ไม่ต้องใช้ Datalist แล้ว)
+    // โหลดรายชื่อสินค้ามาเก็บในตัวแปรอย่างเดียว
     async function fetchProducts() {
         const { data } = await supabaseClient.from('products').select('*');
         if (data) {
@@ -352,13 +354,12 @@
         }
     }
 
-    // 🔥 ระบบค้นหาอัจฉริยะแบบใหม่ (โชว์กล่องค้นหาเอง)
+    // 🔥 ระบบค้นหาอัจฉริยะ
     function handleCustomAutocomplete(textarea) {
         const wrapper = textarea.closest('.autocomplete-wrapper');
         const listEl = wrapper.querySelector('.autocomplete-list');
         const row = textarea.closest('tr');
         
-        // ใช้เฉพาะข้อความ "บรรทัดแรก" ในการค้นหา (เผื่อกด Enter พิมพ์ต่อแล้ว)
         const lines = textarea.value.split('\n');
         const searchWord = lines[0].trim().toLowerCase();
         
@@ -368,14 +369,12 @@
             return;
         }
 
-        // ค้นหาสินค้าจากคลัง
         const filtered = globalProducts.filter(p => {
             const pName = (p.product_name || '').toLowerCase();
             const pCode = (p.product_code || '').toLowerCase();
             return pName.includes(searchWord) || pCode.includes(searchWord);
         });
 
-        // ถ้าพิมพ์ชื่อตรงเป๊ะๆ ให้ผูก ID ให้เลย
         const exactMatch = globalProducts.find(p => (p.product_name || '').toLowerCase() === searchWord);
         if (exactMatch) {
             row.setAttribute('data-product-id', exactMatch.id);
@@ -388,13 +387,11 @@
             return;
         }
 
-        // สร้างกล่องเมนูเด้ง
         listEl.innerHTML = '';
         filtered.forEach(p => {
             const item = document.createElement('div');
             item.innerHTML = `<strong style="color:var(--primary-color);">[${p.product_code || '-'}]</strong> ${p.product_name} <span style="color:#10b981; float:right; font-weight:bold;">${p.price || 0}.-</span>`;
             
-            // onmousedown ดักจับคลิกก่อนที่ Textarea จะเสีย Focus
             item.onmousedown = function(e) { 
                 e.preventDefault(); 
                 applySelectedProduct(textarea, p);
@@ -404,7 +401,6 @@
         listEl.style.display = 'block';
     }
 
-    // ปิดกล่องค้นหา
     function closeAutocomplete(textarea) {
         const wrapper = textarea.closest('.autocomplete-wrapper');
         if(wrapper) {
@@ -413,11 +409,9 @@
         }
     }
 
-    // นำข้อมูลที่คลิกเลือกไปใส่ในช่องและตาราง
     function applySelectedProduct(textarea, product) {
         const row = textarea.closest('tr');
         
-        // แทนที่แค่บรรทัดแรกด้วยชื่อสินค้าที่เลือก (บรรทัดอื่นคงไว้เผื่อพิมพ์รายละเอียดเพิ่ม)
         const lines = textarea.value.split('\n');
         lines[0] = product.product_name;
         textarea.value = lines.join('\n');
@@ -486,6 +480,7 @@
         
         document.getElementById('customer-name').value = "";
         document.getElementById('customer-address').value = "";
+        document.getElementById('customer-extra').value = "";
         document.getElementById('due-date').value = "";
         document.getElementById('blank-date').checked = false;
         document.getElementById('doc-date').value = getTodayThai();
@@ -530,6 +525,7 @@
             const dueDate = document.getElementById('due-date').value;
             const customerName = document.getElementById('customer-name').value;
             const customerAddress = document.getElementById('customer-address').value;
+            // *หมายเหตุ: customer-extra จะมีผลแค่ใน Excel และ JSON ยังไม่ถูกบันทึกลง Supabase หากยังไม่มีคอลัมน์รองรับ
             
             const subtotal = parseFloat(document.getElementById('subtotal').innerText.replace(/,/g, '')) || 0;
             const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
@@ -750,7 +746,6 @@
         document.getElementById('grand-total').innerText = (subtotal - discount).toLocaleString('th-TH', {minimumFractionDigits: 2});
     }
 
-    // 🔥 โครงสร้างตารางใหม่ เปลี่ยนเป็น textarea คู่กับกล่องค้นหา
     function addRow(data = null) {
         if(!data) markDirty();
         const tbody = document.getElementById('items-body');
@@ -838,7 +833,9 @@
         const data = {
             docType: document.getElementById('docType').value, docNum: document.getElementById('doc-num').value,
             docDate: document.getElementById('doc-date').value, dueDate: document.getElementById('due-date').value,
-            customerName: document.getElementById('customer-name').value, customerAddress: document.getElementById('customer-address').value,
+            customerName: document.getElementById('customer-name').value, 
+            customerAddress: document.getElementById('customer-address').value,
+            customerExtra: document.getElementById('customer-extra').value,
             discountLabel: isDiscountVisible ? document.getElementById('discount-label').value : "ส่วนลด (DISCOUNT)",
             discount: isDiscountVisible ? (parseFloat(document.getElementById('discount-val').value) || 0) : 0, hasDiscount: isDiscountVisible,
             items: []
@@ -881,6 +878,7 @@
         document.getElementById('due-date').value = cloudData.dueDate || "";
         document.getElementById('customer-name').value = cloudData.customerName || "";
         document.getElementById('customer-address').value = cloudData.customerAddress || "";
+        document.getElementById('customer-extra').value = cloudData.customerExtra || "";
 
         const discountRow = document.getElementById('discount-row');
         const toggleBtn = document.getElementById('btn-toggle-discount');
@@ -900,11 +898,14 @@
         if (typeof XLSX === 'undefined') { alert('กำลังโหลดข้อมูลสำหรับการสร้าง Excel กรุณารอสักครู่แล้วกดใหม่อีกครั้ง'); return; }
         const docType = document.getElementById('docType').value; const docNum = document.getElementById('doc-num').value;
         const docDate = document.getElementById('doc-date').value; const dueDate = document.getElementById('due-date').value;
-        const customerName = document.getElementById('customer-name').value; const customerAddress = document.getElementById('customer-address').value;
+        const customerName = document.getElementById('customer-name').value; 
+        const customerAddress = document.getElementById('customer-address').value;
+        const customerExtra = document.getElementById('customer-extra').value;
 
         let excelData = [];
         excelData.push(["JN electric&Technology"]); excelData.push([docType]); excelData.push([]);
         excelData.push(["ลูกค้า (BILL TO):", customerName]); excelData.push(["ที่อยู่:", customerAddress]);
+        if (customerExtra) excelData.push(["ข้อมูลเพิ่มเติม:", customerExtra]);
         excelData.push(["เลขที่เอกสาร:", docNum, "วันที่:", docDate]); if(dueDate) excelData.push(["ครบกำหนด:", dueDate]); excelData.push([]);
         excelData.push(["ลำดับ", "รายการ", "S/N", "จำนวน", "หน่วย", "ราคา/หน่วย", "จำนวนเงิน"]);
 
