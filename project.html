@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บริหารโครงการ & ควบคุมต้นทุน - JN Electric</title>
+    <title>ระบบบริหารโครงการและควบคุมต้นทุน - JN Electric</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,46 +17,59 @@
             --slate-100: #f1f5f9;
             --slate-200: #e2e8f0;
             --slate-300: #cbd5e1;
+            --slate-600: #475569;
             --slate-700: #334155;
             --slate-900: #0f172a;
             --emerald-50: #ecfdf5;
             --emerald-600: #059669;
             --emerald-700: #047857;
+            --amber-50: #fffbeb;
             --amber-600: #d97706;
             --rose-50: #fff1f2;
             --rose-600: #e11d48;
             --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --card-shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
         }
 
         * { box-sizing: border-box; }
         body { font-family: 'Prompt', 'Sarabun', sans-serif; background-color: #f1f5f9; color: var(--slate-900); margin: 0; padding: 20px; }
-        .wrapper { max-width: 1300px; margin: 0 auto; }
+        .wrapper { max-width: 1320px; margin: 0 auto; }
 
         /* Header */
         .app-header { background: #ffffff; padding: 16px 22px; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--slate-200); }
         .header-title h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--primary); }
-        .header-title p { margin: 2px 0 0 0; font-size: 12px; color: #64748b; }
-        .btn-group { display: flex; gap: 8px; }
+        .header-title p { margin: 2px 0 0 0; font-size: 12px; color: var(--slate-600); }
+        .btn-group { display: flex; gap: 8px; align-items: center; }
         .btn { padding: 7px 14px; border-radius: 8px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent; transition: 0.15s; }
         .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: #172554; }
         .btn-white { background: #fff; border-color: var(--slate-300); color: var(--slate-700); }
+        .btn-white:hover { background: var(--slate-50); }
         .btn-emerald { background: var(--emerald-600); color: #fff; }
+        .btn-emerald:hover { background: var(--emerald-700); }
         .btn-danger { background: var(--rose-50); color: var(--rose-600); border-color: #fecdd3; }
+        .btn-danger:hover { background: #ffe4e6; }
+        .btn-sm { padding: 4px 9px; font-size: 12px; border-radius: 6px; }
 
         /* Project Select */
         .project-bar { background: #ffffff; padding: 12px 18px; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--slate-200); flex-wrap: wrap; }
-        .custom-select { padding: 8px 12px; border: 1.5px solid var(--slate-200); border-radius: 8px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; min-width: 320px; }
+        .custom-select { padding: 8px 12px; border: 1.5px solid var(--slate-200); border-radius: 8px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; min-width: 320px; outline: none; }
+        .custom-select:focus { border-color: var(--primary); }
 
         /* Tabs Nav (Pills) */
-        .tabs-nav { display: flex; gap: 4px; overflow-x: auto; padding: 6px; background: #e2e8f0; border-radius: 12px; margin-bottom: 16px; }
-        .tab-pill { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; white-space: nowrap; border: none; background: transparent; transition: 0.15s; }
+        .tabs-nav-wrapper { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #e2e8f0; border-radius: 12px; padding: 6px; margin-bottom: 16px; overflow-x: auto; }
+        .tabs-nav { display: flex; gap: 4px; overflow-x: auto; align-items: center; }
+        .tab-pill { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; white-space: nowrap; border: none; background: transparent; transition: 0.15s; display: flex; align-items: center; gap: 6px; }
+        .tab-pill:hover { background: rgba(255,255,255,0.6); }
         .tab-pill.active { background: #ffffff; color: var(--primary); font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+        .btn-add-tab { padding: 7px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; background: #ffffff; color: var(--emerald-700); border: 1px dashed var(--emerald-600); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; transition: 0.15s; }
+        .btn-add-tab:hover { background: var(--emerald-50); }
 
         /* Workspace */
         .workspace { background: #ffffff; border-radius: 14px; padding: 22px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); }
         .sheet-pane { display: none; }
         .sheet-pane.active { display: block; }
-        .pane-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--slate-200); }
+        .pane-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--slate-200); flex-wrap: wrap; gap: 10px; }
         .pane-head h2 { margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); }
 
         /* Tables */
@@ -78,19 +91,26 @@
         .row-total-master { background: #f8fafc; font-weight: 700; font-size: 13.5px; }
         .profit-final-row { background: var(--emerald-50); font-weight: 700; color: var(--emerald-700); font-size: 14.5px; }
 
-        /* Inline Editable Inputs */
         .cell-input { width: 100%; padding: 4px 6px; border: 1px solid transparent; border-radius: 4px; font-family: 'Prompt'; font-size: 13px; background: transparent; transition: 0.15s; }
         .cell-input:hover { border-color: var(--slate-300); background: #fff; }
         .cell-input:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
-        .clean-input { width: 100%; padding: 6px 8px; border: 1px solid var(--slate-300); border-radius: 6px; font-family: 'Prompt'; font-size: 12.5px; }
+        .clean-input { width: 100%; padding: 7px 10px; border: 1px solid var(--slate-300); border-radius: 6px; font-family: 'Prompt'; font-size: 13px; outline: none; }
+        .clean-input:focus { border-color: var(--primary); }
 
-        /* Modal */
+        .action-btns { display: flex; gap: 4px; justify-content: center; align-items: center; }
+        .btn-icon { border: none; background: none; cursor: pointer; padding: 4px 6px; border-radius: 4px; font-size: 13px; transition: 0.15s; }
+        .btn-icon.edit { color: var(--primary); background: var(--primary-light); }
+        .btn-icon.edit:hover { background: #dbeafe; }
+        .btn-icon.del { color: var(--rose-600); background: var(--rose-50); }
+        .btn-icon.del:hover { background: #ffe4e6; }
+
+        /* Modals */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; }
-        .modal-box { background: #fff; width: 500px; max-width: 92%; border-radius: 14px; padding: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .modal-box { background: #fff; width: 480px; max-width: 92%; border-radius: 14px; padding: 22px; box-shadow: var(--card-shadow-lg); }
         .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--slate-200); padding-bottom: 10px; margin-bottom: 15px; }
         .modal-head h3 { margin: 0; font-size: 17px; font-weight: 700; color: var(--primary); }
         .form-item { margin-bottom: 12px; }
-        .form-item label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 4px; }
+        .form-item label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 4px; color: var(--slate-700); }
 
         @media print {
             .no-print { display: none !important; }
@@ -128,8 +148,11 @@
         </div>
     </div>
 
-    <!-- Tabs Nav -->
-    <div class="tabs-nav no-print" id="sheet-tabs-container"></div>
+    <!-- Dynamic Tabs Bar -->
+    <div class="tabs-nav-wrapper no-print">
+        <div class="tabs-nav" id="sheet-tabs-container"></div>
+        <button class="btn-add-tab" onclick="openAddMainTabModal()">➕ เพิ่มหมวดงาน</button>
+    </div>
 
     <!-- Workspace -->
     <div class="workspace">
@@ -143,22 +166,23 @@
 
             <!-- Table 1: ตามใบเสนอราคา -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <div style="font-size: 13.5px; font-weight: 600; color: var(--primary);">1. ตามใบเสนอราคา (ยอดขาย vs ต้นทุนอุปกรณ์ 7 หมวด)</div>
-                <div class="no-print" style="font-size: 12px; color: #64748b;">💡 สามารถคลิกพิมพ์แก้ไข <strong>จำนวน</strong> หรือ <strong>ราคาขาย</strong> ในตารางได้โดยตรง</div>
+                <div style="font-size: 13.5px; font-weight: 600; color: var(--primary);">1. ตามใบเสนอราคา (ยอดขาย vs ต้นทุนอุปกรณ์)</div>
+                <button class="btn btn-emerald btn-sm no-print" onclick="openAddMainTabModal()">➕ เพิ่มหมวดอุปกรณ์</button>
             </div>
             <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
                             <th style="width: 5%;" class="t-center">ลำดับ</th>
-                            <th style="width: 35%;">รายการ</th>
+                            <th style="width: 32%;">รายการ</th>
                             <th style="width: 8%;" class="t-center">จำนวน</th>
                             <th style="width: 7%;" class="t-center">หน่วย</th>
-                            <th style="width: 12%;" class="t-right">ราคา/หน่วย</th>
+                            <th style="width: 11%;" class="t-right">ราคา/หน่วย</th>
                             <th style="width: 11%;" class="t-right">จำนวนเงิน</th>
-                            <th style="width: 11%;" class="t-right text-amber">ราคาทุน/หน่วย</th>
-                            <th style="width: 11%;" class="t-right text-amber">ราคาทุนรวม</th>
-                            <th style="width: 12%;" class="t-right text-emerald">กำไรรวมค่าแรง</th>
+                            <th style="width: 10%;" class="t-right text-amber">ราคาทุน/หน่วย</th>
+                            <th style="width: 10%;" class="t-right text-amber">ราคาทุนรวม</th>
+                            <th style="width: 11%;" class="t-right text-emerald">กำไรรวมค่าแรง</th>
+                            <th style="width: 7%;" class="t-center no-print">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="tbl-main-items-body"></tbody>
@@ -169,6 +193,7 @@
                             <td class="t-right">-</td>
                             <td class="t-right text-amber font-bold" id="sum-h11">0.00</td>
                             <td class="t-right text-emerald font-bold" id="sum-i11">0.00</td>
+                            <td class="no-print"></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -221,13 +246,174 @@
             </div>
         </div>
 
-        <!-- Dynamic Sheets Container -->
+        <!-- Dynamic Sheets Container (BOM, Expenses, Cashflow) -->
         <div id="dynamic-panes-container"></div>
 
     </div>
 </div>
 
-<!-- Modal Create Project -->
+<!-- ==================== MODALS ==================== -->
+
+<!-- Modal: เพิ่มหมวดงาน/แท็บใหม่ -->
+<div class="modal-overlay" id="modalAddMainTab">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3>➕ เพิ่มหมวดงาน / แท็บใหม่</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalAddMainTab')">&times;</span>
+        </div>
+        <div class="form-item">
+            <label>ชื่อหมวดงาน / รายการ:</label>
+            <input type="text" id="add-main-name" class="clean-input" placeholder="เช่น ตู้จัดเก็บอุปกรณ์ Outdoor, เสากัลวาไนซ์...">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item">
+                <label>จำนวน:</label>
+                <input type="number" id="add-main-qty" class="clean-input" value="1">
+            </div>
+            <div class="form-item">
+                <label>หน่วยนับ:</label>
+                <input type="text" id="add-main-unit" class="clean-input" value="ชุด">
+            </div>
+        </div>
+        <div class="form-item">
+            <label>ราคาเสนอขายต่อหน่วย (บาท):</label>
+            <input type="number" id="add-main-price" class="clean-input" value="0">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModal('modalAddMainTab')">ยกเลิก</button>
+            <button class="btn btn-emerald" onclick="submitAddMainTab()">➕ เพิ่มหมวดและสร้างแท็บ</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: แก้ไขหมวดงาน/แท็บหลัก -->
+<div class="modal-overlay" id="modalEditMainTab">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3>✏️ แก้ไขข้อมูลหมวดงาน</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalEditMainTab')">&times;</span>
+        </div>
+        <input type="hidden" id="edit-main-id">
+        <div class="form-item">
+            <label>ชื่อหมวดงาน / รายการ:</label>
+            <input type="text" id="edit-main-name" class="clean-input">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item">
+                <label>จำนวน:</label>
+                <input type="number" id="edit-main-qty" class="clean-input">
+            </div>
+            <div class="form-item">
+                <label>หน่วยนับ:</label>
+                <input type="text" id="edit-main-unit" class="clean-input">
+            </div>
+        </div>
+        <div class="form-item">
+            <label>ราคาเสนอขายต่อหน่วย (บาท):</label>
+            <input type="number" id="edit-main-price" class="clean-input">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModal('modalEditMainTab')">ยกเลิก</button>
+            <button class="btn btn-emerald" onclick="submitEditMainTab()">บันทึกการแก้ไข</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: แก้ไขอุปกรณ์ย่อย (BOM Item) -->
+<div class="modal-overlay" id="modalEditBomItem">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3>✏️ แก้ไขอุปกรณ์ย่อย</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalEditBomItem')">&times;</span>
+        </div>
+        <input type="hidden" id="edit-bom-id">
+        <div class="form-item">
+            <label>ชื่ออุปกรณ์ย่อย:</label>
+            <input type="text" id="edit-bom-name" class="clean-input">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item">
+                <label>จำนวนที่ใช้ต่อจุด:</label>
+                <input type="number" id="edit-bom-qty" class="clean-input">
+            </div>
+            <div class="form-item">
+                <label>ราคาทุนต่อหน่วย (บาท):</label>
+                <input type="number" id="edit-bom-cost" class="clean-input">
+            </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModal('modalEditBomItem')">ยกเลิก</button>
+            <button class="btn btn-emerald" onclick="submitEditBomItem()">บันทึกการแก้ไข</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: แก้ไขค่าใช้จ่าย (Expense) -->
+<div class="modal-overlay" id="modalEditExpense">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3>✏️ แก้ไขรายการค่าใช้จ่าย</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalEditExpense')">&times;</span>
+        </div>
+        <input type="hidden" id="edit-exp-id">
+        <div class="form-item">
+            <label>รายการ / รายละเอียด:</label>
+            <input type="text" id="edit-exp-name" class="clean-input">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item">
+                <label>จำนวนเงิน (บาท):</label>
+                <input type="number" id="edit-exp-amt" class="clean-input">
+            </div>
+            <div class="form-item">
+                <label>วันที่:</label>
+                <input type="date" id="edit-exp-date" class="clean-input">
+            </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModal('modalEditExpense')">ยกเลิก</button>
+            <button class="btn btn-emerald" onclick="submitEditExpense()">บันทึกการแก้ไข</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: แก้ไขเงินทุน (Cashflow) -->
+<div class="modal-overlay" id="modalEditCashflow">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3>✏️ แก้ไขรายการเงินทุน</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalEditCashflow')">&times;</span>
+        </div>
+        <input type="hidden" id="edit-cash-id">
+        <div class="form-item">
+            <label>ประเภทรายการ:</label>
+            <select id="edit-cash-type" class="clean-input">
+                <option value="in">🟢 เบิกรับเงิน (ค่างวด)</option>
+                <option value="out">🔴 จ่ายมัดจำ / ซื้อของ</option>
+            </select>
+        </div>
+        <div class="form-item">
+            <label>ชื่อ / รายการ:</label>
+            <input type="text" id="edit-cash-name" class="clean-input">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item">
+                <label>จำนวนเงิน (บาท):</label>
+                <input type="number" id="edit-cash-amt" class="clean-input">
+            </div>
+            <div class="form-item">
+                <label>วันที่:</label>
+                <input type="date" id="edit-cash-date" class="clean-input">
+            </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModal('modalEditCashflow')">ยกเลิก</button>
+            <button class="btn btn-emerald" onclick="submitEditCashflow()">บันทึกการแก้ไข</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: สร้างโครงการใหม่ -->
 <div class="modal-overlay" id="modalNewProject">
     <div class="modal-box">
         <div class="modal-head">
@@ -236,22 +422,22 @@
         </div>
         <div class="form-item">
             <label>รูปแบบ:</label>
-            <select id="sel-create-type" class="custom-select" style="width:100%;" onchange="toggleCreateType()">
-                <option value="quote">ดึงข้อมูลจากใบเสนอราคา (อัตโนมัติ)</option>
-                <option value="manual">สร้างโครงการอิสระ</option>
+            <select id="sel-create-type" class="clean-input" onchange="toggleCreateType()">
+                <option value="quote">ดึงข้อมูลจากใบเสนอราคา</option>
+                <option value="manual">สร้างโครงการอิสระ (กำหนดหมวดเอง)</option>
             </select>
         </div>
         <div class="form-item" id="row-quote-select">
             <label>เลือกใบเสนอราคา:</label>
-            <select id="sel-quote-doc" class="custom-select" style="width:100%;"></select>
+            <select id="sel-quote-doc" class="clean-input"></select>
         </div>
         <div class="form-item">
             <label>ชื่อโครงการ:</label>
-            <input type="text" id="inp-proj-name" class="clean-input" placeholder="เช่น โครงการติดตั้ง CCTV 9 จุด...">
+            <input type="text" id="inp-proj-name" class="clean-input" placeholder="เช่น โครงการติดตั้ง CCTV...">
         </div>
         <div class="form-item">
             <label>ผู้ว่าจ้าง:</label>
-            <input type="text" id="inp-proj-cust" class="clean-input" placeholder="ชื่อหน่วยงาน หรือบุคคล">
+            <input type="text" id="inp-proj-cust" class="clean-input" placeholder="ชื่อหน่วยงาน หรือลูกค้า">
         </div>
         <div class="form-item">
             <label>ยอดสัญญารวม (บาท):</label>
@@ -321,9 +507,11 @@
 
         document.getElementById('lbl-customer').innerText = currentProject.customer_name || 'ทั่วไป';
 
+        // 1. Load Main Items
         const resMain = await supabaseClient.from('project_main_items').select('*').eq('project_id', currentProject.id).order('item_order');
         mainItems = resMain.data || [];
 
+        // 2. Load BOMs
         const mainIds = mainItems.map(m => m.id);
         if (mainIds.length > 0) {
             const resBom = await supabaseClient.from('project_bom_items').select('*').in('main_item_id', mainIds).order('item_order');
@@ -332,6 +520,7 @@
             bomItems = [];
         }
 
+        // 3. Load Expenses & Cashflow
         const resExp = await supabaseClient.from('project_expenses').select('*').eq('project_id', currentProject.id).order('expense_date');
         expenses = resExp.data || [];
 
@@ -346,12 +535,14 @@
         const container = document.getElementById('sheet-tabs-container');
         container.innerHTML = '';
 
+        // Tab: รวมหลัก
         const masterTab = document.createElement('button');
         masterTab.className = `tab-pill ${activeSheetKey === 'main-summary' ? 'active' : ''}`;
         masterTab.innerHTML = `📊 รวมหลัก`;
         masterTab.onclick = () => switchSheet('main-summary');
         container.appendChild(masterTab);
 
+        // Dynamic BOM Tabs
         mainItems.forEach(item => {
             const tab = document.createElement('button');
             tab.className = `tab-pill ${activeSheetKey === 'bom-' + item.id ? 'active' : ''}`;
@@ -360,6 +551,7 @@
             container.appendChild(tab);
         });
 
+        // Fixed Expense & Cashflow Tabs
         const fixedTabs = [
             { key: 'exp-materials', label: '🪛 วัสดุอื่นๆ' },
             { key: 'exp-ops', label: '⛽ ค่าใช้จ่ายดำเนินงาน' },
@@ -399,14 +591,14 @@
         }
     }
 
-    // --- EXACT EXCEL MASTER SUMMARY CALCULATION ---
+    // --- RENDER MASTER SUMMARY ---
     function renderMasterSummary() {
         const tbody = document.getElementById('tbl-main-items-body');
         tbody.innerHTML = '';
 
-        let sumSelling = 0;   // SUM(F3:F10)
-        let sumBomCost = 0;   // SUM(H3:H10)
-        let sumGrossProfit = 0; // SUM(I3:I10)
+        let sumSelling = 0;
+        let sumBomCost = 0;
+        let sumGrossProfit = 0;
 
         mainItems.forEach((item, idx) => {
             const subs = bomItems.filter(b => b.main_item_id === item.id);
@@ -424,28 +616,28 @@
             tr.innerHTML = `
                 <td class="t-center">${idx + 1}</td>
                 <td><a href="javascript:void(0)" onclick="switchSheet('bom-${item.id}')" style="color:var(--primary);font-weight:500;text-decoration:none;">${item.item_name}</a></td>
-                <td class="t-center">
-                    <input type="number" class="cell-input t-center font-bold" value="${item.qty}" style="width:65px;" onchange="updateMainItemField('${item.id}', 'qty', this.value)">
-                </td>
+                <td class="t-center font-bold">${item.qty}</td>
                 <td class="t-center">${item.unit || 'จุด'}</td>
-                <td class="t-right">
-                    <input type="number" class="cell-input t-right" value="${item.unit_price}" style="width:110px;" onchange="updateMainItemField('${item.id}', 'unit_price', this.value)">
-                </td>
+                <td class="t-right">${Number(item.unit_price).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                 <td class="t-right font-bold">${sellingTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                 <td class="t-right text-amber">${unitCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                 <td class="t-right font-bold text-amber">${costTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                 <td class="t-right font-bold text-emerald">${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                <td class="t-center no-print">
+                    <div class="action-btns">
+                        <button class="btn-icon edit" onclick="openEditMainTabModal('${item.id}')" title="แก้ไข">✏️</button>
+                        <button class="btn-icon del" onclick="deleteMainItem('${item.id}')" title="ลบ">🗑️</button>
+                    </div>
+                </td>
             `;
             tbody.appendChild(tr);
         });
 
-        // Other Deductions
         const valI14 = expenses.filter(e => e.category === 'materials').reduce((s, e) => s + Number(e.amount || 0), 0);
         const valI15 = expenses.filter(e => e.category === 'ops').reduce((s, e) => s + Number(e.amount || 0), 0);
         const valI16 = Number(currentProject.retention_amount || 0);
         const valI17 = expenses.filter(e => e.category === 'labor').reduce((s, e) => s + Number(e.amount || 0), 0);
-        
-        const valI18 = valI14 + valI15 + valI16 + valI17; // SUM(I14:I17)
+        const valI18 = valI14 + valI15 + valI16 + valI17;
 
         const sumF11 = sumSelling;
         const sumH11 = sumBomCost + valI18;
@@ -463,7 +655,7 @@
         document.getElementById('val-net-profit').innerText = sumI11.toLocaleString('en-US', {minimumFractionDigits: 2});
     }
 
-    // --- BOM SHEET ---
+    // --- RENDER BOM SHEET ---
     function renderBomSheet(mainItemId) {
         const item = mainItems.find(m => m.id === mainItemId);
         if (!item) return;
@@ -471,23 +663,35 @@
         const container = document.getElementById('dynamic-panes-container');
         const subs = bomItems.filter(b => b.main_item_id === mainItemId);
         const totalUnitCost = subs.reduce((sum, s) => sum + (Number(s.qty || 1) * Number(s.unit_cost || 0)), 0);
+        const totalCategoryCost = Number(item.qty || 1) * totalUnitCost;
 
         container.innerHTML = `
             <div class="sheet-pane active">
                 <div class="pane-head">
-                    <h2>🛠️ ชีต: ${item.item_name} (จำนวน ${item.qty} ${item.unit})</h2>
-                    <button class="btn btn-white" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                    <div>
+                        <h2>🛠️ ชีต: ${item.item_name}</h2>
+                        <div style="font-size: 13px; color: var(--slate-600); margin-top: 3px;">
+                            จำนวนในโครงการ: <strong style="color:var(--primary);">${item.qty} ${item.unit}</strong> | 
+                            ราคาขาย: <strong>${Number(item.unit_price).toLocaleString()}.-</strong> |
+                            ราคาทุนรวมทั้งหมวด: <strong style="color:var(--amber-600);">${totalCategoryCost.toLocaleString('en-US', {minimumFractionDigits: 2})} บาท</strong>
+                        </div>
+                    </div>
+                    <div class="btn-group no-print">
+                        <button class="btn btn-white btn-sm" onclick="openEditMainTabModal('${item.id}')">✏️ แก้ไขข้อมูลหมวดนี้</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMainItem('${item.id}')">🗑️ ลบแท็บนี้</button>
+                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                    </div>
                 </div>
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
                                 <th style="width: 6%;" class="t-center">ลำดับ</th>
-                                <th style="width: 44%;">รายการ</th>
-                                <th style="width: 14%;" class="t-center">จำนวน/จุด</th>
-                                <th style="width: 18%;" class="t-right">ราคาทุน (บาท)</th>
-                                <th style="width: 18%;" class="t-right">รวม (บาท)</th>
-                                <th style="width: 4%;" class="no-print"></th>
+                                <th style="width: 42%;">รายการอุปกรณ์ย่อย (ต่อ 1 ${item.unit})</th>
+                                <th style="width: 14%;" class="t-center">จำนวนที่ใช้/จุด</th>
+                                <th style="width: 16%;" class="t-right">ราคาทุน/หน่วย (บาท)</th>
+                                <th style="width: 14%;" class="t-right">รวมทุน/จุด (บาท)</th>
+                                <th style="width: 8%;" class="t-center no-print">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -499,7 +703,10 @@
                                     <td class="t-right">${Number(s.unit_cost).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-right font-bold">${(Number(s.qty) * Number(s.unit_cost)).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-center no-print">
-                                        <button style="border:none;background:none;color:var(--rose-600);cursor:pointer;" onclick="deleteBomRow('${s.id}')">✖</button>
+                                        <div class="action-btns">
+                                            <button class="btn-icon edit" onclick="openEditBomModal('${s.id}')" title="แก้ไข">✏️</button>
+                                            <button class="btn-icon del" onclick="deleteBomRow('${s.id}')" title="ลบ">🗑️</button>
+                                        </div>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -508,14 +715,14 @@
                                 <td><input type="text" id="add-sub-name" class="clean-input" placeholder="ชื่ออุปกรณ์ย่อย..."></td>
                                 <td><input type="number" id="add-sub-qty" class="clean-input t-center" value="1"></td>
                                 <td><input type="number" id="add-sub-cost" class="clean-input t-right" value="0"></td>
-                                <td class="t-center" colspan="2"><button class="btn btn-emerald" style="padding: 4px 10px; font-size: 12px;" onclick="addBomRow('${mainItemId}')">➕ เพิ่มแถว</button></td>
+                                <td class="t-center" colspan="2"><button class="btn btn-emerald btn-sm" style="width:100%;" onclick="addBomRow('${mainItemId}')">➕ เพิ่มแถว</button></td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อหน่วย (ส่งไปชีตรวมหลัก)</td>
+                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อ 1 ${item.unit} (ส่งไปชีตรวมหลัก)</td>
                                 <td class="t-right font-bold text-amber" style="font-size: 14px;">${totalUnitCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                                <td></td>
+                                <td class="no-print"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -524,7 +731,7 @@
         `;
     }
 
-    // --- EXPENSES SHEET ---
+    // --- RENDER EXPENSE SHEET ---
     function renderExpenseSheet(catKey) {
         const catTitles = {
             'materials': '🪛 ชีต: วัสดุอื่นๆ (ของสิ้นเปลืองหน้างาน)',
@@ -540,17 +747,17 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <h2>${catTitles[catKey] || 'ค่าใช้จ่าย'}</h2>
-                    <button class="btn btn-white" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 8%;" class="t-center">ลำดับ</th>
-                                <th style="width: 50%;">รายการ</th>
+                                <th style="width: 6%;" class="t-center">ลำดับ</th>
+                                <th style="width: 48%;">รายการ</th>
                                 <th style="width: 20%;" class="t-right">จำนวน/บาท</th>
                                 <th style="width: 18%;" class="t-center">วันที่</th>
-                                <th style="width: 4%;" class="no-print"></th>
+                                <th style="width: 8%;" class="t-center no-print">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -560,7 +767,12 @@
                                     <td>${e.item_name}</td>
                                     <td class="t-right font-bold">${Number(e.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-center">${e.expense_date || '-'}</td>
-                                    <td class="t-center no-print"><button style="border:none;background:none;color:var(--rose-600);cursor:pointer;" onclick="deleteExpenseRow('${e.id}')">✖</button></td>
+                                    <td class="t-center no-print">
+                                        <div class="action-btns">
+                                            <button class="btn-icon edit" onclick="openEditExpenseModal('${e.id}')" title="แก้ไข">✏️</button>
+                                            <button class="btn-icon del" onclick="deleteExpenseRow('${e.id}')" title="ลบ">🗑️</button>
+                                        </div>
+                                    </td>
                                 </tr>
                             `).join('')}
                             <tr class="no-print" style="background: var(--slate-50);">
@@ -568,7 +780,7 @@
                                 <td><input type="text" id="add-exp-name" class="clean-input" placeholder="พิมพ์รายการ..."></td>
                                 <td><input type="number" id="add-exp-amt" class="clean-input t-right" value="0"></td>
                                 <td><input type="date" id="add-exp-date" class="clean-input t-center"></td>
-                                <td class="t-center"><button class="btn btn-emerald" style="padding: 4px 10px; font-size: 12px;" onclick="addExpenseRow('${catKey}')">เพิ่ม</button></td>
+                                <td class="t-center"><button class="btn btn-emerald btn-sm" style="width:100%;" onclick="addExpenseRow('${catKey}')">เพิ่ม</button></td>
                             </tr>
                         </tbody>
                         <tfoot>
@@ -585,7 +797,7 @@
         document.getElementById('add-exp-date').valueAsDate = new Date();
     }
 
-    // --- CASHFLOW SHEET ---
+    // --- RENDER CASHFLOW SHEET ---
     function renderCashflowSheet() {
         const totalIn = cashflows.filter(c => c.flow_type === 'in').reduce((s, c) => s + Number(c.amount || 0), 0);
         const totalOut = cashflows.filter(c => c.flow_type === 'out').reduce((s, c) => s + Number(c.amount || 0), 0);
@@ -596,7 +808,7 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <h2>💰 ชีต: รายการเงินทุน (รับค่างวด / จ่ายมัดจำ)</h2>
-                    <button class="btn btn-white" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
@@ -604,10 +816,10 @@
                             <tr>
                                 <th style="width: 6%;" class="t-center">ลำดับ</th>
                                 <th style="width: 18%;">ประเภท</th>
-                                <th style="width: 36%;">ชื่อ / รายการ</th>
+                                <th style="width: 32%;">ชื่อ / รายการ</th>
                                 <th style="width: 18%;" class="t-right">จำนวน/บาท</th>
                                 <th style="width: 18%;" class="t-center">วันที่</th>
-                                <th style="width: 4%;" class="no-print"></th>
+                                <th style="width: 8%;" class="t-center no-print">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -618,7 +830,12 @@
                                     <td>${c.item_name}</td>
                                     <td class="t-right font-bold" style="color:${c.flow_type === 'in' ? 'var(--emerald-600)' : 'var(--rose-600)'};">${c.flow_type === 'in' ? '+' : '-'}${Number(c.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-center">${c.flow_date || '-'}</td>
-                                    <td class="t-center no-print"><button style="border:none;background:none;color:var(--rose-600);cursor:pointer;" onclick="deleteCashflowRow('${c.id}')">✖</button></td>
+                                    <td class="t-center no-print">
+                                        <div class="action-btns">
+                                            <button class="btn-icon edit" onclick="openEditCashflowModal('${c.id}')" title="แก้ไข">✏️</button>
+                                            <button class="btn-icon del" onclick="deleteCashflowRow('${c.id}')" title="ลบ">🗑️</button>
+                                        </div>
+                                    </td>
                                 </tr>
                             `).join('')}
                             <tr class="no-print" style="background: var(--slate-50);">
@@ -632,14 +849,14 @@
                                 <td><input type="text" id="add-cash-name" class="clean-input" placeholder="เช่น มัดจำอุปกรณ์..."></td>
                                 <td><input type="number" id="add-cash-amt" class="clean-input t-right" value="0"></td>
                                 <td><input type="date" id="add-cash-date" class="clean-input t-center"></td>
-                                <td class="t-center"><button class="btn btn-emerald" style="padding: 4px 10px; font-size: 12px;" onclick="addCashflowRow()">เพิ่ม</button></td>
+                                <td class="t-center"><button class="btn btn-emerald btn-sm" style="width:100%;" onclick="addCashflowRow()">เพิ่ม</button></td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
                                 <td colspan="3" class="t-center font-bold">เบิกรวม: <span class="text-emerald">${totalIn.toLocaleString('en-US', {minimumFractionDigits: 2})}</span> | จ่ายรวม: <span class="text-rose">${totalOut.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
                                 <td class="t-right font-bold text-primary" style="font-size: 14px;">เหลือ: ${balance.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                                <td colspan="2"></td>
+                                <td class="no-print"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -649,20 +866,81 @@
         document.getElementById('add-cash-date').valueAsDate = new Date();
     }
 
-    // --- DB Mutations & Updates ---
-    async function updateMainItemField(id, field, value) {
-        const valNum = parseFloat(value) || 0;
-        await supabaseClient.from('project_main_items').update({ [field]: valNum }).eq('id', id);
+    // ==================== CRUD OPERATIONS & EDIT HANDLERS ====================
+
+    // --- Main Item (Tab) CRUD ---
+    function openAddMainTabModal() {
+        document.getElementById('add-main-name').value = '';
+        document.getElementById('add-main-qty').value = '1';
+        document.getElementById('add-main-unit').value = 'ชุด';
+        document.getElementById('add-main-price').value = '0';
+        document.getElementById('modalAddMainTab').style.display = 'flex';
+    }
+
+    async function submitAddMainTab() {
+        if (!currentProject) return;
+        const name = document.getElementById('add-main-name').value.trim();
+        const qty = parseFloat(document.getElementById('add-main-qty').value) || 1;
+        const unit = document.getElementById('add-main-unit').value.trim() || 'ชุด';
+        const price = parseFloat(document.getElementById('add-main-price').value) || 0;
+
+        if (!name) return alert('กรุณากรอกชื่อหมวดงาน');
+
+        const { data, error } = await supabaseClient.from('project_main_items').insert([{
+            project_id: currentProject.id,
+            item_order: mainItems.length + 1,
+            item_name: name,
+            qty: qty,
+            unit: unit,
+            unit_price: price
+        }]).select().single();
+
+        if (error) return alert('เกิดข้อผิดพลาด: ' + error.message);
+
+        closeModal('modalAddMainTab');
+        activeSheetKey = 'bom-' + data.id;
         await loadFullProjectData();
     }
 
-    async function updateRetentionAmount(value) {
-        const valNum = parseFloat(value) || 0;
-        await supabaseClient.from('projects').update({ retention_amount: valNum }).eq('id', currentProject.id);
-        currentProject.retention_amount = valNum;
-        renderMasterSummary();
+    function openEditMainTabModal(id) {
+        const item = mainItems.find(m => m.id === id);
+        if (!item) return;
+        document.getElementById('edit-main-id').value = item.id;
+        document.getElementById('edit-main-name').value = item.item_name;
+        document.getElementById('edit-main-qty').value = item.qty;
+        document.getElementById('edit-main-unit').value = item.unit || 'ชุด';
+        document.getElementById('edit-main-price').value = item.unit_price;
+        document.getElementById('modalEditMainTab').style.display = 'flex';
     }
 
+    async function submitEditMainTab() {
+        const id = document.getElementById('edit-main-id').value;
+        const name = document.getElementById('edit-main-name').value.trim();
+        const qty = parseFloat(document.getElementById('edit-main-qty').value) || 1;
+        const unit = document.getElementById('edit-main-unit').value.trim() || 'ชุด';
+        const price = parseFloat(document.getElementById('edit-main-price').value) || 0;
+
+        if (!name) return alert('กรุณากรอกชื่อหมวดงาน');
+
+        await supabaseClient.from('project_main_items').update({
+            item_name: name,
+            qty: qty,
+            unit: unit,
+            unit_price: price
+        }).eq('id', id);
+
+        closeModal('modalEditMainTab');
+        await loadFullProjectData();
+    }
+
+    async function deleteMainItem(id) {
+        if (!confirm('ยืนยันลบหมวดงาน/แท็บนี้ และรายการอุปกรณ์ย่อยข้างในทั้งหมด?')) return;
+        await supabaseClient.from('project_main_items').delete().eq('id', id);
+        activeSheetKey = 'main-summary';
+        await loadFullProjectData();
+    }
+
+    // --- BOM Sub-Item CRUD ---
     async function addBomRow(mainItemId) {
         const name = document.getElementById('add-sub-name').value.trim();
         const qty = parseFloat(document.getElementById('add-sub-qty').value) || 1;
@@ -673,12 +951,41 @@
         await loadFullProjectData();
     }
 
+    function openEditBomModal(id) {
+        const s = bomItems.find(b => b.id === id);
+        if (!s) return;
+        document.getElementById('edit-bom-id').value = s.id;
+        document.getElementById('edit-bom-name').value = s.item_name;
+        document.getElementById('edit-bom-qty').value = s.qty;
+        document.getElementById('edit-bom-cost').value = s.unit_cost;
+        document.getElementById('modalEditBomItem').style.display = 'flex';
+    }
+
+    async function submitEditBomItem() {
+        const id = document.getElementById('edit-bom-id').value;
+        const name = document.getElementById('edit-bom-name').value.trim();
+        const qty = parseFloat(document.getElementById('edit-bom-qty').value) || 1;
+        const cost = parseFloat(document.getElementById('edit-bom-cost').value) || 0;
+
+        if (!name) return alert('กรุณากรอกชื่ออุปกรณ์ย่อย');
+
+        await supabaseClient.from('project_bom_items').update({
+            item_name: name,
+            qty: qty,
+            unit_cost: cost
+        }).eq('id', id);
+
+        closeModal('modalEditBomItem');
+        await loadFullProjectData();
+    }
+
     async function deleteBomRow(id) {
         if (!confirm('ยืนยันลบรายการนี้?')) return;
         await supabaseClient.from('project_bom_items').delete().eq('id', id);
         await loadFullProjectData();
     }
 
+    // --- Expense CRUD ---
     async function addExpenseRow(catKey) {
         const name = document.getElementById('add-exp-name').value.trim();
         const amt = parseFloat(document.getElementById('add-exp-amt').value) || 0;
@@ -689,12 +996,41 @@
         await loadFullProjectData();
     }
 
+    function openEditExpenseModal(id) {
+        const e = expenses.find(x => x.id === id);
+        if (!e) return;
+        document.getElementById('edit-exp-id').value = e.id;
+        document.getElementById('edit-exp-name').value = e.item_name;
+        document.getElementById('edit-exp-amt').value = e.amount;
+        document.getElementById('edit-exp-date').value = e.expense_date || '';
+        document.getElementById('modalEditExpense').style.display = 'flex';
+    }
+
+    async function submitEditExpense() {
+        const id = document.getElementById('edit-exp-id').value;
+        const name = document.getElementById('edit-exp-name').value.trim();
+        const amt = parseFloat(document.getElementById('edit-exp-amt').value) || 0;
+        const date = document.getElementById('edit-exp-date').value;
+
+        if (!name || amt <= 0) return alert('กรุณากรอกรายการและจำนวนเงิน');
+
+        await supabaseClient.from('project_expenses').update({
+            item_name: name,
+            amount: amt,
+            expense_date: date
+        }).eq('id', id);
+
+        closeModal('modalEditExpense');
+        await loadFullProjectData();
+    }
+
     async function deleteExpenseRow(id) {
         if (!confirm('ยืนยันลบรายการนี้?')) return;
         await supabaseClient.from('project_expenses').delete().eq('id', id);
         await loadFullProjectData();
     }
 
+    // --- Cashflow CRUD ---
     async function addCashflowRow() {
         const type = document.getElementById('add-cash-type').value;
         const name = document.getElementById('add-cash-name').value.trim();
@@ -706,10 +1042,49 @@
         await loadFullProjectData();
     }
 
+    function openEditCashflowModal(id) {
+        const c = cashflows.find(x => x.id === id);
+        if (!c) return;
+        document.getElementById('edit-cash-id').value = c.id;
+        document.getElementById('edit-cash-type').value = c.flow_type;
+        document.getElementById('edit-cash-name').value = c.item_name;
+        document.getElementById('edit-cash-amt').value = c.amount;
+        document.getElementById('edit-cash-date').value = c.flow_date || '';
+        document.getElementById('modalEditCashflow').style.display = 'flex';
+    }
+
+    async function submitEditCashflow() {
+        const id = document.getElementById('edit-cash-id').value;
+        const type = document.getElementById('edit-cash-type').value;
+        const name = document.getElementById('edit-cash-name').value.trim();
+        const amt = parseFloat(document.getElementById('edit-cash-amt').value) || 0;
+        const date = document.getElementById('edit-cash-date').value;
+
+        if (!name || amt <= 0) return alert('กรุณากรอกรายการและจำนวนเงิน');
+
+        await supabaseClient.from('project_cashflow').update({
+            flow_type: type,
+            item_name: name,
+            amount: amt,
+            flow_date: date
+        }).eq('id', id);
+
+        closeModal('modalEditCashflow');
+        await loadFullProjectData();
+    }
+
     async function deleteCashflowRow(id) {
         if (!confirm('ยืนยันลบรายการนี้?')) return;
         await supabaseClient.from('project_cashflow').delete().eq('id', id);
         await loadFullProjectData();
+    }
+
+    // --- Retention & Project Management ---
+    async function updateRetentionAmount(value) {
+        const valNum = parseFloat(value) || 0;
+        await supabaseClient.from('projects').update({ retention_amount: valNum }).eq('id', currentProject.id);
+        currentProject.retention_amount = valNum;
+        renderMasterSummary();
     }
 
     function openNewProjectModal() { document.getElementById('modalNewProject').style.display = 'flex'; }
