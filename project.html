@@ -79,82 +79,16 @@
         .kpi-sub { font-size: 11.5px; color: var(--slate-600); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
         .badge-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
 
-        /* ==================== TABS BAR (PINNED HOME TAB) ==================== */
-        .tabs-nav-wrapper { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            background: #e2e8f0; 
-            border-radius: 12px; 
-            padding: 6px; 
-            margin-bottom: 18px; 
-        }
-        .pinned-tab-wrap {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-        }
-        .tabs-divider-v {
-            width: 2px;
-            height: 24px;
-            background-color: #cbd5e1;
-            flex-shrink: 0;
-            margin: 0 2px;
-        }
-        .tabs-nav { 
-            display: flex; 
-            gap: 4px; 
-            overflow-x: auto; 
-            align-items: center; 
-            flex: 1;
-            min-width: 0;
-            scrollbar-width: thin;
-        }
-        .tab-pill { 
-            padding: 8px 14px; 
-            border-radius: 8px; 
-            font-size: 13px; 
-            font-weight: 500; 
-            color: #475569; 
-            cursor: pointer; 
-            white-space: nowrap; 
-            border: none; 
-            background: transparent; 
-            transition: 0.15s; 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-        }
+        /* Tabs Navigation (Pinned Left Home) */
+        .tabs-nav-wrapper { display: flex; align-items: center; gap: 8px; background: #e2e8f0; border-radius: 12px; padding: 6px; margin-bottom: 18px; }
+        .pinned-tab-wrap { flex-shrink: 0; display: flex; align-items: center; }
+        .tabs-divider-v { width: 2px; height: 24px; background-color: #cbd5e1; flex-shrink: 0; margin: 0 2px; }
+        .tabs-nav { display: flex; gap: 4px; overflow-x: auto; align-items: center; flex: 1; min-width: 0; }
+        .tab-pill { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; white-space: nowrap; border: none; background: transparent; transition: 0.15s; display: flex; align-items: center; gap: 6px; }
         .tab-pill:hover { background: rgba(255,255,255,0.6); }
-        .tab-pill.active { 
-            background: #ffffff; 
-            color: var(--primary); 
-            font-weight: 600; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06); 
-        }
-        .tab-pill.home-btn {
-            font-weight: 600;
-        }
-        .tab-pill.home-btn.active {
-            background: #ffffff;
-            color: var(--primary);
-        }
-        .btn-add-tab { 
-            flex-shrink: 0;
-            padding: 7px 12px; 
-            border-radius: 8px; 
-            font-size: 12.5px; 
-            font-weight: 600; 
-            background: #ffffff; 
-            color: var(--emerald-700); 
-            border: 1px dashed var(--emerald-600); 
-            cursor: pointer; 
-            white-space: nowrap; 
-            display: flex; 
-            align-items: center; 
-            gap: 4px; 
-            transition: 0.15s; 
-        }
+        .tab-pill.active { background: #ffffff; color: var(--primary); font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+        .tab-pill.home-btn { font-weight: 600; }
+        .btn-add-tab { flex-shrink: 0; padding: 7px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; background: #ffffff; color: var(--emerald-700); border: 1px dashed var(--emerald-600); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; transition: 0.15s; }
         .btn-add-tab:hover { background: var(--emerald-50); }
 
         /* Workspace */
@@ -299,7 +233,6 @@
 
     <!-- ==================== TABS BAR (PINNED HOME TAB) ==================== -->
     <div class="tabs-nav-wrapper no-print">
-        <!-- 1. Pinned Home Tab (ล็อคไม่เลื่อน) -->
         <div class="pinned-tab-wrap">
             <button class="tab-pill home-btn active" id="btn-tab-home" onclick="switchSheet('main-summary')">
                 🏠 หน้าหลัก
@@ -308,10 +241,8 @@
         
         <div class="tabs-divider-v"></div>
 
-        <!-- 2. Scrollable Dynamic Tabs (หมวดงาน + ค่าใช้จ่าย + เงินทุน) -->
         <div class="tabs-nav" id="sheet-tabs-container"></div>
 
-        <!-- 3. Action Button (เพิ่มหลายหมวด) -->
         <button class="btn-add-tab" onclick="openBatchMainTabModal()">➕ เพิ่มหลายหมวดงาน</button>
     </div>
 
@@ -725,7 +656,7 @@
         <div class="form-item">
             <label>รูปแบบ:</label>
             <select id="sel-create-type" class="clean-input" onchange="toggleCreateType()">
-                <option value="quote">ดึงข้อมูลจากใบเสนอราคา</option>
+                <option value="quote">ดึงข้อมูลจากใบเสนอราคา (Auto Cost & BOM)</option>
                 <option value="manual">สร้างโครงการอิสระ</option>
             </select>
         </div>
@@ -844,17 +775,14 @@
     }
 
     function renderTabs() {
-        // 1. อัปเดตสถานะปุ่ม "หน้าหลัก" ที่ล็อคไว้ทางซ้าย
         const homeBtn = document.getElementById('btn-tab-home');
         if (homeBtn) {
             homeBtn.className = `tab-pill home-btn ${activeSheetKey === 'main-summary' ? 'active' : ''}`;
         }
 
-        // 2. เรนเดอร์แท็บอื่นๆ ลงในกล่องเลื่อน (Scrollable Container)
         const container = document.getElementById('sheet-tabs-container');
         container.innerHTML = '';
 
-        // Dynamic BOM Tabs
         mainItems.forEach(item => {
             const tab = document.createElement('button');
             tab.className = `tab-pill ${activeSheetKey === 'bom-' + item.id ? 'active' : ''}`;
@@ -863,7 +791,6 @@
             container.appendChild(tab);
         });
 
-        // Fixed Expense & Funding Tabs
         const fixedTabs = [
             { key: 'exp-materials', label: '🪛 วัสดุอื่นๆ' },
             { key: 'exp-ops', label: '⛽ ค่าใช้จ่ายดำเนินงาน' },
@@ -1530,7 +1457,7 @@
         await loadFullProjectData();
     }
 
-    // ==================== SINGLE EDIT / DELETE CRUD ====================
+    // ==================== SINGLE CRUD OPERATIONS ====================
 
     // Expense Single CRUD
     async function addExpenseRow(catKey) {
@@ -1785,6 +1712,7 @@
         await loadFullProjectData();
     }
 
+    // ==================== AUTO-IMPORT QUOTATION & PRODUCT COST ====================
     function openNewProjectModal() { document.getElementById('modalNewProject').style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -1797,13 +1725,14 @@
             quotes.forEach(q => {
                 const opt = document.createElement('option');
                 opt.value = q.id;
-                opt.textContent = `${q.doc_num} | ยอด ${Number(q.grand_total || 0).toLocaleString()}.-`;
+                opt.textContent = `${q.doc_num} | ${q.customer_name || 'ลูกค้า'} | ยอด ${Number(q.grand_total || 0).toLocaleString()}.-`;
                 sel.appendChild(opt);
             });
             sel.onchange = () => {
                 const selected = quotes.find(q => q.id === sel.value);
                 if (selected) {
                     document.getElementById('inp-proj-name').value = `โครงการตามบิล ${selected.doc_num}`;
+                    document.getElementById('inp-proj-cust').value = selected.customer_name || '';
                     document.getElementById('inp-proj-amt').value = selected.grand_total || 0;
                 }
             };
@@ -1824,33 +1753,91 @@
 
         if (!name) return alert('กรุณากรอกชื่อโครงการ');
 
-        const { data: newProj, error } = await supabaseClient.from('projects').insert([{
-            project_name: name,
-            customer_name: cust,
-            contract_amount: amt,
-            document_id: quoteId
-        }]).select().single();
+        try {
+            // 1. บันทึกสร้างโครงการ
+            const { data: newProj, error: pErr } = await supabaseClient.from('projects').insert([{
+                project_name: name,
+                customer_name: cust,
+                contract_amount: amt,
+                document_id: quoteId
+            }]).select().single();
 
-        if (error) return alert('เกิดข้อผิดพลาด: ' + error.message);
+            if (pErr) throw pErr;
 
-        if (quoteId) {
-            const { data: docItems } = await supabaseClient.from('document_items').select('*').eq('document_id', quoteId);
-            if (docItems && docItems.length > 0) {
-                const inserts = docItems.map((item, idx) => ({
-                    project_id: newProj.id,
-                    item_order: idx + 1,
-                    item_name: item.description ? item.description.split('\n')[0] : 'รายการ',
-                    qty: item.qty || 1,
-                    unit: item.unit || 'ชุด',
-                    unit_price: item.price || 0
-                }));
-                await supabaseClient.from('project_main_items').insert(inserts);
+            // 2. ถ้าเลือกดึงจากใบเสนอราคา -> ดึงข้อมูลรายการ & ราคาทุนอัตโนมัติ
+            if (quoteId) {
+                const { data: docItems } = await supabaseClient.from('document_items').select('*').eq('document_id', quoteId);
+                
+                // ค้นหาฐานข้อมูลสินค้าเป็นตัวสำรอง (Product Catalog Cost Map)
+                let productCostMap = new Map();
+                try {
+                    const { data: productsData } = await supabaseClient.from('products').select('*');
+                    if (productsData && Array.isArray(productsData)) {
+                        productsData.forEach(p => {
+                            const pName = (p.name || p.item_name || p.description || '').trim().toLowerCase();
+                            const cost = Number(p.cost || p.cost_price || p.unit_cost || p.buy_price || p.purchase_price || 0);
+                            if (pName && cost > 0) productCostMap.set(pName, cost);
+                        });
+                    }
+                } catch (e) {
+                    console.warn("Product lookup skipped", e);
+                }
+
+                if (docItems && docItems.length > 0) {
+                    for (let idx = 0; idx < docItems.length; idx++) {
+                        const item = docItems[idx];
+                        const fullDesc = item.description || item.name || item.item_name || 'รายการ';
+                        const itemName = fullDesc.split('\n')[0].trim();
+                        const qty = Number(item.qty || item.quantity || 1);
+                        const unit = item.unit || 'ชุด';
+                        const unitPrice = Number(item.price || item.unit_price || 0);
+
+                        // ค้นหาราคาทุนจากทุกชื่อคอลัมน์ที่เป็นไปได้
+                        let unitCost = Number(
+                            item.cost || 
+                            item.cost_price || 
+                            item.unit_cost || 
+                            item.buy_price || 
+                            item.purchase_price || 
+                            item.original_price || 
+                            0
+                        );
+
+                        // ถ้าในบิลไม่มีต้นทุน ให้ค้นจากชื่อสินค้าในระบบแคตตาล็อก
+                        if (unitCost <= 0 && productCostMap.has(itemName.toLowerCase())) {
+                            unitCost = productCostMap.get(itemName.toLowerCase()) || 0;
+                        }
+
+                        // สร้างหมวดงานหลัก (Main Item)
+                        const { data: mainItem, error: mErr } = await supabaseClient.from('project_main_items').insert([{
+                            project_id: newProj.id,
+                            item_order: idx + 1,
+                            item_name: itemName,
+                            qty: qty,
+                            unit: unit,
+                            unit_price: unitPrice
+                        }]).select().single();
+
+                        // สร้างรายการใน BOM ให้อัตโนมัติทันที
+                        if (!mErr && mainItem && unitCost > 0) {
+                            await supabaseClient.from('project_bom_items').insert([{
+                                main_item_id: mainItem.id,
+                                item_order: 1,
+                                item_name: itemName,
+                                qty: 1,
+                                unit_cost: unitCost
+                            }]);
+                        }
+                    }
+                }
             }
-        }
 
-        closeModal('modalNewProject');
-        currentProject = newProj;
-        await loadProjectList();
+            closeModal('modalNewProject');
+            currentProject = newProj;
+            await loadProjectList();
+        } catch (err) {
+            alert('เกิดข้อผิดพลาด: ' + err.message);
+        }
     }
 
     async function deleteCurrentProject() {
