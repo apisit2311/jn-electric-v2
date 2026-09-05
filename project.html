@@ -157,10 +157,10 @@
     <!-- Workspace -->
     <div class="workspace">
         
-        <!-- SHEET: รวมหลัก -->
+        <!-- SHEET: หน้าหลัก -->
         <div class="sheet-pane active" id="pane-main-summary">
             <div class="pane-head">
-                <h2>📊 รวมหลัก: ตารางสรุปรายรับ ต้นทุน และกำไรโครงการ</h2>
+                <h2>📊 หน้าหลัก: ตารางสรุปรายรับ ต้นทุน และกำไรโครงการ</h2>
                 <div style="font-size: 13px; color: #64748b;">ผู้ว่าจ้าง: <strong id="lbl-customer" style="color:#0f172a;">-</strong></div>
             </div>
 
@@ -535,10 +535,10 @@
         const container = document.getElementById('sheet-tabs-container');
         container.innerHTML = '';
 
-        // Tab: รวมหลัก
+        // Tab: หน้าหลัก
         const masterTab = document.createElement('button');
         masterTab.className = `tab-pill ${activeSheetKey === 'main-summary' ? 'active' : ''}`;
-        masterTab.innerHTML = `📊 รวมหลัก`;
+        masterTab.innerHTML = `📊 หน้าหลัก`;
         masterTab.onclick = () => switchSheet('main-summary');
         container.appendChild(masterTab);
 
@@ -679,7 +679,7 @@
                     <div class="btn-group no-print">
                         <button class="btn btn-white btn-sm" onclick="openEditMainTabModal('${item.id}')">✏️ แก้ไขข้อมูลหมวดนี้</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteMainItem('${item.id}')">🗑️ ลบแท็บนี้</button>
-                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
                     </div>
                 </div>
                 <div class="table-wrap">
@@ -720,7 +720,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อ 1 ${item.unit} (ส่งไปชีตรวมหลัก)</td>
+                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อ 1 ${item.unit} (ส่งไปชีตหน้าหลัก)</td>
                                 <td class="t-right font-bold text-amber" style="font-size: 14px;">${totalUnitCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td class="no-print"></td>
                             </tr>
@@ -747,7 +747,7 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <h2>${catTitles[catKey] || 'ค่าใช้จ่าย'}</h2>
-                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
@@ -785,7 +785,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="2" class="t-center font-bold">รวม (ส่งไปชีตรวมหลัก)</td>
+                                <td colspan="2" class="t-center font-bold">รวม (ส่งไปชีตหน้าหลัก)</td>
                                 <td class="t-right font-bold text-rose" style="font-size: 14px;">${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td colspan="2"></td>
                             </tr>
@@ -808,7 +808,7 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <h2>💰 ชีต: รายการเงินทุน (รับค่างวด / จ่ายมัดจำ)</h2>
-                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
