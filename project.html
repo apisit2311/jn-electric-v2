@@ -79,13 +79,82 @@
         .kpi-sub { font-size: 11.5px; color: var(--slate-600); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
         .badge-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
 
-        /* Tabs Nav (Pills) */
-        .tabs-nav-wrapper { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #e2e8f0; border-radius: 12px; padding: 6px; margin-bottom: 18px; overflow-x: auto; }
-        .tabs-nav { display: flex; gap: 4px; overflow-x: auto; align-items: center; }
-        .tab-pill { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; white-space: nowrap; border: none; background: transparent; transition: 0.15s; display: flex; align-items: center; gap: 6px; }
+        /* ==================== TABS BAR (PINNED HOME TAB) ==================== */
+        .tabs-nav-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            background: #e2e8f0; 
+            border-radius: 12px; 
+            padding: 6px; 
+            margin-bottom: 18px; 
+        }
+        .pinned-tab-wrap {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+        .tabs-divider-v {
+            width: 2px;
+            height: 24px;
+            background-color: #cbd5e1;
+            flex-shrink: 0;
+            margin: 0 2px;
+        }
+        .tabs-nav { 
+            display: flex; 
+            gap: 4px; 
+            overflow-x: auto; 
+            align-items: center; 
+            flex: 1;
+            min-width: 0;
+            scrollbar-width: thin;
+        }
+        .tab-pill { 
+            padding: 8px 14px; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            font-weight: 500; 
+            color: #475569; 
+            cursor: pointer; 
+            white-space: nowrap; 
+            border: none; 
+            background: transparent; 
+            transition: 0.15s; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+        }
         .tab-pill:hover { background: rgba(255,255,255,0.6); }
-        .tab-pill.active { background: #ffffff; color: var(--primary); font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
-        .btn-add-tab { padding: 7px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; background: #ffffff; color: var(--emerald-700); border: 1px dashed var(--emerald-600); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; transition: 0.15s; }
+        .tab-pill.active { 
+            background: #ffffff; 
+            color: var(--primary); 
+            font-weight: 600; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06); 
+        }
+        .tab-pill.home-btn {
+            font-weight: 600;
+        }
+        .tab-pill.home-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+        }
+        .btn-add-tab { 
+            flex-shrink: 0;
+            padding: 7px 12px; 
+            border-radius: 8px; 
+            font-size: 12.5px; 
+            font-weight: 600; 
+            background: #ffffff; 
+            color: var(--emerald-700); 
+            border: 1px dashed var(--emerald-600); 
+            cursor: pointer; 
+            white-space: nowrap; 
+            display: flex; 
+            align-items: center; 
+            gap: 4px; 
+            transition: 0.15s; 
+        }
         .btn-add-tab:hover { background: var(--emerald-50); }
 
         /* Workspace */
@@ -228,19 +297,31 @@
         </div>
     </div>
 
-    <!-- Dynamic Tabs Bar -->
+    <!-- ==================== TABS BAR (PINNED HOME TAB) ==================== -->
     <div class="tabs-nav-wrapper no-print">
+        <!-- 1. Pinned Home Tab (ล็อคไม่เลื่อน) -->
+        <div class="pinned-tab-wrap">
+            <button class="tab-pill home-btn active" id="btn-tab-home" onclick="switchSheet('main-summary')">
+                🏠 หน้าหลัก
+            </button>
+        </div>
+        
+        <div class="tabs-divider-v"></div>
+
+        <!-- 2. Scrollable Dynamic Tabs (หมวดงาน + ค่าใช้จ่าย + เงินทุน) -->
         <div class="tabs-nav" id="sheet-tabs-container"></div>
+
+        <!-- 3. Action Button (เพิ่มหลายหมวด) -->
         <button class="btn-add-tab" onclick="openBatchMainTabModal()">➕ เพิ่มหลายหมวดงาน</button>
     </div>
 
     <!-- Workspace -->
     <div class="workspace">
         
-        <!-- SHEET: รวมหลัก -->
+        <!-- SHEET: หน้าหลัก -->
         <div class="sheet-pane active" id="pane-main-summary">
             <div class="pane-head">
-                <h2>📊 รวมหลัก: ตารางสรุปรายรับ ต้นทุน และกำไรโครงการ</h2>
+                <h2>📊 หน้าหลัก: ตารางสรุปรายรับ ต้นทุน และกำไรโครงการ</h2>
                 <div style="font-size: 13px; color: #64748b;">ผู้ว่าจ้าง: <strong id="lbl-customer" style="color:#0f172a;">-</strong></div>
             </div>
 
@@ -328,9 +409,9 @@
     </div>
 </div>
 
-<!-- ==================== BATCH ADD MODALS (เพิ่มหลายรายการพร้อมกัน) ==================== -->
+<!-- ==================== BATCH ADD MODALS ==================== -->
 
-<!-- Modal: เพิ่มหลายหมวดงาน (Batch Main Items) -->
+<!-- Modal: เพิ่มหลายหมวดงาน -->
 <div class="modal-overlay" id="modalBatchMain">
     <div class="modal-box modal-lg">
         <div class="modal-head">
@@ -363,7 +444,7 @@
     </div>
 </div>
 
-<!-- Modal: เพิ่มอุปกรณ์ย่อยหลายรายการ (Batch BOM) -->
+<!-- Modal: เพิ่มอุปกรณ์ย่อยหลายรายการ -->
 <div class="modal-overlay" id="modalBatchBom">
     <div class="modal-box modal-lg">
         <div class="modal-head">
@@ -396,7 +477,7 @@
     </div>
 </div>
 
-<!-- Modal: เพิ่มค่าใช้จ่ายหลายรายการ (Batch Expenses) -->
+<!-- Modal: เพิ่มค่าใช้จ่ายหลายรายการ -->
 <div class="modal-overlay" id="modalBatchExpense">
     <div class="modal-box modal-lg">
         <div class="modal-head">
@@ -431,7 +512,7 @@
     </div>
 </div>
 
-<!-- Modal: เพิ่มแหล่งเงินทุนหลายรายการ (Batch Funding) -->
+<!-- Modal: เพิ่มแหล่งเงินทุนหลายรายการ -->
 <div class="modal-overlay" id="modalBatchFunding">
     <div class="modal-box modal-lg">
         <div class="modal-head">
@@ -763,15 +844,15 @@
     }
 
     function renderTabs() {
+        // 1. อัปเดตสถานะปุ่ม "หน้าหลัก" ที่ล็อคไว้ทางซ้าย
+        const homeBtn = document.getElementById('btn-tab-home');
+        if (homeBtn) {
+            homeBtn.className = `tab-pill home-btn ${activeSheetKey === 'main-summary' ? 'active' : ''}`;
+        }
+
+        // 2. เรนเดอร์แท็บอื่นๆ ลงในกล่องเลื่อน (Scrollable Container)
         const container = document.getElementById('sheet-tabs-container');
         container.innerHTML = '';
-
-        // Tab: รวมหลัก
-        const masterTab = document.createElement('button');
-        masterTab.className = `tab-pill ${activeSheetKey === 'main-summary' ? 'active' : ''}`;
-        masterTab.innerHTML = `📊 รวมหลัก`;
-        masterTab.onclick = () => switchSheet('main-summary');
-        container.appendChild(masterTab);
 
         // Dynamic BOM Tabs
         mainItems.forEach(item => {
@@ -952,7 +1033,7 @@
                         <button class="btn btn-emerald btn-sm" onclick="openBatchBomModal('${item.id}')">⚡ เพิ่มหลายรายการ</button>
                         <button class="btn btn-white btn-sm" onclick="openEditMainTabModal('${item.id}')">✏️ แก้ไขหมวด</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteMainItem('${item.id}')">🗑️ ลบแท็บนี้</button>
-                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
                     </div>
                 </div>
                 <div class="table-wrap">
@@ -993,7 +1074,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อ 1 ${item.unit} (ส่งไปชีตรวมหลัก)</td>
+                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อ 1 ${item.unit} (ส่งไปหน้าหลัก)</td>
                                 <td class="t-right font-bold text-amber" style="font-size: 14px;">${totalUnitCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td class="no-print"></td>
                             </tr>
@@ -1028,7 +1109,7 @@
                     </div>
                     <div class="btn-group no-print">
                         <button class="btn btn-emerald btn-sm" onclick="openBatchExpenseModal('${catKey}')">⚡ เพิ่มหลายรายการ</button>
-                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
                     </div>
                 </div>
                 <div class="table-wrap">
@@ -1081,7 +1162,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="5" class="t-center font-bold">รวมค่าใช้จ่ายหมวดนี้ (ส่งไปชีตรวมหลัก)</td>
+                                <td colspan="5" class="t-center font-bold">รวมค่าใช้จ่ายหมวดนี้ (ส่งไปหน้าหลัก)</td>
                                 <td class="t-right font-bold text-rose" style="font-size: 14px;">${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td colspan="2"></td>
                             </tr>
@@ -1127,7 +1208,7 @@
                     <div class="btn-group no-print">
                         <button class="btn btn-emerald btn-sm" onclick="openBatchFundingModal()">⚡ เพิ่มหลายรายการ</button>
                         <button class="btn btn-white btn-sm" onclick="openFundingModal()">➕ เพิ่ม 1 รายการ</button>
-                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
+                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
                     </div>
                 </div>
 
@@ -1704,7 +1785,6 @@
         await loadFullProjectData();
     }
 
-    // Project Modals & Init
     function openNewProjectModal() { document.getElementById('modalNewProject').style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
