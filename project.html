@@ -127,7 +127,7 @@
 
         /* Modals */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; }
-        .modal-box { background: #fff; width: 480px; max-width: 92%; border-radius: 14px; padding: 22px; box-shadow: var(--card-shadow-lg); }
+        .modal-box { background: #fff; width: 500px; max-width: 92%; border-radius: 14px; padding: 22px; box-shadow: var(--card-shadow-lg); }
         .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--slate-200); padding-bottom: 10px; margin-bottom: 15px; }
         .modal-head h3 { margin: 0; font-size: 17px; font-weight: 700; color: var(--primary); }
         .form-item { margin-bottom: 12px; }
@@ -451,7 +451,7 @@
     </div>
 </div>
 
-<!-- Modal: แก้ไขค่าใช้จ่าย (Expense) -->
+<!-- Modal: แก้ไขค่าใช้จ่ายหน้างาน (Expense) - แยกจำนวน/หน่วย/ราคา/หน่วย -->
 <div class="modal-overlay" id="modalEditExpense">
     <div class="modal-box">
         <div class="modal-head">
@@ -465,13 +465,27 @@
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div class="form-item">
-                <label>จำนวนเงิน (บาท):</label>
-                <input type="number" id="edit-exp-amt" class="clean-input">
+                <label>จำนวน:</label>
+                <input type="number" id="edit-exp-qty" class="clean-input" oninput="calcModalExpTotal()">
             </div>
             <div class="form-item">
-                <label>วันที่:</label>
-                <input type="date" id="edit-exp-date" class="clean-input">
+                <label>หน่วยนับ:</label>
+                <input type="text" id="edit-exp-unit" class="clean-input" placeholder="เช่น เส้น, วัน, ครั้ง">
             </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item">
+                <label>ราคาต่อหน่วย (บาท):</label>
+                <input type="number" id="edit-exp-unit-price" class="clean-input" oninput="calcModalExpTotal()">
+            </div>
+            <div class="form-item">
+                <label>รวมเงิน (บาท):</label>
+                <input type="number" id="edit-exp-amt" class="clean-input font-bold" style="background:#f8fafc; color:var(--rose-600);" readonly>
+            </div>
+        </div>
+        <div class="form-item">
+            <label>วันที่:</label>
+            <input type="date" id="edit-exp-date" class="clean-input">
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
             <button class="btn btn-white" onclick="closeModal('modalEditExpense')">ยกเลิก</button>
@@ -849,14 +863,15 @@
         `;
     }
 
-    // --- RENDER EXPENSE SHEET ---
+    // --- RENDER EXPENSE SHEET (แยกช่อง จำนวน / หน่วย / ราคาต่อหน่วย / รวมเงิน) ---
     function renderExpenseSheet(catKey) {
-        const catTitles = {
-            'materials': '🪛 ชีต: วัสดุอื่นๆ (ของสิ้นเปลืองหน้างาน)',
-            'ops': '⛽ ชีต: ค่าใช้จ่ายดำเนินงาน (ค่าน้ำมัน/เดินทาง)',
-            'labor': '👷 ชีต: ยอดเบิกค่าแรง'
+        const catConfig = {
+            'materials': { title: '🪛 ชีต: วัสดุอื่นๆ (ของสิ้นเปลืองหน้างาน)', defaultUnit: 'ชิ้น', placeholder: 'เช่น ท่อ PVC 4 หุน, ข้อต่อ, ปูน...' },
+            'ops': { title: '⛽ ชีต: ค่าใช้จ่ายดำเนินงาน (ค่าน้ำมัน/เดินทาง)', defaultUnit: 'ครั้ง', placeholder: 'เช่น ค่าน้ำมันรถ, ค่าที่พัก...' },
+            'labor': { title: '👷 ชีต: ยอดเบิกจ่ายค่าแรงช่าง', defaultUnit: 'วัน', placeholder: 'เช่น ค่าแรงช่างติดตั้ง, ค่าเหมาเดินท่อ...' }
         };
 
+        const config = catConfig[catKey] || { title: 'ค่าใช้จ่าย', defaultUnit: 'รายการ', placeholder: 'พิมพ์รายการ...' };
         const list = expenses.filter(e => e.category === catKey);
         const total = list.reduce((s, e) => s + Number(e.amount || 0), 0);
 
@@ -864,26 +879,41 @@
         container.innerHTML = `
             <div class="sheet-pane active">
                 <div class="pane-head">
-                    <h2>${catTitles[catKey] || 'ค่าใช้จ่าย'}</h2>
+                    <div>
+                        <h2>${config.title}</h2>
+                        <div style="font-size: 13px; color: var(--slate-600); margin-top: 3px;">
+                            คำนวณจาก: <strong>จำนวน &times; ราคาต่อหน่วย = รวมเงิน</strong>
+                        </div>
+                    </div>
                     <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 6%;" class="t-center">ลำดับ</th>
-                                <th style="width: 48%;">รายการ</th>
-                                <th style="width: 20%;" class="t-right">จำนวน/บาท</th>
-                                <th style="width: 18%;" class="t-center">วันที่</th>
-                                <th style="width: 8%;" class="t-center no-print">จัดการ</th>
+                                <th style="width: 5%;" class="t-center">ลำดับ</th>
+                                <th style="width: 33%;">รายการ</th>
+                                <th style="width: 10%;" class="t-center">จำนวน</th>
+                                <th style="width: 9%;" class="t-center">หน่วย</th>
+                                <th style="width: 13%;" class="t-right">ราคา/หน่วย (บาท)</th>
+                                <th style="width: 13%;" class="t-right">รวมเงิน (บาท)</th>
+                                <th style="width: 10%;" class="t-center">วันที่</th>
+                                <th style="width: 7%;" class="t-center no-print">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${list.map((e, idx) => `
+                            ${list.map((e, idx) => {
+                                const qty = Number(e.qty || 1);
+                                const unitPrice = e.unit_price !== undefined && e.unit_price !== null ? Number(e.unit_price) : (Number(e.amount || 0) / qty);
+                                const totalAmt = Number(e.amount || 0);
+                                return `
                                 <tr>
                                     <td class="t-center">${idx + 1}</td>
                                     <td>${e.item_name}</td>
-                                    <td class="t-right font-bold">${Number(e.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                    <td class="t-center font-bold">${qty}</td>
+                                    <td class="t-center">${e.unit || config.defaultUnit}</td>
+                                    <td class="t-right">${unitPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                    <td class="t-right font-bold text-rose">${totalAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-center">${e.expense_date || '-'}</td>
                                     <td class="t-center no-print">
                                         <div class="action-btns">
@@ -892,18 +922,22 @@
                                         </div>
                                     </td>
                                 </tr>
-                            `).join('')}
+                                `;
+                            }).join('')}
                             <tr class="no-print" style="background: var(--slate-50);">
                                 <td class="t-center font-bold text-primary">+</td>
-                                <td><input type="text" id="add-exp-name" class="clean-input" placeholder="พิมพ์รายการ..."></td>
-                                <td><input type="number" id="add-exp-amt" class="clean-input t-right" value="0"></td>
+                                <td><input type="text" id="add-exp-name" class="clean-input" placeholder="${config.placeholder}"></td>
+                                <td><input type="number" id="add-exp-qty" class="clean-input t-center" value="1" oninput="calcInlineExpTotal()"></td>
+                                <td><input type="text" id="add-exp-unit" class="clean-input t-center" value="${config.defaultUnit}"></td>
+                                <td><input type="number" id="add-exp-price" class="clean-input t-right" value="0" placeholder="ราคา/หน่วย" oninput="calcInlineExpTotal()"></td>
+                                <td class="t-right font-bold text-rose" id="lbl-inline-total" style="vertical-align:middle; padding-right:14px;">0.00</td>
                                 <td><input type="date" id="add-exp-date" class="clean-input t-center"></td>
-                                <td class="t-center"><button class="btn btn-emerald btn-sm" style="width:100%;" onclick="addExpenseRow('${catKey}')">เพิ่ม</button></td>
+                                <td class="t-center"><button class="btn btn-emerald btn-sm" style="width:100%;" onclick="addExpenseRow('${catKey}')">➕ เพิ่ม</button></td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="2" class="t-center font-bold">รวม (ส่งไปชีตรวมหลัก)</td>
+                                <td colspan="5" class="t-center font-bold">รวมค่าใช้จ่ายหมวดนี้ (ส่งไปชีตรวมหลัก)</td>
                                 <td class="t-right font-bold text-rose" style="font-size: 14px;">${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td colspan="2"></td>
                             </tr>
@@ -913,6 +947,14 @@
             </div>
         `;
         document.getElementById('add-exp-date').valueAsDate = new Date();
+    }
+
+    function calcInlineExpTotal() {
+        const qty = parseFloat(document.getElementById('add-exp-qty').value) || 0;
+        const price = parseFloat(document.getElementById('add-exp-price').value) || 0;
+        const total = qty * price;
+        const lbl = document.getElementById('lbl-inline-total');
+        if (lbl) lbl.innerText = total.toLocaleString('en-US', {minimumFractionDigits: 2});
     }
 
     // --- RENDER FUNDING SHEET (ทะเบียนแหล่งเงินทุน) ---
@@ -1002,6 +1044,82 @@
     }
 
     // ==================== CRUD OPERATIONS & EDIT HANDLERS ====================
+
+    // --- Expense CRUD ---
+    async function addExpenseRow(catKey) {
+        const name = document.getElementById('add-exp-name').value.trim();
+        const qty = parseFloat(document.getElementById('add-exp-qty').value) || 1;
+        const unit = document.getElementById('add-exp-unit').value.trim() || 'ชิ้น';
+        const unitPrice = parseFloat(document.getElementById('add-exp-price').value) || 0;
+        const totalAmt = qty * unitPrice;
+        const date = document.getElementById('add-exp-date').value;
+
+        if (!name || totalAmt <= 0) return alert('กรุณาระบุรายการ จำนวน และราคาต่อหน่วยให้ถูกต้อง');
+
+        await supabaseClient.from('project_expenses').insert([{
+            project_id: currentProject.id,
+            category: catKey,
+            item_name: name,
+            qty: qty,
+            unit: unit,
+            unit_price: unitPrice,
+            amount: totalAmt,
+            expense_date: date
+        }]);
+        await loadFullProjectData();
+    }
+
+    function openEditExpenseModal(id) {
+        const e = expenses.find(x => x.id === id);
+        if (!e) return;
+        const qty = Number(e.qty || 1);
+        const unitPrice = e.unit_price !== undefined && e.unit_price !== null ? Number(e.unit_price) : (Number(e.amount || 0) / qty);
+
+        document.getElementById('edit-exp-id').value = e.id;
+        document.getElementById('edit-exp-name').value = e.item_name || '';
+        document.getElementById('edit-exp-qty').value = qty;
+        document.getElementById('edit-exp-unit').value = e.unit || 'ชิ้น';
+        document.getElementById('edit-exp-unit-price').value = unitPrice;
+        document.getElementById('edit-exp-amt').value = Number(e.amount || 0);
+        document.getElementById('edit-exp-date').value = e.expense_date || '';
+        document.getElementById('modalEditExpense').style.display = 'flex';
+    }
+
+    function calcModalExpTotal() {
+        const qty = parseFloat(document.getElementById('edit-exp-qty').value) || 0;
+        const price = parseFloat(document.getElementById('edit-exp-unit-price').value) || 0;
+        document.getElementById('edit-exp-amt').value = qty * price;
+    }
+
+    async function submitEditExpense() {
+        const id = document.getElementById('edit-exp-id').value;
+        const name = document.getElementById('edit-exp-name').value.trim();
+        const qty = parseFloat(document.getElementById('edit-exp-qty').value) || 1;
+        const unit = document.getElementById('edit-exp-unit').value.trim() || 'ชิ้น';
+        const unitPrice = parseFloat(document.getElementById('edit-exp-unit-price').value) || 0;
+        const amt = qty * unitPrice;
+        const date = document.getElementById('edit-exp-date').value;
+
+        if (!name || amt <= 0) return alert('กรุณากรอกรายการ จำนวน และราคาต่อหน่วยให้ถูกต้อง');
+
+        await supabaseClient.from('project_expenses').update({
+            item_name: name,
+            qty: qty,
+            unit: unit,
+            unit_price: unitPrice,
+            amount: amt,
+            expense_date: date
+        }).eq('id', id);
+
+        closeModal('modalEditExpense');
+        await loadFullProjectData();
+    }
+
+    async function deleteExpenseRow(id) {
+        if (!confirm('ยืนยันลบรายการนี้?')) return;
+        await supabaseClient.from('project_expenses').delete().eq('id', id);
+        await loadFullProjectData();
+    }
 
     // --- Funding CRUD ---
     function openFundingModal(id = null) {
@@ -1177,51 +1295,6 @@
     async function deleteBomRow(id) {
         if (!confirm('ยืนยันลบรายการนี้?')) return;
         await supabaseClient.from('project_bom_items').delete().eq('id', id);
-        await loadFullProjectData();
-    }
-
-    // --- Expense CRUD ---
-    async function addExpenseRow(catKey) {
-        const name = document.getElementById('add-exp-name').value.trim();
-        const amt = parseFloat(document.getElementById('add-exp-amt').value) || 0;
-        const date = document.getElementById('add-exp-date').value;
-        if (!name || amt <= 0) return alert('กรุณาระบุรายการและจำนวนเงิน');
-
-        await supabaseClient.from('project_expenses').insert([{ project_id: currentProject.id, category: catKey, item_name: name, amount: amt, expense_date: date }]);
-        await loadFullProjectData();
-    }
-
-    function openEditExpenseModal(id) {
-        const e = expenses.find(x => x.id === id);
-        if (!e) return;
-        document.getElementById('edit-exp-id').value = e.id;
-        document.getElementById('edit-exp-name').value = e.item_name;
-        document.getElementById('edit-exp-amt').value = e.amount;
-        document.getElementById('edit-exp-date').value = e.expense_date || '';
-        document.getElementById('modalEditExpense').style.display = 'flex';
-    }
-
-    async function submitEditExpense() {
-        const id = document.getElementById('edit-exp-id').value;
-        const name = document.getElementById('edit-exp-name').value.trim();
-        const amt = parseFloat(document.getElementById('edit-exp-amt').value) || 0;
-        const date = document.getElementById('edit-exp-date').value;
-
-        if (!name || amt <= 0) return alert('กรุณากรอกรายการและจำนวนเงิน');
-
-        await supabaseClient.from('project_expenses').update({
-            item_name: name,
-            amount: amt,
-            expense_date: date
-        }).eq('id', id);
-
-        closeModal('modalEditExpense');
-        await loadFullProjectData();
-    }
-
-    async function deleteExpenseRow(id) {
-        if (!confirm('ยืนยันลบรายการนี้?')) return;
-        await supabaseClient.from('project_expenses').delete().eq('id', id);
         await loadFullProjectData();
     }
 
