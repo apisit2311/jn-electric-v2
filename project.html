@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบริหารโครงการและควบคุมต้นทุน - JN Electric</title>
+    <title>บริหารโครงการ & ควบคุมต้นทุน - JN Electric</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,13 +17,11 @@
             --slate-100: #f1f5f9;
             --slate-200: #e2e8f0;
             --slate-300: #cbd5e1;
-            --slate-600: #475569;
-            --slate-800: #1e293b;
+            --slate-700: #334155;
             --slate-900: #0f172a;
             --emerald-50: #ecfdf5;
             --emerald-600: #059669;
             --emerald-700: #047857;
-            --amber-50: #fffbeb;
             --amber-600: #d97706;
             --rose-50: #fff1f2;
             --rose-600: #e11d48;
@@ -32,30 +30,24 @@
 
         * { box-sizing: border-box; }
         body { font-family: 'Prompt', 'Sarabun', sans-serif; background-color: #f1f5f9; color: var(--slate-900); margin: 0; padding: 20px; }
-        .wrapper { max-width: 1280px; margin: 0 auto; }
+        .wrapper { max-width: 1300px; margin: 0 auto; }
 
         /* Header */
         .app-header { background: #ffffff; padding: 16px 22px; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--slate-200); }
         .header-title h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--primary); }
-        .header-title p { margin: 2px 0 0 0; font-size: 12px; color: var(--slate-600); }
+        .header-title p { margin: 2px 0 0 0; font-size: 12px; color: #64748b; }
         .btn-group { display: flex; gap: 8px; }
         .btn { padding: 7px 14px; border-radius: 8px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent; transition: 0.15s; }
         .btn-primary { background: var(--primary); color: #fff; }
-        .btn-white { background: #fff; border-color: var(--slate-300); color: var(--slate-800); }
+        .btn-white { background: #fff; border-color: var(--slate-300); color: var(--slate-700); }
         .btn-emerald { background: var(--emerald-600); color: #fff; }
         .btn-danger { background: var(--rose-50); color: var(--rose-600); border-color: #fecdd3; }
 
-        /* Project Control Bar */
+        /* Project Select */
         .project-bar { background: #ffffff; padding: 12px 18px; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--slate-200); flex-wrap: wrap; }
         .custom-select { padding: 8px 12px; border: 1.5px solid var(--slate-200); border-radius: 8px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; min-width: 320px; }
 
-        /* KPI Cards */
-        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 16px; }
-        .kpi-card { background: #fff; padding: 16px 18px; border-radius: 12px; border: 1px solid var(--slate-200); box-shadow: var(--card-shadow); }
-        .kpi-label { font-size: 12px; color: var(--slate-600); font-weight: 600; margin-bottom: 4px; }
-        .kpi-value { font-size: 20px; font-weight: 700; color: var(--slate-900); }
-
-        /* Sheet Tabs */
+        /* Tabs Nav (Pills) */
         .tabs-nav { display: flex; gap: 4px; overflow-x: auto; padding: 6px; background: #e2e8f0; border-radius: 12px; margin-bottom: 16px; }
         .tab-pill { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; white-space: nowrap; border: none; background: transparent; transition: 0.15s; }
         .tab-pill.active { background: #ffffff; color: var(--primary); font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
@@ -86,6 +78,10 @@
         .row-total-master { background: #f8fafc; font-weight: 700; font-size: 13.5px; }
         .profit-final-row { background: var(--emerald-50); font-weight: 700; color: var(--emerald-700); font-size: 14.5px; }
 
+        /* Inline Editable Inputs */
+        .cell-input { width: 100%; padding: 4px 6px; border: 1px solid transparent; border-radius: 4px; font-family: 'Prompt'; font-size: 13px; background: transparent; transition: 0.15s; }
+        .cell-input:hover { border-color: var(--slate-300); background: #fff; }
+        .cell-input:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
         .clean-input { width: 100%; padding: 6px 8px; border: 1px solid var(--slate-300); border-radius: 6px; font-family: 'Prompt'; font-size: 12.5px; }
 
         /* Modal */
@@ -111,11 +107,11 @@
     <div class="app-header">
         <div class="header-title">
             <h1>📑 ระบบบริหารโครงการและควบคุมต้นทุน (Project ERP)</h1>
-            <p>คำนวณต้นทุนต่อหน่วย (BOM) วิเคราะห์กำไร และควบคุมค่าใช้จ่ายหน้างาน</p>
+            <p>ถอดแบบต้นทุนต่อหน่วย (BOM) คำนวณกำไรสุทธิ และติดตามเงินทุนโครงการ</p>
         </div>
         <div class="btn-group no-print">
-            <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์</button>
-            <a href="checklist.html" class="btn btn-white">🛒 รายการเตรียมของ</a>
+            <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์หน้านี้</button>
+            <a href="checklist.html" class="btn btn-white">🛒 ใบเช็คของ</a>
             <a href="index.html" class="btn btn-primary">⬅️ ออกบิล</a>
         </div>
     </div>
@@ -132,26 +128,6 @@
         </div>
     </div>
 
-    <!-- Metric KPI Header Cards -->
-    <div class="kpi-row">
-        <div class="kpi-card" style="border-left: 4px solid var(--primary);">
-            <div class="kpi-label">รายรับโครงการรวม (ยอดขาย)</div>
-            <div class="kpi-value text-primary" id="kpi-selling">0.00</div>
-        </div>
-        <div class="kpi-card" style="border-left: 4px solid var(--amber-600);">
-            <div class="kpi-label">ต้นทุนอุปกรณ์รวม (BOM)</div>
-            <div class="kpi-value text-amber" id="kpi-bom-cost">0.00</div>
-        </div>
-        <div class="kpi-card" style="border-left: 4px solid var(--rose-600);">
-            <div class="kpi-label">ค่าใช้จ่ายหน้างาน/อื่นๆ</div>
-            <div class="kpi-value text-rose" id="kpi-expenses">0.00</div>
-        </div>
-        <div class="kpi-card" style="border-left: 4px solid var(--emerald-600); background: var(--emerald-50);">
-            <div class="kpi-label" style="color: var(--emerald-700);">กำไรสุทธิคงเหลือ (Net Profit)</div>
-            <div class="kpi-value text-emerald" id="kpi-net-profit">0.00</div>
-        </div>
-    </div>
-
     <!-- Tabs Nav -->
     <div class="tabs-nav no-print" id="sheet-tabs-container"></div>
 
@@ -165,77 +141,87 @@
                 <div style="font-size: 13px; color: #64748b;">ผู้ว่าจ้าง: <strong id="lbl-customer" style="color:#0f172a;">-</strong></div>
             </div>
 
-            <!-- Table 1: รายการตามใบเสนอราคา -->
-            <div style="font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: var(--primary);">1. รายการตามใบเสนอราคา (ยอดขาย vs ต้นทุนอุปกรณ์)</div>
+            <!-- Table 1: ตามใบเสนอราคา -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <div style="font-size: 13.5px; font-weight: 600; color: var(--primary);">1. ตามใบเสนอราคา (ยอดขาย vs ต้นทุนอุปกรณ์ 7 หมวด)</div>
+                <div class="no-print" style="font-size: 12px; color: #64748b;">💡 สามารถคลิกพิมพ์แก้ไข <strong>จำนวน</strong> หรือ <strong>ราคาขาย</strong> ในตารางได้โดยตรง</div>
+            </div>
             <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 5%;" class="t-center">#</th>
-                            <th style="width: 37%;">รายการ</th>
-                            <th style="width: 7%;" class="t-center">จำนวน</th>
+                            <th style="width: 5%;" class="t-center">ลำดับ</th>
+                            <th style="width: 35%;">รายการ</th>
+                            <th style="width: 8%;" class="t-center">จำนวน</th>
                             <th style="width: 7%;" class="t-center">หน่วย</th>
-                            <th style="width: 11%;" class="t-right">ราคาขาย/หน่วย</th>
-                            <th style="width: 11%;" class="t-right">ยอดรวมขาย</th>
+                            <th style="width: 12%;" class="t-right">ราคา/หน่วย</th>
+                            <th style="width: 11%;" class="t-right">จำนวนเงิน</th>
                             <th style="width: 11%;" class="t-right text-amber">ราคาทุน/หน่วย</th>
                             <th style="width: 11%;" class="t-right text-amber">ราคาทุนรวม</th>
-                            <th style="width: 12%;" class="t-right text-emerald">กำไรขั้นต้น</th>
+                            <th style="width: 12%;" class="t-right text-emerald">กำไรรวมค่าแรง</th>
                         </tr>
                     </thead>
                     <tbody id="tbl-main-items-body"></tbody>
                     <tfoot>
                         <tr class="row-total-master">
-                            <td colspan="5" class="t-center font-bold">รวมหมวดอุปกรณ์หลัก</td>
-                            <td class="t-right text-primary font-bold" id="sum-selling-total">0.00</td>
+                            <td colspan="5" class="t-center font-bold">รวมยอดโครงการ</td>
+                            <td class="t-right text-primary font-bold" id="sum-f11">0.00</td>
                             <td class="t-right">-</td>
-                            <td class="t-right text-amber font-bold" id="sum-bom-total">0.00</td>
-                            <td class="t-right text-emerald font-bold" id="sum-gross-profit">0.00</td>
+                            <td class="t-right text-amber font-bold" id="sum-h11">0.00</td>
+                            <td class="t-right text-emerald font-bold" id="sum-i11">0.00</td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
 
             <!-- Table 2: ค่าใช้จ่ายอื่นๆ นับรวมนำยอดไปลบกำไร -->
-            <div style="font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: var(--rose-600);">2. ค่าใช้จ่ายหน้างานและรายการหักกำไร</div>
+            <div style="font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: var(--rose-600);">2. ค่าใช้จ่ายอื่นๆ นับรวมนำยอดไปลบกำไร</div>
             <div class="table-wrap" style="max-width: 650px;">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 10%;" class="t-center">#</th>
-                            <th style="width: 60%;">หมวดหมู่ค่าใช้จ่าย</th>
+                            <th style="width: 12%;" class="t-center">ลำดับ</th>
+                            <th style="width: 58%;">รายการ</th>
                             <th style="width: 30%;" class="t-right">จำนวนเงิน (บาท)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="t-center">1</td>
-                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-materials')" style="color:var(--primary);text-decoration:none;font-weight:500;">วัสดุสิ้นเปลืองอื่นๆ (ชีต: วัสดุอื่นๆ)</a></td>
-                            <td class="t-right font-bold" id="deduct-materials">0.00</td>
+                            <td class="t-center">8</td>
+                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-materials')" style="color:var(--primary);text-decoration:none;font-weight:500;">วัสดุอื่นๆ</a></td>
+                            <td class="t-right font-bold" id="val-i14">0.00</td>
                         </tr>
                         <tr>
-                            <td class="t-center">2</td>
-                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-ops')" style="color:var(--primary);text-decoration:none;font-weight:500;">ค่าใช้จ่ายดำเนินงาน / น้ำมัน (ชีต: ค่าใช้จ่ายดำเนินงาน)</a></td>
-                            <td class="t-right font-bold" id="deduct-ops">0.00</td>
+                            <td class="t-center">9</td>
+                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-ops')" style="color:var(--primary);text-decoration:none;font-weight:500;">ค่าใช้จ่ายดำเนินงาน</a></td>
+                            <td class="t-right font-bold" id="val-i15">0.00</td>
                         </tr>
                         <tr>
-                            <td class="t-center">3</td>
-                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-labor')" style="color:var(--primary);text-decoration:none;font-weight:500;">ยอดเบิกจ่ายค่าแรงช่าง (ชีต: ยอดเบิกค่าแรง)</a></td>
-                            <td class="t-right font-bold" id="deduct-labor">0.00</td>
+                            <td class="t-center">10</td>
+                            <td>ประกันสัญญา 5% (แก้ไขยอดได้)</td>
+                            <td class="t-right font-bold">
+                                <input type="number" id="inp-retention" class="cell-input t-right font-bold" style="width: 130px; display: inline-block;" onchange="updateRetentionAmount(this.value)">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="t-center">11</td>
+                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-labor')" style="color:var(--primary);text-decoration:none;font-weight:500;">ยอดเบิกค่าแรง</a></td>
+                            <td class="t-right font-bold" id="val-i17">0.00</td>
                         </tr>
                         <tr class="row-total-master">
-                            <td colspan="2" class="t-center font-bold">รวมค่าใช้จ่ายโครงการทั้งหมด</td>
-                            <td class="t-right font-bold text-rose" id="sum-expenses-total">0.00</td>
+                            <td colspan="2" class="t-center font-bold">รวมค่าใช้จ่ายโครงการ (I18)</td>
+                            <td class="t-right font-bold text-rose" id="val-i18">0.00</td>
                         </tr>
                         <tr class="profit-final-row">
                             <td colspan="2" class="t-center font-bold">💰 กำไรสุทธิคงเหลือจริง (Net Profit)</td>
-                            <td class="t-right font-bold" id="final-net-profit">0.00</td>
+                            <td class="t-right font-bold" id="val-net-profit">0.00</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Dynamic Container for BOM & Other Sheets -->
+        <!-- Dynamic Sheets Container -->
         <div id="dynamic-panes-container"></div>
 
     </div>
@@ -251,7 +237,7 @@
         <div class="form-item">
             <label>รูปแบบ:</label>
             <select id="sel-create-type" class="custom-select" style="width:100%;" onchange="toggleCreateType()">
-                <option value="quote">ดึงข้อมูลจากใบเสนอราคา</option>
+                <option value="quote">ดึงข้อมูลจากใบเสนอราคา (อัตโนมัติ)</option>
                 <option value="manual">สร้างโครงการอิสระ</option>
             </select>
         </div>
@@ -261,11 +247,11 @@
         </div>
         <div class="form-item">
             <label>ชื่อโครงการ:</label>
-            <input type="text" id="inp-proj-name" class="clean-input" placeholder="เช่น โครงการติดตั้ง CCTV...">
+            <input type="text" id="inp-proj-name" class="clean-input" placeholder="เช่น โครงการติดตั้ง CCTV 9 จุด...">
         </div>
         <div class="form-item">
             <label>ผู้ว่าจ้าง:</label>
-            <input type="text" id="inp-proj-cust" class="clean-input" placeholder="ชื่อหน่วยงาน หรือลูกค้า">
+            <input type="text" id="inp-proj-cust" class="clean-input" placeholder="ชื่อหน่วยงาน หรือบุคคล">
         </div>
         <div class="form-item">
             <label>ยอดสัญญารวม (บาท):</label>
@@ -335,11 +321,9 @@
 
         document.getElementById('lbl-customer').innerText = currentProject.customer_name || 'ทั่วไป';
 
-        // 1. Load Main Items
         const resMain = await supabaseClient.from('project_main_items').select('*').eq('project_id', currentProject.id).order('item_order');
         mainItems = resMain.data || [];
 
-        // 2. Load BOMs
         const mainIds = mainItems.map(m => m.id);
         if (mainIds.length > 0) {
             const resBom = await supabaseClient.from('project_bom_items').select('*').in('main_item_id', mainIds).order('item_order');
@@ -348,7 +332,6 @@
             bomItems = [];
         }
 
-        // 3. Load Expenses & Cashflow
         const resExp = await supabaseClient.from('project_expenses').select('*').eq('project_id', currentProject.id).order('expense_date');
         expenses = resExp.data || [];
 
@@ -416,76 +399,71 @@
         }
     }
 
-    // --- ตรรกะคำนวณที่ถูกต้อง 100% ---
+    // --- EXACT EXCEL MASTER SUMMARY CALCULATION ---
     function renderMasterSummary() {
         const tbody = document.getElementById('tbl-main-items-body');
         tbody.innerHTML = '';
 
-        let totalSelling = 0;
-        let totalBomCost = 0;
+        let sumSelling = 0;   // SUM(F3:F10)
+        let sumBomCost = 0;   // SUM(H3:H10)
+        let sumGrossProfit = 0; // SUM(I3:I10)
 
         mainItems.forEach((item, idx) => {
             const subs = bomItems.filter(b => b.main_item_id === item.id);
-            // 1. ราคาทุนต่อ 1 ชิ้น = รวม(จำนวนที่ใช้ต่อชิ้น * ราคาทุนย่อย)
             const unitCost = subs.reduce((sum, s) => sum + (Number(s.qty || 1) * Number(s.unit_cost || 0)), 0);
             
-            // 2. ยอดขายของแถวนี้ = จำนวน * ราคาขายต่อหน่วย
-            const rowSelling = Number(item.qty || 0) * Number(item.unit_price || 0);
-            
-            // 3. ทุนรวมของแถวนี้ = จำนวน * ราคาทุนต่อหน่วย
-            const rowCost = Number(item.qty || 0) * unitCost;
-            
-            // 4. กำไรขั้นต้นของแถวนี้ = ยอดขาย - ราคาทุนรวม
-            const rowGrossProfit = rowSelling - rowCost;
+            const sellingTotal = Number(item.qty || 0) * Number(item.unit_price || 0);
+            const costTotal = Number(item.qty || 0) * unitCost;
+            const grossProfit = sellingTotal - costTotal;
 
-            totalSelling += rowSelling;
-            totalBomCost += rowCost;
+            sumSelling += sellingTotal;
+            sumBomCost += costTotal;
+            sumGrossProfit += grossProfit;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="t-center">${idx + 1}</td>
                 <td><a href="javascript:void(0)" onclick="switchSheet('bom-${item.id}')" style="color:var(--primary);font-weight:500;text-decoration:none;">${item.item_name}</a></td>
-                <td class="t-center font-bold">${item.qty}</td>
-                <td class="t-center">${item.unit || 'ชิ้น'}</td>
-                <td class="t-right">${Number(item.unit_price).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                <td class="t-right font-bold">${rowSelling.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                <td class="t-center">
+                    <input type="number" class="cell-input t-center font-bold" value="${item.qty}" style="width:65px;" onchange="updateMainItemField('${item.id}', 'qty', this.value)">
+                </td>
+                <td class="t-center">${item.unit || 'จุด'}</td>
+                <td class="t-right">
+                    <input type="number" class="cell-input t-right" value="${item.unit_price}" style="width:110px;" onchange="updateMainItemField('${item.id}', 'unit_price', this.value)">
+                </td>
+                <td class="t-right font-bold">${sellingTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                 <td class="t-right text-amber">${unitCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                <td class="t-right font-bold text-amber">${rowCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                <td class="t-right font-bold text-emerald">${rowGrossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                <td class="t-right font-bold text-amber">${costTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                <td class="t-right font-bold text-emerald">${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             `;
             tbody.appendChild(tr);
         });
 
-        const grossProfit = totalSelling - totalBomCost;
+        // Other Deductions
+        const valI14 = expenses.filter(e => e.category === 'materials').reduce((s, e) => s + Number(e.amount || 0), 0);
+        const valI15 = expenses.filter(e => e.category === 'ops').reduce((s, e) => s + Number(e.amount || 0), 0);
+        const valI16 = Number(currentProject.retention_amount || 0);
+        const valI17 = expenses.filter(e => e.category === 'labor').reduce((s, e) => s + Number(e.amount || 0), 0);
+        
+        const valI18 = valI14 + valI15 + valI16 + valI17; // SUM(I14:I17)
 
-        // คำนวณค่าใช้จ่ายหน้างานจริง (ไม่มีค่าติดลบแฝง)
-        const matExp = expenses.filter(e => e.category === 'materials').reduce((s, e) => s + Number(e.amount || 0), 0);
-        const opsExp = expenses.filter(e => e.category === 'ops').reduce((s, e) => s + Number(e.amount || 0), 0);
-        const laborExp = expenses.filter(e => e.category === 'labor').reduce((s, e) => s + Number(e.amount || 0), 0);
-        const totalExpenses = matExp + opsExp + laborExp;
+        const sumF11 = sumSelling;
+        const sumH11 = sumBomCost + valI18;
+        const sumI11 = sumGrossProfit - valI18;
 
-        // กำไรสุทธิ = กำไรขั้นต้น - ค่าใช้จ่ายหน้างานจริง
-        const netProfit = grossProfit - totalExpenses;
+        document.getElementById('sum-f11').innerText = sumF11.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('sum-h11').innerText = sumH11.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('sum-i11').innerText = sumI11.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-        // Update Master Table
-        document.getElementById('sum-selling-total').innerText = totalSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('sum-bom-total').innerText = totalBomCost.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('sum-gross-profit').innerText = grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
-
-        document.getElementById('deduct-materials').innerText = matExp.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('deduct-ops').innerText = opsExp.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('deduct-labor').innerText = laborExp.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('sum-expenses-total').innerText = totalExpenses.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('final-net-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
-
-        // Update Header KPI Cards
-        document.getElementById('kpi-selling').innerText = totalSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('kpi-bom-cost').innerText = totalBomCost.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('kpi-expenses').innerText = totalExpenses.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('kpi-net-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('val-i14').innerText = valI14.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('val-i15').innerText = valI15.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('inp-retention').value = valI16;
+        document.getElementById('val-i17').innerText = valI17.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('val-i18').innerText = valI18.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('val-net-profit').innerText = sumI11.toLocaleString('en-US', {minimumFractionDigits: 2});
     }
 
-    // --- BOM SUB-ITEMS SHEET (ถอดแบบต่อ 1 หน่วย) ---
+    // --- BOM SHEET ---
     function renderBomSheet(mainItemId) {
         const item = mainItems.find(m => m.id === mainItemId);
         if (!item) return;
@@ -493,29 +471,22 @@
         const container = document.getElementById('dynamic-panes-container');
         const subs = bomItems.filter(b => b.main_item_id === mainItemId);
         const totalUnitCost = subs.reduce((sum, s) => sum + (Number(s.qty || 1) * Number(s.unit_cost || 0)), 0);
-        const totalCategoryCost = Number(item.qty || 1) * totalUnitCost;
 
         container.innerHTML = `
             <div class="sheet-pane active">
                 <div class="pane-head">
-                    <div>
-                        <h2>🛠️ ชีตถอดแบบ: ${item.item_name}</h2>
-                        <div style="font-size: 13px; color: var(--slate-600); margin-top: 3px;">
-                            รายการนี้ในโครงการมีจำนวน: <strong style="color:var(--primary);">${item.qty} ${item.unit}</strong> | 
-                            ราคาทุนรวมทั้งหมวด: <strong style="color:var(--amber-600);">${totalCategoryCost.toLocaleString('en-US', {minimumFractionDigits: 2})} บาท</strong>
-                        </div>
-                    </div>
-                    <button class="btn btn-white" onclick="switchSheet('main-summary')">⬅️ กลับหน้ารวมหลัก</button>
+                    <h2>🛠️ ชีต: ${item.item_name} (จำนวน ${item.qty} ${item.unit})</h2>
+                    <button class="btn btn-white" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
                         <thead>
                             <tr>
                                 <th style="width: 6%;" class="t-center">ลำดับ</th>
-                                <th style="width: 44%;">รายการอุปกรณ์ย่อย (ที่ใช้ต่อ 1 ${item.unit})</th>
-                                <th style="width: 14%;" class="t-center">จำนวนที่ใช้ / 1 ${item.unit}</th>
-                                <th style="width: 18%;" class="t-right">ราคาทุนต่อหน่วย (บาท)</th>
-                                <th style="width: 18%;" class="t-right">รวมทุนต่อ 1 ${item.unit} (บาท)</th>
+                                <th style="width: 44%;">รายการ</th>
+                                <th style="width: 14%;" class="t-center">จำนวน/จุด</th>
+                                <th style="width: 18%;" class="t-right">ราคาทุน (บาท)</th>
+                                <th style="width: 18%;" class="t-right">รวม (บาท)</th>
                                 <th style="width: 4%;" class="no-print"></th>
                             </tr>
                         </thead>
@@ -534,16 +505,16 @@
                             `).join('')}
                             <tr class="no-print" style="background: var(--slate-50);">
                                 <td class="t-center font-bold text-primary">+</td>
-                                <td><input type="text" id="add-sub-name" class="clean-input" placeholder="พิมพ์ชื่อของย่อย เช่น น็อต, เจโบลท์, ปูน..."></td>
-                                <td><input type="number" id="add-sub-qty" class="clean-input t-center" value="1" title="จำนวนชิ้นที่ใช้ต่อ 1 หน่วย"></td>
-                                <td><input type="number" id="add-sub-cost" class="clean-input t-right" value="0" placeholder="ราคาทุน"></td>
-                                <td class="t-center" colspan="2"><button class="btn btn-emerald" style="padding: 4px 10px; font-size: 12px;" onclick="addBomRow('${mainItemId}')">➕ เพิ่มของย่อย</button></td>
+                                <td><input type="text" id="add-sub-name" class="clean-input" placeholder="ชื่ออุปกรณ์ย่อย..."></td>
+                                <td><input type="number" id="add-sub-qty" class="clean-input t-center" value="1"></td>
+                                <td><input type="number" id="add-sub-cost" class="clean-input t-right" value="0"></td>
+                                <td class="t-center" colspan="2"><button class="btn btn-emerald" style="padding: 4px 10px; font-size: 12px;" onclick="addBomRow('${mainItemId}')">➕ เพิ่มแถว</button></td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อ 1 ${item.unit} (ส่งไปชีตรวมหลัก)</td>
-                                <td class="t-right font-bold text-amber" style="font-size: 14.5px;">${totalUnitCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อหน่วย (ส่งไปชีตรวมหลัก)</td>
+                                <td class="t-right font-bold text-amber" style="font-size: 14px;">${totalUnitCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -556,9 +527,9 @@
     // --- EXPENSES SHEET ---
     function renderExpenseSheet(catKey) {
         const catTitles = {
-            'materials': '🪛 ชีต: วัสดุสิ้นเปลืองอื่นๆ',
-            'ops': '⛽ ชีต: ค่าใช้จ่ายดำเนินงาน / ค่าน้ำมัน',
-            'labor': '👷 ชีต: ยอดเบิกจ่ายค่าแรงช่าง'
+            'materials': '🪛 ชีต: วัสดุอื่นๆ (ของสิ้นเปลืองหน้างาน)',
+            'ops': '⛽ ชีต: ค่าใช้จ่ายดำเนินงาน (ค่าน้ำมัน/เดินทาง)',
+            'labor': '👷 ชีต: ยอดเบิกค่าแรง'
         };
 
         const list = expenses.filter(e => e.category === catKey);
@@ -569,7 +540,7 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <h2>${catTitles[catKey] || 'ค่าใช้จ่าย'}</h2>
-                    <button class="btn btn-white" onclick="switchSheet('main-summary')">⬅️ กลับหน้ารวมหลัก</button>
+                    <button class="btn btn-white" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
@@ -577,7 +548,7 @@
                             <tr>
                                 <th style="width: 8%;" class="t-center">ลำดับ</th>
                                 <th style="width: 50%;">รายการ</th>
-                                <th style="width: 20%;" class="t-right">จำนวนเงิน (บาท)</th>
+                                <th style="width: 20%;" class="t-right">จำนวน/บาท</th>
                                 <th style="width: 18%;" class="t-center">วันที่</th>
                                 <th style="width: 4%;" class="no-print"></th>
                             </tr>
@@ -594,7 +565,7 @@
                             `).join('')}
                             <tr class="no-print" style="background: var(--slate-50);">
                                 <td class="t-center font-bold text-primary">+</td>
-                                <td><input type="text" id="add-exp-name" class="clean-input" placeholder="พิมพ์รายการค่าใช้จ่าย..."></td>
+                                <td><input type="text" id="add-exp-name" class="clean-input" placeholder="พิมพ์รายการ..."></td>
                                 <td><input type="number" id="add-exp-amt" class="clean-input t-right" value="0"></td>
                                 <td><input type="date" id="add-exp-date" class="clean-input t-center"></td>
                                 <td class="t-center"><button class="btn btn-emerald" style="padding: 4px 10px; font-size: 12px;" onclick="addExpenseRow('${catKey}')">เพิ่ม</button></td>
@@ -602,7 +573,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="2" class="t-center font-bold">รวมค่าใช้จ่ายหมวดนี้</td>
+                                <td colspan="2" class="t-center font-bold">รวม (ส่งไปชีตรวมหลัก)</td>
                                 <td class="t-right font-bold text-rose" style="font-size: 14px;">${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td colspan="2"></td>
                             </tr>
@@ -625,7 +596,7 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <h2>💰 ชีต: รายการเงินทุน (รับค่างวด / จ่ายมัดจำ)</h2>
-                    <button class="btn btn-white" onclick="switchSheet('main-summary')">⬅️ กลับหน้ารวมหลัก</button>
+                    <button class="btn btn-white" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
@@ -634,7 +605,7 @@
                                 <th style="width: 6%;" class="t-center">ลำดับ</th>
                                 <th style="width: 18%;">ประเภท</th>
                                 <th style="width: 36%;">ชื่อ / รายการ</th>
-                                <th style="width: 18%;" class="t-right">จำนวนเงิน (บาท)</th>
+                                <th style="width: 18%;" class="t-right">จำนวน/บาท</th>
                                 <th style="width: 18%;" class="t-center">วันที่</th>
                                 <th style="width: 4%;" class="no-print"></th>
                             </tr>
@@ -667,7 +638,7 @@
                         <tfoot>
                             <tr class="row-total-master">
                                 <td colspan="3" class="t-center font-bold">เบิกรวม: <span class="text-emerald">${totalIn.toLocaleString('en-US', {minimumFractionDigits: 2})}</span> | จ่ายรวม: <span class="text-rose">${totalOut.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
-                                <td class="t-right font-bold text-primary" style="font-size: 14px;">เงินสดคงเหลือ: ${balance.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                <td class="t-right font-bold text-primary" style="font-size: 14px;">เหลือ: ${balance.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td colspan="2"></td>
                             </tr>
                         </tfoot>
@@ -678,19 +649,27 @@
         document.getElementById('add-cash-date').valueAsDate = new Date();
     }
 
-    // --- DB ACTIONS ---
+    // --- DB Mutations & Updates ---
+    async function updateMainItemField(id, field, value) {
+        const valNum = parseFloat(value) || 0;
+        await supabaseClient.from('project_main_items').update({ [field]: valNum }).eq('id', id);
+        await loadFullProjectData();
+    }
+
+    async function updateRetentionAmount(value) {
+        const valNum = parseFloat(value) || 0;
+        await supabaseClient.from('projects').update({ retention_amount: valNum }).eq('id', currentProject.id);
+        currentProject.retention_amount = valNum;
+        renderMasterSummary();
+    }
+
     async function addBomRow(mainItemId) {
         const name = document.getElementById('add-sub-name').value.trim();
         const qty = parseFloat(document.getElementById('add-sub-qty').value) || 1;
         const cost = parseFloat(document.getElementById('add-sub-cost').value) || 0;
-        if (!name) return alert('กรุณาระบุชื่ออุปกรณ์ย่อย');
+        if (!name) return alert('กรุณาระบุชื่อรายการ');
 
-        await supabaseClient.from('project_bom_items').insert([{
-            main_item_id: mainItemId,
-            item_name: name,
-            qty: qty,
-            unit_cost: cost
-        }]);
+        await supabaseClient.from('project_bom_items').insert([{ main_item_id: mainItemId, item_name: name, qty: qty, unit_cost: cost }]);
         await loadFullProjectData();
     }
 
@@ -706,13 +685,7 @@
         const date = document.getElementById('add-exp-date').value;
         if (!name || amt <= 0) return alert('กรุณาระบุรายการและจำนวนเงิน');
 
-        await supabaseClient.from('project_expenses').insert([{
-            project_id: currentProject.id,
-            category: catKey,
-            item_name: name,
-            amount: amt,
-            expense_date: date
-        }]);
+        await supabaseClient.from('project_expenses').insert([{ project_id: currentProject.id, category: catKey, item_name: name, amount: amt, expense_date: date }]);
         await loadFullProjectData();
     }
 
@@ -729,13 +702,7 @@
         const date = document.getElementById('add-cash-date').value;
         if (!name || amt <= 0) return alert('กรุณาระบุรายการและจำนวนเงิน');
 
-        await supabaseClient.from('project_cashflow').insert([{
-            project_id: currentProject.id,
-            flow_type: type,
-            item_name: name,
-            amount: amt,
-            flow_date: date
-        }]);
+        await supabaseClient.from('project_cashflow').insert([{ project_id: currentProject.id, flow_type: type, item_name: name, amount: amt, flow_date: date }]);
         await loadFullProjectData();
     }
 
@@ -788,12 +755,12 @@
             project_name: name,
             customer_name: cust,
             contract_amount: amt,
+            retention_amount: 0,
             document_id: quoteId
         }]).select().single();
 
         if (error) return alert('เกิดข้อผิดพลาด: ' + error.message);
 
-        // Import Items from Quote
         if (quoteId) {
             const { data: docItems } = await supabaseClient.from('document_items').select('*').eq('document_id', quoteId);
             if (docItems && docItems.length > 0) {
