@@ -27,20 +27,24 @@
             --amber-600: #d97706;
             --rose-50: #fff1f2;
             --rose-600: #e11d48;
+            --purple-50: #faf5ff;
+            --purple-600: #9333ea;
             --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-            --card-shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+            --card-shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
         }
 
         * { box-sizing: border-box; }
         body { font-family: 'Prompt', 'Sarabun', sans-serif; background-color: #f1f5f9; color: var(--slate-900); margin: 0; padding: 20px; }
-        .wrapper { max-width: 1320px; margin: 0 auto; }
+        .wrapper { max-width: 1360px; margin: 0 auto; }
 
         /* Header */
-        .app-header { background: #ffffff; padding: 16px 22px; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--slate-200); }
-        .header-title h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--primary); }
+        .app-header { background: #ffffff; padding: 16px 24px; border-radius: 14px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--slate-200); }
+        .header-title { display: flex; align-items: center; gap: 12px; }
+        .header-logo-icon { width: 44px; height: 44px; background: var(--primary-light); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; }
+        .header-title h1 { margin: 0; font-size: 19px; font-weight: 700; color: var(--primary); }
         .header-title p { margin: 2px 0 0 0; font-size: 12px; color: var(--slate-600); }
         .btn-group { display: flex; gap: 8px; align-items: center; }
-        .btn { padding: 7px 14px; border-radius: 8px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent; transition: 0.15s; }
+        .btn { padding: 8px 15px; border-radius: 9px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: all 0.15s ease; }
         .btn-primary { background: var(--primary); color: #fff; }
         .btn-primary:hover { background: #172554; }
         .btn-white { background: #fff; border-color: var(--slate-300); color: var(--slate-700); }
@@ -49,15 +53,34 @@
         .btn-emerald:hover { background: var(--emerald-700); }
         .btn-danger { background: var(--rose-50); color: var(--rose-600); border-color: #fecdd3; }
         .btn-danger:hover { background: #ffe4e6; }
-        .btn-sm { padding: 4px 9px; font-size: 12px; border-radius: 6px; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 7px; }
 
-        /* Project Select */
-        .project-bar { background: #ffffff; padding: 12px 18px; border-radius: 12px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--slate-200); flex-wrap: wrap; }
-        .custom-select { padding: 8px 12px; border: 1.5px solid var(--slate-200); border-radius: 8px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; min-width: 320px; outline: none; }
-        .custom-select:focus { border-color: var(--primary); }
+        /* Project Select Bar */
+        .project-bar { background: #ffffff; padding: 12px 20px; border-radius: 14px; box-shadow: var(--card-shadow); margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--slate-200); flex-wrap: wrap; }
+        .custom-select { padding: 9px 14px; border: 1.5px solid var(--slate-200); border-radius: 9px; font-family: 'Prompt'; font-size: 13.5px; font-weight: 500; min-width: 340px; outline: none; transition: 0.15s; }
+        .custom-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,58,138,0.1); }
+
+        /* ==================== สรุปด้านบน (KPI SUMMARY DASHBOARD) ==================== */
+        .kpi-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .kpi-card { background: #ffffff; padding: 18px 20px; border-radius: 14px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); position: relative; overflow: hidden; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.06); }
+        .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+        .kpi-card.blue::before { background: var(--primary); }
+        .kpi-card.amber::before { background: var(--amber-600); }
+        .kpi-card.rose::before { background: var(--rose-600); }
+        .kpi-card.emerald::before { background: var(--emerald-600); }
+        .kpi-card.emerald { background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border-color: #bbf7d0; }
+        .kpi-card.purple::before { background: var(--purple-600); }
+
+        .kpi-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .kpi-title { font-size: 12px; font-weight: 600; color: var(--slate-600); text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-icon-badge { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .kpi-val { font-size: 22px; font-weight: 700; color: var(--slate-900); line-height: 1.2; }
+        .kpi-sub { font-size: 11.5px; color: var(--slate-600); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+        .badge-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
 
         /* Tabs Nav (Pills) */
-        .tabs-nav-wrapper { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #e2e8f0; border-radius: 12px; padding: 6px; margin-bottom: 16px; overflow-x: auto; }
+        .tabs-nav-wrapper { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #e2e8f0; border-radius: 12px; padding: 6px; margin-bottom: 18px; overflow-x: auto; }
         .tabs-nav { display: flex; gap: 4px; overflow-x: auto; align-items: center; }
         .tab-pill { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; white-space: nowrap; border: none; background: transparent; transition: 0.15s; display: flex; align-items: center; gap: 6px; }
         .tab-pill:hover { background: rgba(255,255,255,0.6); }
@@ -66,17 +89,17 @@
         .btn-add-tab:hover { background: var(--emerald-50); }
 
         /* Workspace */
-        .workspace { background: #ffffff; border-radius: 14px; padding: 22px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); }
+        .workspace { background: #ffffff; border-radius: 14px; padding: 24px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); }
         .sheet-pane { display: none; }
         .sheet-pane.active { display: block; }
         .pane-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--slate-200); flex-wrap: wrap; gap: 10px; }
-        .pane-head h2 { margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); }
+        .pane-head h2 { margin: 0; font-size: 16.5px; font-weight: 700; color: var(--primary); }
 
         /* Tables */
-        .table-wrap { overflow-x: auto; border: 1px solid var(--slate-200); border-radius: 10px; margin-bottom: 20px; }
+        .table-wrap { overflow-x: auto; border: 1px solid var(--slate-200); border-radius: 10px; margin-bottom: 22px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
-        th { background: var(--slate-50); color: #475569; font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--slate-200); }
-        td { padding: 9px 12px; border-bottom: 1px solid var(--slate-200); color: var(--slate-900); }
+        th { background: var(--slate-50); color: #475569; font-weight: 600; padding: 11px 12px; border-bottom: 1px solid var(--slate-200); }
+        td { padding: 10px 12px; border-bottom: 1px solid var(--slate-200); color: var(--slate-900); }
         tr:last-child td { border-bottom: none; }
         tbody tr:hover { background-color: #f8fafc; }
 
@@ -89,12 +112,12 @@
         .text-rose { color: var(--rose-600); }
 
         .row-total-master { background: #f8fafc; font-weight: 700; font-size: 13.5px; }
-        .profit-final-row { background: var(--emerald-50); font-weight: 700; color: var(--emerald-700); font-size: 14.5px; }
+        .profit-final-row { background: var(--emerald-50); font-weight: 700; color: var(--emerald-700); font-size: 15px; }
 
         .cell-input { width: 100%; padding: 4px 6px; border: 1px solid transparent; border-radius: 4px; font-family: 'Prompt'; font-size: 13px; background: transparent; transition: 0.15s; }
         .cell-input:hover { border-color: var(--slate-300); background: #fff; }
         .cell-input:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
-        .clean-input { width: 100%; padding: 7px 10px; border: 1px solid var(--slate-300); border-radius: 6px; font-family: 'Prompt'; font-size: 13px; outline: none; }
+        .clean-input { width: 100%; padding: 8px 10px; border: 1px solid var(--slate-300); border-radius: 7px; font-family: 'Prompt'; font-size: 13px; outline: none; }
         .clean-input:focus { border-color: var(--primary); }
 
         .action-btns { display: flex; gap: 4px; justify-content: center; align-items: center; }
@@ -126,8 +149,11 @@
     <!-- Header -->
     <div class="app-header">
         <div class="header-title">
-            <h1>📑 ระบบบริหารโครงการและควบคุมต้นทุน (Project ERP)</h1>
-            <p>ถอดแบบต้นทุนต่อหน่วย (BOM) คำนวณกำไรสุทธิ และติดตามเงินทุนโครงการ</p>
+            <div class="header-logo-icon">⚡</div>
+            <div>
+                <h1>Project ERP & Cost Management</h1>
+                <p>ระบบบริหารโครงการ ถอดแบบอุปกรณ์ต่อหน่วย (BOM) และคำนวณกำไรสุทธิ</p>
+            </div>
         </div>
         <div class="btn-group no-print">
             <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์หน้านี้</button>
@@ -139,12 +165,67 @@
     <!-- Project Selector -->
     <div class="project-bar no-print">
         <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 13px; font-weight: 600;">📁 โครงการ:</span>
+            <span style="font-size: 13.5px; font-weight: 600; color: var(--slate-700);">📁 โครงการ:</span>
             <select id="project-select" class="custom-select" onchange="switchProject()"></select>
         </div>
         <div class="btn-group">
             <button class="btn btn-emerald" onclick="openNewProjectModal()">➕ สร้างโครงการใหม่</button>
             <button class="btn btn-danger" onclick="deleteCurrentProject()">🗑️ ลบโครงการ</button>
+        </div>
+    </div>
+
+    <!-- ==================== ส่วนสรุปสวยๆ ด้านบน (EXECUTIVE SUMMARY) ==================== -->
+    <div class="kpi-dashboard">
+        <!-- 1. ยอดรวมสัญญา -->
+        <div class="kpi-card blue">
+            <div class="kpi-header-row">
+                <div class="kpi-title">ยอดรวมสัญญา (รายรับ)</div>
+                <div class="kpi-icon-badge" style="background: var(--primary-light); color: var(--primary);">📄</div>
+            </div>
+            <div class="kpi-val text-primary" id="kpi-selling">0.00</div>
+            <div class="kpi-sub" id="kpi-customer">ผู้ว่าจ้าง: -</div>
+        </div>
+
+        <!-- 2. ต้นทุนอุปกรณ์รวม -->
+        <div class="kpi-card amber">
+            <div class="kpi-header-row">
+                <div class="kpi-title">ต้นทุนอุปกรณ์รวม (BOM)</div>
+                <div class="kpi-icon-badge" style="background: var(--amber-50); color: var(--amber-600);">🛠️</div>
+            </div>
+            <div class="kpi-val text-amber" id="kpi-bom-cost">0.00</div>
+            <div class="kpi-sub" id="kpi-bom-count">0 หมวดรายการอุปกรณ์</div>
+        </div>
+
+        <!-- 3. ค่าใช้จ่ายโครงการ & ประกัน -->
+        <div class="kpi-card rose">
+            <div class="kpi-header-row">
+                <div class="kpi-title">ค่าใช้จ่ายโครงการ & ประกัน</div>
+                <div class="kpi-icon-badge" style="background: var(--rose-50); color: var(--rose-600);">📝</div>
+            </div>
+            <div class="kpi-val text-rose" id="kpi-expenses">0.00</div>
+            <div class="kpi-sub">วัสดุ, ค่าดำเนินงาน, ประกัน 5%, ค่าแรง</div>
+        </div>
+
+        <!-- 4. กำไรสุทธิคงเหลือ (เด่นพิเศษ) -->
+        <div class="kpi-card emerald">
+            <div class="kpi-header-row">
+                <div class="kpi-title" style="color: var(--emerald-700);">กำไรสุทธิคงเหลือ (Net Profit)</div>
+                <div class="kpi-icon-badge" style="background: var(--emerald-50); color: var(--emerald-700);">💰</div>
+            </div>
+            <div class="kpi-val text-emerald" id="kpi-net-profit">0.00</div>
+            <div class="kpi-sub">
+                <span class="badge-pill" id="kpi-margin-badge" style="background: #dcfce7; color: var(--emerald-700);">อัตรากำไร: 0%</span>
+            </div>
+        </div>
+
+        <!-- 5. กระแสเงินสดคงเหลือ -->
+        <div class="kpi-card purple">
+            <div class="kpi-header-row">
+                <div class="kpi-title" style="color: var(--purple-600);">เงินสดหมุนเวียนคงเหลือ</div>
+                <div class="kpi-icon-badge" style="background: var(--purple-50); color: var(--purple-600);">💳</div>
+            </div>
+            <div class="kpi-val" id="kpi-cash-balance" style="color: var(--purple-600);">0.00</div>
+            <div class="kpi-sub">เงินรับค่างวด - จ่ายมัดจำ/ซื้อของ</div>
         </div>
     </div>
 
@@ -157,10 +238,10 @@
     <!-- Workspace -->
     <div class="workspace">
         
-        <!-- SHEET: หน้าหลัก -->
+        <!-- SHEET: รวมหลัก -->
         <div class="sheet-pane active" id="pane-main-summary">
             <div class="pane-head">
-                <h2>📊 หน้าหลัก: ตารางสรุปรายรับ ต้นทุน และกำไรโครงการ</h2>
+                <h2>📊 รวมหลัก: ตารางสรุปรายรับ ต้นทุน และกำไรโครงการ</h2>
                 <div style="font-size: 13px; color: #64748b;">ผู้ว่าจ้าง: <strong id="lbl-customer" style="color:#0f172a;">-</strong></div>
             </div>
 
@@ -535,10 +616,10 @@
         const container = document.getElementById('sheet-tabs-container');
         container.innerHTML = '';
 
-        // Tab: หน้าหลัก
+        // Tab: รวมหลัก
         const masterTab = document.createElement('button');
         masterTab.className = `tab-pill ${activeSheetKey === 'main-summary' ? 'active' : ''}`;
-        masterTab.innerHTML = `📊 หน้าหลัก`;
+        masterTab.innerHTML = `📊 รวมหลัก`;
         masterTab.onclick = () => switchSheet('main-summary');
         container.appendChild(masterTab);
 
@@ -591,7 +672,7 @@
         }
     }
 
-    // --- RENDER MASTER SUMMARY ---
+    // --- RENDER MASTER SUMMARY & UPDATE TOP DASHBOARD ---
     function renderMasterSummary() {
         const tbody = document.getElementById('tbl-main-items-body');
         tbody.innerHTML = '';
@@ -643,6 +724,7 @@
         const sumH11 = sumBomCost + valI18;
         const sumI11 = sumGrossProfit - valI18;
 
+        // Update Tables
         document.getElementById('sum-f11').innerText = sumF11.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('sum-h11').innerText = sumH11.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('sum-i11').innerText = sumI11.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -653,6 +735,25 @@
         document.getElementById('val-i17').innerText = valI17.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('val-i18').innerText = valI18.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('val-net-profit').innerText = sumI11.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        // ==================== UPDATE TOP KPI CARDS ====================
+        document.getElementById('kpi-selling').innerText = sumF11.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('kpi-customer').innerText = `ผู้ว่าจ้าง: ${currentProject.customer_name || 'ไม่ระบุ'}`;
+        
+        document.getElementById('kpi-bom-cost').innerText = sumBomCost.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('kpi-bom-count').innerText = `${mainItems.length} หมวดรายการอุปกรณ์`;
+
+        document.getElementById('kpi-expenses').innerText = valI18.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        document.getElementById('kpi-net-profit').innerText = sumI11.toLocaleString('en-US', {minimumFractionDigits: 2});
+        const marginPct = sumF11 > 0 ? ((sumI11 / sumF11) * 100).toFixed(1) : 0;
+        document.getElementById('kpi-margin-badge').innerText = `อัตรากำไร: ${marginPct}%`;
+
+        // Cashflow Balance
+        const totalCashIn = cashflows.filter(c => c.flow_type === 'in').reduce((s, c) => s + Number(c.amount || 0), 0);
+        const totalCashOut = cashflows.filter(c => c.flow_type === 'out').reduce((s, c) => s + Number(c.amount || 0), 0);
+        const cashBalance = totalCashIn - totalCashOut;
+        document.getElementById('kpi-cash-balance').innerText = cashBalance.toLocaleString('en-US', {minimumFractionDigits: 2});
     }
 
     // --- RENDER BOM SHEET ---
@@ -679,7 +780,7 @@
                     <div class="btn-group no-print">
                         <button class="btn btn-white btn-sm" onclick="openEditMainTabModal('${item.id}')">✏️ แก้ไขข้อมูลหมวดนี้</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteMainItem('${item.id}')">🗑️ ลบแท็บนี้</button>
-                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
+                        <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
                     </div>
                 </div>
                 <div class="table-wrap">
@@ -720,7 +821,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อ 1 ${item.unit} (ส่งไปชีตหน้าหลัก)</td>
+                                <td colspan="4" class="t-center font-bold">รวมราคาทุนต่อ 1 ${item.unit} (ส่งไปชีตรวมหลัก)</td>
                                 <td class="t-right font-bold text-amber" style="font-size: 14px;">${totalUnitCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td class="no-print"></td>
                             </tr>
@@ -747,7 +848,7 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <h2>${catTitles[catKey] || 'ค่าใช้จ่าย'}</h2>
-                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
+                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
@@ -785,7 +886,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="2" class="t-center font-bold">รวม (ส่งไปชีตหน้าหลัก)</td>
+                                <td colspan="2" class="t-center font-bold">รวม (ส่งไปชีตรวมหลัก)</td>
                                 <td class="t-right font-bold text-rose" style="font-size: 14px;">${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td colspan="2"></td>
                             </tr>
@@ -808,7 +909,7 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <h2>💰 ชีต: รายการเงินทุน (รับค่างวด / จ่ายมัดจำ)</h2>
-                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
+                    <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับรวมหลัก</button>
                 </div>
                 <div class="table-wrap">
                     <table>
@@ -868,7 +969,6 @@
 
     // ==================== CRUD OPERATIONS & EDIT HANDLERS ====================
 
-    // --- Main Item (Tab) CRUD ---
     function openAddMainTabModal() {
         document.getElementById('add-main-name').value = '';
         document.getElementById('add-main-qty').value = '1';
@@ -940,7 +1040,6 @@
         await loadFullProjectData();
     }
 
-    // --- BOM Sub-Item CRUD ---
     async function addBomRow(mainItemId) {
         const name = document.getElementById('add-sub-name').value.trim();
         const qty = parseFloat(document.getElementById('add-sub-qty').value) || 1;
@@ -985,7 +1084,6 @@
         await loadFullProjectData();
     }
 
-    // --- Expense CRUD ---
     async function addExpenseRow(catKey) {
         const name = document.getElementById('add-exp-name').value.trim();
         const amt = parseFloat(document.getElementById('add-exp-amt').value) || 0;
@@ -1030,7 +1128,6 @@
         await loadFullProjectData();
     }
 
-    // --- Cashflow CRUD ---
     async function addCashflowRow() {
         const type = document.getElementById('add-cash-type').value;
         const name = document.getElementById('add-cash-name').value.trim();
@@ -1079,7 +1176,6 @@
         await loadFullProjectData();
     }
 
-    // --- Retention & Project Management ---
     async function updateRetentionAmount(value) {
         const valNum = parseFloat(value) || 0;
         await supabaseClient.from('projects').update({ retention_amount: valNum }).eq('id', currentProject.id);
