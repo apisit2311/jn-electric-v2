@@ -174,7 +174,7 @@
         </div>
     </div>
 
-    <!-- ==================== ส่วนสรุปสวยๆ ด้านบน (EXECUTIVE SUMMARY) ==================== -->
+    <!-- ==================== สรุปด้านบน (KPI SUMMARY DASHBOARD) ==================== -->
     <div class="kpi-dashboard">
         <!-- 1. ยอดรวมสัญญา -->
         <div class="kpi-card blue">
@@ -196,14 +196,14 @@
             <div class="kpi-sub" id="kpi-bom-count">0 หมวดรายการอุปกรณ์</div>
         </div>
 
-        <!-- 3. ค่าใช้จ่ายโครงการ & ประกัน -->
+        <!-- 3. ค่าใช้จ่ายโครงการ -->
         <div class="kpi-card rose">
             <div class="kpi-header-row">
-                <div class="kpi-title">ค่าใช้จ่ายโครงการ & ประกัน</div>
+                <div class="kpi-title">ค่าใช้จ่ายหน้างานรวม</div>
                 <div class="kpi-icon-badge" style="background: var(--rose-50); color: var(--rose-600);">📝</div>
             </div>
             <div class="kpi-val text-rose" id="kpi-expenses">0.00</div>
-            <div class="kpi-sub">วัสดุ, ค่าดำเนินงาน, ประกัน 5%, ค่าแรง</div>
+            <div class="kpi-sub">วัสดุอื่นๆ, ค่าดำเนินงาน, เบิกค่าแรง</div>
         </div>
 
         <!-- 4. กำไรสุทธิคงเหลือ (เด่นพิเศษ) -->
@@ -281,41 +281,34 @@
             </div>
 
             <!-- Table 2: ค่าใช้จ่ายอื่นๆ นับรวมนำยอดไปลบกำไร -->
-            <div style="font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: var(--rose-600);">2. ค่าใช้จ่ายอื่นๆ นับรวมนำยอดไปลบกำไร</div>
+            <div style="font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: var(--rose-600);">2. ค่าใช้จ่ายหน้างานและรายการหักกำไร</div>
             <div class="table-wrap" style="max-width: 650px;">
                 <table>
                     <thead>
                         <tr>
                             <th style="width: 12%;" class="t-center">ลำดับ</th>
-                            <th style="width: 58%;">รายการ</th>
+                            <th style="width: 58%;">รายการค่าใช้จ่าย</th>
                             <th style="width: 30%;" class="t-right">จำนวนเงิน (บาท)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="t-center">8</td>
-                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-materials')" style="color:var(--primary);text-decoration:none;font-weight:500;">วัสดุอื่นๆ</a></td>
+                            <td class="t-center">1</td>
+                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-materials')" style="color:var(--primary);text-decoration:none;font-weight:500;">วัสดุสิ้นเปลืองอื่นๆ (ชีต: วัสดุอื่นๆ)</a></td>
                             <td class="t-right font-bold" id="val-i14">0.00</td>
                         </tr>
                         <tr>
-                            <td class="t-center">9</td>
-                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-ops')" style="color:var(--primary);text-decoration:none;font-weight:500;">ค่าใช้จ่ายดำเนินงาน</a></td>
+                            <td class="t-center">2</td>
+                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-ops')" style="color:var(--primary);text-decoration:none;font-weight:500;">ค่าใช้จ่ายดำเนินงาน / น้ำมัน (ชีต: ค่าดำเนินงาน)</a></td>
                             <td class="t-right font-bold" id="val-i15">0.00</td>
                         </tr>
                         <tr>
-                            <td class="t-center">10</td>
-                            <td>ประกันสัญญา 5% (แก้ไขยอดได้)</td>
-                            <td class="t-right font-bold">
-                                <input type="number" id="inp-retention" class="cell-input t-right font-bold" style="width: 130px; display: inline-block;" onchange="updateRetentionAmount(this.value)">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="t-center">11</td>
-                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-labor')" style="color:var(--primary);text-decoration:none;font-weight:500;">ยอดเบิกค่าแรง</a></td>
+                            <td class="t-center">3</td>
+                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-labor')" style="color:var(--primary);text-decoration:none;font-weight:500;">ยอดเบิกจ่ายค่าแรงช่าง (ชีต: ยอดเบิกค่าแรง)</a></td>
                             <td class="t-right font-bold" id="val-i17">0.00</td>
                         </tr>
                         <tr class="row-total-master">
-                            <td colspan="2" class="t-center font-bold">รวมค่าใช้จ่ายโครงการ (I18)</td>
+                            <td colspan="2" class="t-center font-bold">รวมค่าใช้จ่ายโครงการทั้งหมด (I18)</td>
                             <td class="t-right font-bold text-rose" id="val-i18">0.00</td>
                         </tr>
                         <tr class="profit-final-row">
@@ -714,11 +707,11 @@
             tbody.appendChild(tr);
         });
 
+        // 3 Expense Categories Only (No Retention)
         const valI14 = expenses.filter(e => e.category === 'materials').reduce((s, e) => s + Number(e.amount || 0), 0);
         const valI15 = expenses.filter(e => e.category === 'ops').reduce((s, e) => s + Number(e.amount || 0), 0);
-        const valI16 = Number(currentProject.retention_amount || 0);
         const valI17 = expenses.filter(e => e.category === 'labor').reduce((s, e) => s + Number(e.amount || 0), 0);
-        const valI18 = valI14 + valI15 + valI16 + valI17;
+        const valI18 = valI14 + valI15 + valI17;
 
         const sumF11 = sumSelling;
         const sumH11 = sumBomCost + valI18;
@@ -731,7 +724,6 @@
 
         document.getElementById('val-i14').innerText = valI14.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('val-i15').innerText = valI15.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('inp-retention').value = valI16;
         document.getElementById('val-i17').innerText = valI17.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('val-i18').innerText = valI18.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('val-net-profit').innerText = sumI11.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -1176,13 +1168,6 @@
         await loadFullProjectData();
     }
 
-    async function updateRetentionAmount(value) {
-        const valNum = parseFloat(value) || 0;
-        await supabaseClient.from('projects').update({ retention_amount: valNum }).eq('id', currentProject.id);
-        currentProject.retention_amount = valNum;
-        renderMasterSummary();
-    }
-
     function openNewProjectModal() { document.getElementById('modalNewProject').style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -1226,7 +1211,6 @@
             project_name: name,
             customer_name: cust,
             contract_amount: amt,
-            retention_amount: 0,
             document_id: quoteId
         }]).select().single();
 
