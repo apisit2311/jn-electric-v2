@@ -656,7 +656,7 @@
         <div class="form-item">
             <label>รูปแบบ:</label>
             <select id="sel-create-type" class="clean-input" onchange="toggleCreateType()">
-                <option value="quote">ดึงข้อมูลจากใบเสนอราคา (Auto Cost & BOM)</option>
+                <option value="quote">ดึงข้อมูลจากใบเสนอราคา (ดึง cost_price อัตโนมัติ)</option>
                 <option value="manual">สร้างโครงการอิสระ</option>
             </select>
         </div>
@@ -1205,7 +1205,6 @@
         });
     }
 
-    // 1. Batch Main Items
     function openBatchMainTabModal() {
         const tbody = document.getElementById('tbl-batch-main-body');
         tbody.innerHTML = '';
@@ -1261,7 +1260,6 @@
         await loadFullProjectData();
     }
 
-    // 2. Batch BOM Sub-Items
     function openBatchBomModal(mainItemId) {
         currentBatchMainItemId = mainItemId;
         const item = mainItems.find(m => m.id === mainItemId);
@@ -1322,7 +1320,6 @@
         await loadFullProjectData();
     }
 
-    // 3. Batch Expenses
     function openBatchExpenseModal(catKey) {
         currentBatchExpenseCategory = catKey;
         const catTitles = {
@@ -1401,7 +1398,6 @@
         await loadFullProjectData();
     }
 
-    // 4. Batch Funding
     function openBatchFundingModal() {
         const tbody = document.getElementById('tbl-batch-fund-body');
         tbody.innerHTML = '';
@@ -1459,7 +1455,6 @@
 
     // ==================== SINGLE CRUD OPERATIONS ====================
 
-    // Expense Single CRUD
     async function addExpenseRow(catKey) {
         const name = document.getElementById('add-exp-name').value.trim();
         const qty = parseFloat(document.getElementById('add-exp-qty').value) || 1;
@@ -1535,7 +1530,6 @@
         await loadFullProjectData();
     }
 
-    // Funding Single CRUD
     function openFundingModal(id = null) {
         if (id) {
             const f = fundings.find(x => x.id === id);
@@ -1595,7 +1589,6 @@
         await loadFullProjectData();
     }
 
-    // Main Item Single CRUD
     function openAddMainTabModal() {
         document.getElementById('add-main-name').value = '';
         document.getElementById('add-main-qty').value = '1';
@@ -1667,7 +1660,6 @@
         await loadFullProjectData();
     }
 
-    // BOM Single CRUD
     async function addBomRow(mainItemId) {
         const name = document.getElementById('add-sub-name').value.trim();
         const qty = parseFloat(document.getElementById('add-sub-qty').value) || 1;
@@ -1712,7 +1704,7 @@
         await loadFullProjectData();
     }
 
-    // ==================== AUTO-IMPORT QUOTATION & PRODUCT COST ====================
+    // ==================== AUTO-FETCH QUOTATION & PRODUCTS (COST_PRICE) ====================
     function openNewProjectModal() { document.getElementById('modalNewProject').style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -1754,7 +1746,7 @@
         if (!name) return alert('กรุณากรอกชื่อโครงการ');
 
         try {
-            // 1. บันทึกสร้างโครงการ
+            // 1. สร้างโครงการใหม่
             const { data: newProj, error: pErr } = await supabaseClient.from('projects').insert([{
                 project_name: name,
                 customer_name: cust,
@@ -1764,23 +1756,26 @@
 
             if (pErr) throw pErr;
 
-            // 2. ถ้าเลือกดึงจากใบเสนอราคา -> ดึงข้อมูลรายการ & ราคาทุนอัตโนมัติ
+            // 2. ถ้าเลือกดึงจากใบเสนอราคา -> ดึงข้อมูลรายการ & ราคาทุน cost_price อัตโนมัติ
             if (quoteId) {
                 const { data: docItems } = await supabaseClient.from('document_items').select('*').eq('document_id', quoteId);
                 
-                // ค้นหาฐานข้อมูลสินค้าเป็นตัวสำรอง (Product Catalog Cost Map)
-                let productCostMap = new Map();
+                // ดึงแคตตาล็อกสินค้า products ทั้งหมดเพื่อนำ cost_price มาแมป
+                const prodById = new Map();
+                const prodByName = new Map();
+
                 try {
                     const { data: productsData } = await supabaseClient.from('products').select('*');
                     if (productsData && Array.isArray(productsData)) {
                         productsData.forEach(p => {
+                            const cost = Number(p.cost_price || p.cost || p.unit_cost || 0);
+                            if (p.id) prodById.set(p.id, cost);
                             const pName = (p.name || p.item_name || p.description || '').trim().toLowerCase();
-                            const cost = Number(p.cost || p.cost_price || p.unit_cost || p.buy_price || p.purchase_price || 0);
-                            if (pName && cost > 0) productCostMap.set(pName, cost);
+                            if (pName) prodByName.set(pName, cost);
                         });
                     }
                 } catch (e) {
-                    console.warn("Product lookup skipped", e);
+                    console.warn("Product cost fetch skipped", e);
                 }
 
                 if (docItems && docItems.length > 0) {
@@ -1792,23 +1787,17 @@
                         const unit = item.unit || 'ชุด';
                         const unitPrice = Number(item.price || item.unit_price || 0);
 
-                        // ค้นหาราคาทุนจากทุกชื่อคอลัมน์ที่เป็นไปได้
-                        let unitCost = Number(
-                            item.cost || 
-                            item.cost_price || 
-                            item.unit_cost || 
-                            item.buy_price || 
-                            item.purchase_price || 
-                            item.original_price || 
-                            0
-                        );
-
-                        // ถ้าในบิลไม่มีต้นทุน ให้ค้นจากชื่อสินค้าในระบบแคตตาล็อก
-                        if (unitCost <= 0 && productCostMap.has(itemName.toLowerCase())) {
-                            unitCost = productCostMap.get(itemName.toLowerCase()) || 0;
+                        // ดึง cost_price: เช็คจาก product_id ในบิล -> เช็คจากชื่อสินค้า -> เช็คฟิลด์ในบิล
+                        let unitCost = 0;
+                        if (item.product_id && prodById.has(item.product_id)) {
+                            unitCost = prodById.get(item.product_id);
+                        } else if (prodByName.has(itemName.toLowerCase())) {
+                            unitCost = prodByName.get(itemName.toLowerCase());
+                        } else {
+                            unitCost = Number(item.cost_price || item.cost || item.unit_cost || 0);
                         }
 
-                        // สร้างหมวดงานหลัก (Main Item)
+                        // บันทึกหมวดงานหลัก (Main Item)
                         const { data: mainItem, error: mErr } = await supabaseClient.from('project_main_items').insert([{
                             project_id: newProj.id,
                             item_order: idx + 1,
@@ -1818,8 +1807,8 @@
                             unit_price: unitPrice
                         }]).select().single();
 
-                        // สร้างรายการใน BOM ให้อัตโนมัติทันที
-                        if (!mErr && mainItem && unitCost > 0) {
+                        // สร้างแถวอุปกรณ์ย่อย (BOM Item) รองรับไว้ทันทีเสมอ
+                        if (!mErr && mainItem) {
                             await supabaseClient.from('project_bom_items').insert([{
                                 main_item_id: mainItem.id,
                                 item_order: 1,
