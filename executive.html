@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สรุปภาพรวมโครงการ ค่าใช้จ่าย - Executive Overview</title>
+    <title>สรุปภาพรวมโครงการสำหรับผู้บริหาร - Executive Overview</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -49,7 +49,6 @@
         .btn-emerald { background: var(--emerald-600); color: #fff; }
         .btn-emerald:hover { background: var(--emerald-700); }
 
-        /* KPI Dashboard Cards Grid */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 22px; }
         .kpi-card { background: #ffffff; padding: 18px 20px; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); position: relative; overflow: hidden; }
         .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
@@ -86,7 +85,6 @@
 
         .row-total-master { background: #f8fafc; font-weight: 700; }
         .profit-final-row { background: var(--emerald-50); font-weight: 700; color: var(--emerald-700); font-size: 15px; }
-
         .tag-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
         .tag-pill.green { background: #dcfce7; color: var(--emerald-700); }
 
@@ -115,7 +113,6 @@
     </div>
 
     <div id="main-content" style="display: none;">
-        
         <div class="exec-header">
             <div class="header-title-box">
                 <div class="header-badge-icon">⚡</div>
@@ -130,75 +127,44 @@
             </div>
         </div>
 
-        <!-- 5 Key Executive KPIs Grid -->
         <div class="kpi-grid">
-            <!-- 1. ยอดสัญญา -->
             <div class="kpi-card blue">
-                <div class="kpi-head">
-                    <span class="kpi-label">ยอดรวมสัญญา (รายรับ)</span>
-                    <span style="font-size: 16px;">📄</span>
-                </div>
+                <div class="kpi-head"><span class="kpi-label">ยอดรวมสัญญา (รายรับ)</span><span>📄</span></div>
                 <div class="kpi-val text-primary" id="kpi-selling">0.00</div>
                 <div class="kpi-sub">มูลค่างานตามใบเสนอราคา</div>
             </div>
 
-            <!-- 2. ต้นทุนโครงการรวม -->
             <div class="kpi-card rose">
-                <div class="kpi-head">
-                    <span class="kpi-label">งบประมาณต้นทุนรวม</span>
-                    <span style="font-size: 16px;">💸</span>
-                </div>
+                <div class="kpi-head"><span class="kpi-label">งบประมาณต้นทุนรวม</span><span>💸</span></div>
                 <div class="kpi-val text-rose" id="kpi-cost">0.00</div>
                 <div class="kpi-sub" id="kpi-cost-sub">ทุนอุปกรณ์ + ค่าใช้จ่ายหน้างาน</div>
             </div>
 
-            <!-- 3. กำไรสุทธิคงเหลือ -->
             <div class="kpi-card emerald">
-                <div class="kpi-head">
-                    <span class="kpi-label" style="color:var(--emerald-700);">กำไรสุทธิโครงการ (P&L)</span>
-                    <span style="font-size: 16px;">💰</span>
-                </div>
+                <div class="kpi-head"><span class="kpi-label" style="color:var(--emerald-700);">กำไรสุทธิโครงการ (P&L)</span><span>💰</span></div>
                 <div class="kpi-val text-emerald" id="kpi-profit">0.00</div>
-                <div class="kpi-sub">
-                    <span class="tag-pill green" id="kpi-margin-tag">อัตรากำไร: 0%</span>
-                </div>
+                <div class="kpi-sub"><span class="tag-pill green" id="kpi-margin-tag">อัตรากำไร: 0%</span></div>
             </div>
 
-            <!-- 4. เงินสดคงเหลือจริงในมือ -->
             <div class="kpi-card purple" id="card-fund">
-                <div class="kpi-head">
-                    <span class="kpi-label" style="color:var(--purple-600);">เงินสดคงเหลือในมือจริง</span>
-                    <span style="font-size: 16px;">💳</span>
-                </div>
+                <div class="kpi-head"><span class="kpi-label" style="color:var(--purple-600);">เงินสดคงเหลือในมือจริง</span><span>💳</span></div>
                 <div class="kpi-val text-purple" id="kpi-cash-balance">0.00</div>
                 <div class="kpi-sub" id="kpi-cash-sub">รับเข้า - จ่ายจริง - มัดจำ</div>
             </div>
 
-            <!-- 5. เงินที่ต้องเพิ่มเข้าในโครงการ (การ์ดใหม่) -->
             <div class="kpi-card" id="card-need-fund">
-                <div class="kpi-head">
-                    <span class="kpi-label" id="lbl-need-fund-title">เงินที่ต้องเพิ่มเข้าโครงการ</span>
-                    <span style="font-size: 16px;">🪙</span>
-                </div>
+                <div class="kpi-head"><span class="kpi-label" id="lbl-need-fund-title">เงินที่ต้องเพิ่มเข้าโครงการ</span><span>🪙</span></div>
                 <div class="kpi-val" id="kpi-need-fund">0.00</div>
                 <div class="kpi-sub" id="kpi-need-fund-status">เงินทุนเพียงพอแล้ว</div>
             </div>
         </div>
 
-        <!-- Section 1: สรุปต้นทุนและกำไรตามหมวดงานหลัก -->
         <div class="section-card">
             <div class="section-title">📊 1. รายการตามสัญญา & ต้นทุนอุปกรณ์หลัก (BOM Summary)</div>
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr>
-                            <th style="width: 6%;" class="t-center">#</th>
-                            <th style="width: 38%;">หมวดงาน / รายการ</th>
-                            <th style="width: 12%;" class="t-center">จำนวน</th>
-                            <th style="width: 14%;" class="t-right">ราคาขายรวม</th>
-                            <th style="width: 14%;" class="t-right text-amber">ต้นทุนรวม</th>
-                            <th style="width: 16%;" class="t-right text-emerald">กำไรขั้นต้น</th>
-                        </tr>
+                        <tr><th style="width: 6%;" class="t-center">#</th><th style="width: 38%;">หมวดงาน / รายการ</th><th style="width: 12%;" class="t-center">จำนวน</th><th style="width: 14%;" class="t-right">ราคาขายรวม</th><th style="width: 14%;" class="t-right text-amber">ต้นทุนรวม</th><th style="width: 16%;" class="t-right text-emerald">กำไรขั้นต้น</th></tr>
                     </thead>
                     <tbody id="tbl-main-body"></tbody>
                     <tfoot>
@@ -213,18 +179,12 @@
             </div>
         </div>
 
-        <!-- Section 2: สรุปค่าใช้จ่ายหน้างานจริง -->
         <div class="section-card">
             <div class="section-title">🛠️ 2. สรุปค่าใช้จ่ายหน้างานจริง & สรุปกำไรสุทธิ</div>
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr>
-                            <th style="width: 6%;" class="t-center">#</th>
-                            <th style="width: 54%;">หมวดหมู่ค่าใช้จ่ายหน้างาน</th>
-                            <th style="width: 20%;" class="t-right">จำนวนเงินงบประมาณ</th>
-                            <th style="width: 20%;" class="t-right text-emerald">จ่ายจริงแล้ว</th>
-                        </tr>
+                        <tr><th style="width: 6%;" class="t-center">#</th><th style="width: 54%;">หมวดหมู่ค่าใช้จ่ายหน้างาน</th><th style="width: 20%;" class="t-right">จำนวนเงินงบประมาณ</th><th style="width: 20%;" class="t-right text-emerald">จ่ายจริงแล้ว</th></tr>
                     </thead>
                     <tbody id="tbl-expense-body"></tbody>
                     <tfoot>
@@ -242,7 +202,6 @@
             </div>
         </div>
 
-        <!-- Section 3: สรุปสถานะเงินสด & เงินมัดจำสินค้า -->
         <div class="section-card">
             <div class="section-title">📥 3. สถานะเงินทุนรับเข้า & เงินมัดจำสินค้าชั่วคราว</div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
@@ -250,12 +209,7 @@
                     <div style="font-size: 13.5px; font-weight: 600; color: var(--purple-600); margin-bottom: 8px;">เงินทุนที่รับเข้ามาแล้ว:</div>
                     <div class="table-wrap">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>แหล่งที่มา</th>
-                                    <th class="t-right">จำนวนเงิน</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>แหล่งที่มา</th><th class="t-right">จำนวนเงิน</th></tr></thead>
                             <tbody id="tbl-fund-body"></tbody>
                         </table>
                     </div>
@@ -265,12 +219,7 @@
                     <div style="font-size: 13.5px; font-weight: 600; color: var(--amber-600); margin-bottom: 8px;">เงินมัดจำสินค้าที่โอนออกไป (รอเคลียร์บิล):</div>
                     <div class="table-wrap">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>รายการ / ร้านค้า</th>
-                                    <th class="t-right text-amber">ยอดมัดจำ</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>รายการ / ร้านค้า</th><th class="t-right text-amber">ยอดมัดจำ</th></tr></thead>
                             <tbody id="tbl-deposit-body"></tbody>
                         </table>
                     </div>
@@ -295,13 +244,11 @@
     window.onload = async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('id');
-
         if (!projectId) {
             document.getElementById('loading-view').style.display = 'none';
             document.getElementById('error-view').style.display = 'block';
             return;
         }
-
         await loadExecutiveData(projectId);
     };
 
@@ -327,11 +274,9 @@
             cashflows = cData || [];
 
             renderExecutiveOverview();
-
             document.getElementById('loading-view').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
         } catch (err) {
-            console.error(err);
             document.getElementById('loading-view').style.display = 'none';
             document.getElementById('error-view').style.display = 'block';
         }
@@ -378,16 +323,9 @@
         document.getElementById('sum-main-cost').innerText = sumBomCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('sum-main-profit').innerText = (sumSelling - sumBomCost).toLocaleString('en-US', {minimumFractionDigits: 2});
 
-        const catMap = {
-            'materials': 'วัสดุสิ้นเปลืองอื่นๆ',
-            'ops': 'ค่าใช้จ่ายดำเนินงาน / น้ำมัน',
-            'labor': 'ยอดเบิกจ่ายค่าแรงช่าง'
-        };
-
+        const catMap = { 'materials': 'วัสดุสิ้นเปลืองอื่นๆ', 'ops': 'ค่าใช้จ่ายดำเนินงาน / น้ำมัน', 'labor': 'ยอดเบิกจ่ายค่าแรงช่าง' };
         let customCats = [];
-        try {
-            customCats = JSON.parse(localStorage.getItem(`exp_cats_${project.id}`) || '[]');
-        } catch(e) {}
+        try { customCats = JSON.parse(localStorage.getItem(`exp_cats_${project.id}`) || '[]'); } catch(e) {}
         const customMap = {};
         customCats.forEach(c => { customMap[c.key] = c.name; });
 
@@ -439,26 +377,16 @@
         const unpaidPendingTotal = totalProjectCost - actualPaidTotal;
         const cashBalance = totalFundIn - actualPaidTotal - totalDeposits;
 
-        // คำนวณเงินที่ต้องเพิ่มเข้าในโครงการ
-        const neededFund = Math.max(0, unpaidPendingTotal - cashBalance);
+        // 🌟 สูตรคำนวณเงินที่ต้องเพิ่มเข้าโครงการใน executive.html
+        const netPendingToPay = Math.max(0, unpaidPendingTotal - totalDeposits);
+        const neededFund = Math.max(0, netPendingToPay - cashBalance);
 
         const tbodyFund = document.getElementById('tbl-fund-body');
-        tbodyFund.innerHTML = fundInList.map(f => `
-            <tr>
-                <td>${f.item_name || 'เงินทุน'}</td>
-                <td class="t-right font-bold text-purple">${Number(f.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            </tr>
-        `).join('') || `<tr><td colspan="2" class="t-center" style="color:#94a3b8;">ยังไม่มีเงินทุนรับเข้า</td></tr>`;
+        tbodyFund.innerHTML = fundInList.map(f => `<tr><td>${f.item_name || 'เงินทุน'}</td><td class="t-right font-bold text-purple">${Number(f.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td></tr>`).join('') || `<tr><td colspan="2" class="t-center" style="color:#94a3b8;">ยังไม่มีเงินทุนรับเข้า</td></tr>`;
 
         const tbodyDep = document.getElementById('tbl-deposit-body');
-        tbodyDep.innerHTML = depositList.map(d => `
-            <tr>
-                <td>${d.item_name || 'มัดจำสินค้า'}</td>
-                <td class="t-right font-bold text-amber">${Number(d.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            </tr>
-        `).join('') || `<tr><td colspan="2" class="t-center" style="color:#94a3b8;">ไม่มีเงินมัดจำค้างอยู่</td></tr>`;
+        tbodyDep.innerHTML = depositList.map(d => `<tr><td>${d.item_name || 'มัดจำสินค้า'}</td><td class="t-right font-bold text-amber">${Number(d.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td></tr>`).join('') || `<tr><td colspan="2" class="t-center" style="color:#94a3b8;">ไม่มีเงินมัดจำค้างอยู่</td></tr>`;
 
-        // Update Top KPIs
         document.getElementById('kpi-selling').innerText = sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-cost').innerText = totalProjectCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -467,7 +395,6 @@
         document.getElementById('kpi-cash-balance').innerText = cashBalance.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-cash-sub').innerText = `รับเข้า ${totalFundIn.toLocaleString()} | จ่ายจริง ${actualPaidTotal.toLocaleString()}`;
 
-        // Card 5: เงินที่ต้องเพิ่มเข้าในโครงการ
         const cardNeedFund = document.getElementById('card-need-fund');
         const valNeedFund = document.getElementById('kpi-need-fund');
         const statusNeedFund = document.getElementById('kpi-need-fund-status');
