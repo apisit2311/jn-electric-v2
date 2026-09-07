@@ -36,7 +36,6 @@
         body { font-family: 'Prompt', 'Sarabun', sans-serif; background-color: #f8fafc; color: var(--slate-900); margin: 0; padding: 20px 15px; }
         .wrapper { max-width: 1080px; margin: 0 auto; }
 
-        /* Top Banner */
         .exec-header { background: #ffffff; padding: 20px 24px; border-radius: 16px; box-shadow: var(--card-shadow); margin-bottom: 20px; border: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .header-title-box { display: flex; align-items: center; gap: 14px; }
         .header-badge-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: #fff; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; box-shadow: 0 4px 10px rgba(30,58,138,0.2); }
@@ -50,7 +49,6 @@
         .btn-emerald { background: var(--emerald-600); color: #fff; }
         .btn-emerald:hover { background: var(--emerald-700); }
 
-        /* KPI Dashboard Cards */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 22px; }
         .kpi-card { background: #ffffff; padding: 20px; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); position: relative; overflow: hidden; }
         .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
@@ -65,7 +63,6 @@
         .kpi-val { font-size: 24px; font-weight: 700; line-height: 1.2; margin-top: 4px; }
         .kpi-sub { font-size: 12px; color: var(--slate-600); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
 
-        /* Content Sections */
         .section-card { background: #ffffff; border-radius: 16px; padding: 22px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); margin-bottom: 20px; }
         .section-title { font-size: 15.5px; font-weight: 700; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1.5px solid var(--slate-100); padding-bottom: 10px; }
 
@@ -90,9 +87,7 @@
 
         .tag-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
         .tag-pill.green { background: #dcfce7; color: var(--emerald-700); }
-        .tag-pill.amber { background: #fef3c7; color: var(--amber-600); }
 
-        /* Loading / Error */
         #loading-view, #error-view { text-align: center; padding: 80px 20px; background: #fff; border-radius: 16px; border: 1px solid var(--slate-200); }
         .spinner { width: 44px; height: 44px; border: 4px solid var(--slate-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -107,22 +102,18 @@
 <body>
 
 <div class="wrapper">
-    <!-- Loading State -->
     <div id="loading-view">
         <div class="spinner"></div>
         <h3 style="margin:0; font-weight:600; color:var(--slate-700);">กำลังโหลดข้อมูลสรุปโครงการ...</h3>
     </div>
 
-    <!-- Error State -->
     <div id="error-view" style="display: none;">
         <h2 style="color:var(--rose-600); margin-top:0;">⚠️ ไม่พบข้อมูลโครงการ</h2>
         <p style="color:var(--slate-600);">กรุณาตรวจสอบลิงก์ หรือติดต่อผู้จัดการโครงการ</p>
     </div>
 
-    <!-- Main Dashboard View -->
     <div id="main-content" style="display: none;">
         
-        <!-- Header Banner -->
         <div class="exec-header">
             <div class="header-title-box">
                 <div class="header-badge-icon">⚡</div>
@@ -137,9 +128,7 @@
             </div>
         </div>
 
-        <!-- 4 Key Executive KPIs -->
         <div class="kpi-grid">
-            <!-- 1. ยอดสัญญา -->
             <div class="kpi-card blue">
                 <div class="kpi-head">
                     <span class="kpi-label">ยอดรวมสัญญา (รายรับ)</span>
@@ -149,7 +138,6 @@
                 <div class="kpi-sub">มูลค่างานตามใบเสนอราคา</div>
             </div>
 
-            <!-- 2. ต้นทุนโครงการรวม -->
             <div class="kpi-card rose">
                 <div class="kpi-head">
                     <span class="kpi-label">งบประมาณต้นทุนรวม</span>
@@ -159,7 +147,6 @@
                 <div class="kpi-sub" id="kpi-cost-sub">ทุนอุปกรณ์ + ค่าใช้จ่ายหน้างาน</div>
             </div>
 
-            <!-- 3. กำไรสุทธิคงเหลือ -->
             <div class="kpi-card emerald">
                 <div class="kpi-head">
                     <span class="kpi-label" style="color:var(--emerald-700);">กำไรสุทธิคงเหลือ (P&L)</span>
@@ -171,7 +158,6 @@
                 </div>
             </div>
 
-            <!-- 4. เงินสดคงเหลือจริงในมือ -->
             <div class="kpi-card purple" id="card-fund">
                 <div class="kpi-head">
                     <span class="kpi-label" style="color:var(--purple-600);">เงินสดคงเหลือจริงในมือ</span>
@@ -182,7 +168,6 @@
             </div>
         </div>
 
-        <!-- Section 1: สรุปต้นทุนและกำไรตามหมวดงานหลัก -->
         <div class="section-card">
             <div class="section-title">📊 1. รายการตามสัญญา & ต้นทุนอุปกรณ์หลัก (BOM Summary)</div>
             <div class="table-wrap">
@@ -210,7 +195,6 @@
             </div>
         </div>
 
-        <!-- Section 2: สรุปค่าใช้จ่ายหน้างานจริง -->
         <div class="section-card">
             <div class="section-title">🛠️ 2. สรุปค่าใช้จ่ายหน้างานจริง & สรุปกำไรสุทธิ</div>
             <div class="table-wrap">
@@ -239,11 +223,9 @@
             </div>
         </div>
 
-        <!-- Section 3: สรุปสถานะเงินสด & เงินมัดจำสินค้า -->
         <div class="section-card">
             <div class="section-title">📥 3. สถานะเงินทุนรับเข้า & เงินมัดจำสินค้าชั่วคราว</div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
-                <!-- แหล่งเงินทุน -->
                 <div>
                     <div style="font-size: 13.5px; font-weight: 600; color: var(--purple-600); margin-bottom: 8px;">เงินทุนที่รับเข้ามาแล้ว:</div>
                     <div class="table-wrap">
@@ -259,7 +241,6 @@
                     </div>
                 </div>
 
-                <!-- เงินมัดจำสินค้า -->
                 <div>
                     <div style="font-size: 13.5px; font-weight: 600; color: var(--amber-600); margin-bottom: 8px;">เงินมัดจำสินค้าที่โอนออกไป (รอเคลียร์บิล):</div>
                     <div class="table-wrap">
@@ -306,27 +287,22 @@
 
     async function loadExecutiveData(projectId) {
         try {
-            // 1. Fetch Project
             const { data: pData, error: pErr } = await supabaseClient.from('projects').select('*').eq('id', projectId).single();
             if (pErr || !pData) throw new Error("Project not found");
             project = pData;
 
-            // 2. Fetch Main Items
             const { data: mData } = await supabaseClient.from('project_main_items').select('*').eq('project_id', projectId).order('item_order');
             mainItems = mData || [];
 
-            // 3. Fetch BOM Items
             const mainIds = mainItems.map(m => m.id);
             if (mainIds.length > 0) {
                 const { data: bData } = await supabaseClient.from('project_bom_items').select('*').in('main_item_id', mainIds).order('item_order');
                 bomItems = bData || [];
             }
 
-            // 4. Fetch Expenses
             const { data: eData } = await supabaseClient.from('project_expenses').select('*').eq('project_id', projectId).order('expense_date');
             expenses = eData || [];
 
-            // 5. Fetch Cashflow
             const { data: cData } = await supabaseClient.from('project_cashflow').select('*').eq('project_id', projectId).order('flow_date');
             cashflows = cData || [];
 
@@ -346,7 +322,6 @@
         document.getElementById('lbl-proj-cust').innerText = project.customer_name || 'ลูกค้าทั่วไป';
         document.getElementById('lbl-proj-date').innerText = new Date(project.created_at || Date.now()).toLocaleDateString('th-TH');
 
-        // Main Items Table & Totals
         let sumSelling = 0;
         let sumBomCost = 0;
         let sumBomPaid = 0;
@@ -383,12 +358,18 @@
         document.getElementById('sum-main-cost').innerText = sumBomCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('sum-main-profit').innerText = (sumSelling - sumBomCost).toLocaleString('en-US', {minimumFractionDigits: 2});
 
-        // Site Expenses Table & Categories
         const catMap = {
             'materials': 'วัสดุสิ้นเปลืองอื่นๆ',
             'ops': 'ค่าใช้จ่ายดำเนินงาน / น้ำมัน',
             'labor': 'ยอดเบิกจ่ายค่าแรงช่าง'
         };
+
+        let customCats = [];
+        try {
+            customCats = JSON.parse(localStorage.getItem(`exp_cats_${project.id}`) || '[]');
+        } catch(e) {}
+        const customMap = {};
+        customCats.forEach(c => { customMap[c.key] = c.name; });
 
         const categories = [...new Set(expenses.map(e => e.category || 'materials'))];
         const tbodyExp = document.getElementById('tbl-expense-body');
@@ -405,10 +386,15 @@
             sumSiteCost += total;
             sumSitePaid += paid;
 
+            let displayName = catMap[catKey] || customMap[catKey] || catKey;
+            if (displayName.startsWith('custom_')) {
+                displayName = list[0]?.item_name ? `หมวดเพิ่มเติม (${list[0].item_name})` : 'หมวดค่าใช้จ่ายเพิ่มเติม';
+            }
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="t-center">${idx + 1}</td>
-                <td class="font-bold">${catMap[catKey] || catKey}</td>
+                <td class="font-bold">${displayName}</td>
                 <td class="t-right font-bold text-rose">${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                 <td class="t-right font-bold text-emerald">${paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             `;
@@ -418,14 +404,12 @@
         document.getElementById('sum-site-cost').innerText = sumSiteCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('sum-site-paid').innerText = sumSitePaid.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-        // Net Profit & Total Project Cost
         const totalProjectCost = sumBomCost + sumSiteCost;
         const netProfit = sumSelling - totalProjectCost;
         const marginPct = sumSelling > 0 ? ((netProfit / sumSelling) * 100).toFixed(1) : 0;
 
         document.getElementById('final-net-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2}) + ` บาท (อัตรากำไร ${marginPct}%)`;
 
-        // Cashflow & Deposits
         const fundInList = cashflows.filter(c => c.flow_type !== 'deposit' && c.flow_type !== 'out');
         const depositList = cashflows.filter(c => c.flow_type === 'deposit' || c.flow_type === 'out');
 
@@ -434,7 +418,6 @@
         const actualPaidTotal = sumBomPaid + sumSitePaid;
         const cashBalance = totalFundIn - actualPaidTotal - totalDeposits;
 
-        // Render Fund & Deposit Tables
         const tbodyFund = document.getElementById('tbl-fund-body');
         tbodyFund.innerHTML = fundInList.map(f => `
             <tr>
@@ -451,7 +434,6 @@
             </tr>
         `).join('') || `<tr><td colspan="2" class="t-center" style="color:#94a3b8;">ไม่มีเงินมัดจำค้างอยู่</td></tr>`;
 
-        // Update Top KPIs
         document.getElementById('kpi-selling').innerText = sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-cost').innerText = totalProjectCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
