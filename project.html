@@ -294,42 +294,34 @@
                 </table>
             </div>
 
-            <!-- Table 2: ค่าใช้จ่ายหน้างานจริง -->
-            <div style="font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: var(--rose-600);">2. ค่าใช้จ่ายหน้างานจริง (ส่วนที่ 2)</div>
-            <div class="table-wrap" style="max-width: 680px;">
+            <!-- Table 2: ค่าใช้จ่ายหน้างานจริง (มีปุ่มเพิ่มหมวดหมู่) -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <div style="font-size: 13.5px; font-weight: 600; color: var(--rose-600);">2. ค่าใช้จ่ายหน้างานจริง (ส่วนที่ 2)</div>
+                <button class="btn btn-emerald btn-sm no-print" onclick="openAddExpenseCategoryModal()">➕ เพิ่มหมวดค่าใช้จ่าย</button>
+            </div>
+            <div class="table-wrap" style="max-width: 780px;">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 10%;" class="t-center">ลำดับ</th>
-                            <th style="width: 60%;">หมวดหมู่ค่าใช้จ่าย</th>
-                            <th style="width: 30%;" class="t-right">จำนวนเงิน (บาท)</th>
+                            <th style="width: 8%;" class="t-center">ลำดับ</th>
+                            <th style="width: 58%;">หมวดหมู่ค่าใช้จ่าย</th>
+                            <th style="width: 26%;" class="t-right">จำนวนเงิน (บาท)</th>
+                            <th style="width: 8%;" class="t-center no-print">จัดการ</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td class="t-center">1</td>
-                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-materials')" style="color:var(--primary);text-decoration:none;font-weight:500;">วัสดุสิ้นเปลืองอื่นๆ (ชีต: วัสดุอื่นๆ)</a></td>
-                            <td class="t-right font-bold" id="val-i14">0.00</td>
-                        </tr>
-                        <tr>
-                            <td class="t-center">2</td>
-                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-ops')" style="color:var(--primary);text-decoration:none;font-weight:500;">ค่าใช้จ่ายดำเนินงาน / น้ำมัน (ชีต: ค่าดำเนินงาน)</a></td>
-                            <td class="t-right font-bold" id="val-i15">0.00</td>
-                        </tr>
-                        <tr>
-                            <td class="t-center">3</td>
-                            <td><a href="javascript:void(0)" onclick="switchSheet('exp-labor')" style="color:var(--primary);text-decoration:none;font-weight:500;">ยอดเบิกจ่ายค่าแรงช่าง (ชีต: ยอดเบิกค่าแรง)</a></td>
-                            <td class="t-right font-bold" id="val-i17">0.00</td>
-                        </tr>
+                    <tbody id="tbl-expense-categories-body"></tbody>
+                    <tfoot>
                         <tr class="row-total-master">
                             <td colspan="2" class="t-center font-bold">รวมค่าใช้จ่ายหน้างาน (ส่วนที่ 2)</td>
                             <td class="t-right font-bold text-rose" id="val-i18">0.00</td>
+                            <td class="no-print"></td>
                         </tr>
                         <tr class="profit-final-row">
                             <td colspan="2" class="t-center font-bold">💰 กำไรสุทธิคงเหลือจริง (Net Profit)</td>
                             <td class="t-right font-bold" id="val-net-profit">0.00</td>
+                            <td class="no-print"></td>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -340,16 +332,38 @@
     </div>
 </div>
 
-<!-- ==================== BATCH ADD MODALS ==================== -->
+<!-- ==================== MODALS ==================== -->
 
-<!-- Modal: เพิ่มหลายหมวดงาน -->
+<!-- Modal: เพิ่มหมวดหมู่ค่าใช้จ่ายใหม่ในส่วนที่ 2 -->
+<div class="modal-overlay" id="modalAddExpenseCategory">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3>➕ เพิ่มหมวดหมู่ค่าใช้จ่าย (ส่วนที่ 2)</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalAddExpenseCategory')">&times;</span>
+        </div>
+        <div class="form-item">
+            <label>ชื่อหมวดหมู่ค่าใช้จ่าย:</label>
+            <input type="text" id="add-cat-name" class="clean-input" placeholder="เช่น ค่าเช่าเครื่องจักร / รถเครน, ค่าที่พัก, ค่าธรรมเนียม...">
+        </div>
+        <div class="form-item">
+            <label>หน่วยนับเริ่มต้น:</label>
+            <input type="text" id="add-cat-unit" class="clean-input" value="รายการ" placeholder="เช่น วัน, เที่ยว, รายการ">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModal('modalAddExpenseCategory')">ยกเลิก</button>
+            <button class="btn btn-emerald" onclick="submitAddExpenseCategory()">➕ สร้างหมวดหมู่และเปิดแท็บ</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: เพิ่มหลายหมวดงาน (BOM) -->
 <div class="modal-overlay" id="modalBatchMain">
     <div class="modal-box modal-lg">
         <div class="modal-head">
             <h3>⚡ เพิ่มหมวดงานตามใบเสนอราคา (หลายรายการ)</h3>
             <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalBatchMain')">&times;</span>
         </div>
-        <div style="font-size: 12.5px; color: var(--slate-600); margin-bottom: 12px;">กรอกข้อมูลหมวดงานหลายๆ แถว แล้วกดบันทึกพร้อมกันครั้งเดียว (แถวที่เว้นว่างระบบจะไม่นำไปบันทึก)</div>
+        <div style="font-size: 12.5px; color: var(--slate-600); margin-bottom: 12px;">กรอกข้อมูลหมวดงานหลายๆ แถว แล้วกดบันทึกพร้อมกันครั้งเดียว</div>
         <div class="table-wrap" style="max-height: 380px; overflow-y: auto;">
             <table>
                 <thead>
@@ -375,7 +389,7 @@
     </div>
 </div>
 
-<!-- Modal: เพิ่มอุปกรณ์ย่อยหลายรายการ -->
+<!-- Modal: เพิ่มอุปกรณ์ย่อยหลายรายการ (BOM Items) -->
 <div class="modal-overlay" id="modalBatchBom">
     <div class="modal-box modal-lg">
         <div class="modal-head">
@@ -476,8 +490,6 @@
     </div>
 </div>
 
-<!-- ==================== SINGLE EDIT / CREATE MODALS ==================== -->
-
 <!-- Modal: เพิ่ม/แก้ไข เงินทุนเดี่ยว -->
 <div class="modal-overlay" id="modalFunding">
     <div class="modal-box">
@@ -509,7 +521,7 @@
     </div>
 </div>
 
-<!-- Modal: เพิ่มหมวดงานเดี่ยว -->
+<!-- Modal: เพิ่มหมวดงานเดี่ยว (BOM) -->
 <div class="modal-overlay" id="modalAddMainTab">
     <div class="modal-box">
         <div class="modal-head">
@@ -700,12 +712,39 @@
     let currentBatchMainItemId = null;
     let currentBatchExpenseCategory = null;
 
+    const DEFAULT_EXPENSE_CATEGORIES = [
+        { key: 'materials', name: 'วัสดุสิ้นเปลืองอื่นๆ', tabLabel: '🪛 วัสดุอื่นๆ', defaultUnit: 'ชิ้น', placeholder: 'เช่น ท่อ PVC 4 หุน, ข้อต่อ, ปูน...' },
+        { key: 'ops', name: 'ค่าใช้จ่ายดำเนินงาน / น้ำมัน', tabLabel: '⛽ ค่าใช้จ่ายดำเนินงาน', defaultUnit: 'ครั้ง', placeholder: 'เช่น ค่าน้ำมันรถ, ค่าที่พัก...' },
+        { key: 'labor', name: 'ยอดเบิกจ่ายค่าแรงช่าง', tabLabel: '👷 ยอดเบิกค่าแรง', defaultUnit: 'วัน', placeholder: 'เช่น ค่าแรงช่างติดตั้ง, ค่าเหมาเดินท่อ...' }
+    ];
+
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) { window.location.href = "index.html"; return; }
         await loadProjectList();
         await loadQuotesForModal();
     };
+
+    function getProjectExpenseCategories() {
+        let customCats = [];
+        if (currentProject) {
+            try {
+                customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
+            } catch(e) {}
+        }
+        expenses.forEach(e => {
+            if (e.category && !DEFAULT_EXPENSE_CATEGORIES.some(c => c.key === e.category) && !customCats.some(c => c.key === e.category)) {
+                customCats.push({
+                    key: e.category,
+                    name: e.category,
+                    tabLabel: '📋 ' + e.category,
+                    defaultUnit: e.unit || 'รายการ',
+                    placeholder: 'พิมพ์รายการ...'
+                });
+            }
+        });
+        return [...DEFAULT_EXPENSE_CATEGORIES, ...customCats];
+    }
 
     async function loadProjectList() {
         const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
@@ -783,6 +822,7 @@
         const container = document.getElementById('sheet-tabs-container');
         container.innerHTML = '';
 
+        // BOM Tabs
         mainItems.forEach(item => {
             const tab = document.createElement('button');
             tab.className = `tab-pill ${activeSheetKey === 'bom-' + item.id ? 'active' : ''}`;
@@ -791,20 +831,22 @@
             container.appendChild(tab);
         });
 
-        const fixedTabs = [
-            { key: 'exp-materials', label: '🪛 วัสดุอื่นๆ' },
-            { key: 'exp-ops', label: '⛽ ค่าใช้จ่ายดำเนินงาน' },
-            { key: 'exp-labor', label: '👷 ยอดเบิกค่าแรง' },
-            { key: 'funding', label: '💰 ทะเบียนเงินทุน' }
-        ];
-
-        fixedTabs.forEach(s => {
+        // Dynamic Expense Tabs (Standard + Custom)
+        const allExpenseCats = getProjectExpenseCategories();
+        allExpenseCats.forEach(cat => {
             const tab = document.createElement('button');
-            tab.className = `tab-pill ${activeSheetKey === s.key ? 'active' : ''}`;
-            tab.innerHTML = s.label;
-            tab.onclick = () => switchSheet(s.key);
+            tab.className = `tab-pill ${activeSheetKey === 'exp-' + cat.key ? 'active' : ''}`;
+            tab.innerHTML = cat.tabLabel || ('📋 ' + cat.name);
+            tab.onclick = () => switchSheet('exp-' + cat.key);
             container.appendChild(tab);
         });
+
+        // Funding Tab
+        const fundTab = document.createElement('button');
+        fundTab.className = `tab-pill ${activeSheetKey === 'funding' ? 'active' : ''}`;
+        fundTab.innerHTML = '💰 ทะเบียนเงินทุน';
+        fundTab.onclick = () => switchSheet('funding');
+        container.appendChild(fundTab);
     }
 
     function switchSheet(key) {
@@ -830,8 +872,9 @@
         }
     }
 
-    // --- RENDER MASTER SUMMARY & UPDATE TOP DASHBOARD ---
+    // --- RENDER MASTER SUMMARY & TABLE 2 DYNAMICALLY ---
     function renderMasterSummary() {
+        // Table 1: Main Items
         const tbody = document.getElementById('tbl-main-items-body');
         tbody.innerHTML = '';
 
@@ -872,35 +915,55 @@
             tbody.appendChild(tr);
         });
 
-        // Part 2: Site Expenses
-        const valI14 = expenses.filter(e => e.category === 'materials').reduce((s, e) => s + Number(e.amount || 0), 0);
-        const valI15 = expenses.filter(e => e.category === 'ops').reduce((s, e) => s + Number(e.amount || 0), 0);
-        const valI17 = expenses.filter(e => e.category === 'labor').reduce((s, e) => s + Number(e.amount || 0), 0);
-        const valI18 = valI14 + valI15 + valI17;
+        // Table 2: Dynamic Expense Categories
+        const tbodyExp = document.getElementById('tbl-expense-categories-body');
+        tbodyExp.innerHTML = '';
 
-        const totalProjectCost = sumBomCost + valI18;
+        const allExpenseCats = getProjectExpenseCategories();
+        let totalSiteExpenses = 0;
+
+        allExpenseCats.forEach((cat, idx) => {
+            const catTotal = expenses.filter(e => e.category === cat.key).reduce((s, e) => s + Number(e.amount || 0), 0);
+            totalSiteExpenses += catTotal;
+
+            const isCustom = !DEFAULT_EXPENSE_CATEGORIES.some(d => d.key === cat.key);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="t-center">${idx + 1}</td>
+                <td>
+                    <a href="javascript:void(0)" onclick="switchSheet('exp-${cat.key}')" style="color:var(--primary);text-decoration:none;font-weight:500;">
+                        ${cat.tabLabel ? cat.tabLabel : '📋 ' + cat.name}
+                    </a>
+                </td>
+                <td class="t-right font-bold text-slate-800">${catTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                <td class="t-center no-print">
+                    ${isCustom ? `<button class="btn-icon del" onclick="deleteCustomExpenseCategory('${cat.key}')" title="ลบหมวดหมู่นี้">🗑️</button>` : ''}
+                </td>
+            `;
+            tbodyExp.appendChild(tr);
+        });
+
+        const totalProjectCost = sumBomCost + totalSiteExpenses;
         const netProfit = sumSelling - totalProjectCost;
 
         const totalFundIn = fundings.reduce((sum, f) => sum + Number(f.amount || 0), 0);
         const remainingFund = totalFundIn - totalProjectCost;
 
-        // Update Tables
+        // Update Summary Row Totals
         document.getElementById('sum-f11').innerText = sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('sum-h11').innerText = sumBomCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('sum-i11').innerText = sumGrossProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-        document.getElementById('val-i14').innerText = valI14.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('val-i15').innerText = valI15.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('val-i17').innerText = valI17.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('val-i18').innerText = valI18.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('val-i18').innerText = totalSiteExpenses.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('val-net-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-        // Update KPI Cards
+        // Update Top Dashboard KPIs
         document.getElementById('kpi-selling').innerText = sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-customer').innerText = `ผู้ว่าจ้าง: ${currentProject.customer_name || 'ไม่ระบุ'}`;
         
         document.getElementById('kpi-total-cost').innerText = totalProjectCost.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('kpi-cost-sub').innerText = `อุปกรณ์: ${sumBomCost.toLocaleString()} | หน้างาน: ${valI18.toLocaleString()}`;
+        document.getElementById('kpi-cost-sub').innerText = `อุปกรณ์: ${sumBomCost.toLocaleString()} | หน้างาน: ${totalSiteExpenses.toLocaleString()}`;
 
         document.getElementById('kpi-net-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
         const marginPct = sumSelling > 0 ? ((netProfit / sumSelling) * 100).toFixed(1) : 0;
@@ -933,6 +996,63 @@
             badgeFund.style.color = '#047857';
             statusFund.innerHTML = `<span style="color:var(--emerald-700);font-weight:600;">🟢 สภาพคล่องพร้อมใช้งาน</span>`;
         }
+    }
+
+    // --- EXPENSE CATEGORY HANDLERS ---
+    function openAddExpenseCategoryModal() {
+        document.getElementById('add-cat-name').value = '';
+        document.getElementById('add-cat-unit').value = 'รายการ';
+        document.getElementById('modalAddExpenseCategory').style.display = 'flex';
+    }
+
+    function submitAddExpenseCategory() {
+        if (!currentProject) return;
+        const name = document.getElementById('add-cat-name').value.trim();
+        const unit = document.getElementById('add-cat-unit').value.trim() || 'รายการ';
+
+        if (!name) return alert('กรุณากรอกชื่อหมวดหมู่ค่าใช้จ่าย');
+
+        const key = 'custom_' + Date.now();
+        let customCats = [];
+        try {
+            customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
+        } catch(e) {}
+
+        customCats.push({
+            key: key,
+            name: name,
+            tabLabel: '📋 ' + name,
+            defaultUnit: unit,
+            placeholder: 'พิมพ์รายการ...'
+        });
+
+        localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
+        closeModal('modalAddExpenseCategory');
+        switchSheet('exp-' + key);
+    }
+
+    async function deleteCustomExpenseCategory(catKey) {
+        const hasExpenses = expenses.some(e => e.category === catKey);
+        const confirmMsg = hasExpenses 
+            ? 'หมวดนี้มีรายการค่าใช้จ่ายอยู่ ยืนยันที่จะลบหมวดนี้และรายการค่าใช้จ่ายทั้งหมดในหมวดใช่หรือไม่?'
+            : 'ยืนยันลบหมวดหมู่ค่าใช้จ่ายนี้ใช่หรือไม่?';
+
+        if (!confirm(confirmMsg)) return;
+
+        if (hasExpenses) {
+            await supabaseClient.from('project_expenses').delete().eq('project_id', currentProject.id).eq('category', catKey);
+        }
+
+        let customCats = [];
+        try {
+            customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
+        } catch(e) {}
+
+        customCats = customCats.filter(c => c.key !== catKey);
+        localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
+
+        activeSheetKey = 'main-summary';
+        await loadFullProjectData();
     }
 
     // --- RENDER BOM SHEET ---
@@ -1012,15 +1132,16 @@
         `;
     }
 
-    // --- RENDER EXPENSE SHEET ---
+    // --- RENDER EXPENSE SHEET (DYNAMIC CATEGORY) ---
     function renderExpenseSheet(catKey) {
-        const catConfig = {
-            'materials': { title: '🪛 ชีต: วัสดุอื่นๆ (ของสิ้นเปลืองหน้างาน)', defaultUnit: 'ชิ้น', placeholder: 'เช่น ท่อ PVC 4 หุน, ข้อต่อ, ปูน...' },
-            'ops': { title: '⛽ ชีต: ค่าใช้จ่ายดำเนินงาน (ค่าน้ำมัน/เดินทาง)', defaultUnit: 'ครั้ง', placeholder: 'เช่น ค่าน้ำมันรถ, ค่าที่พัก...' },
-            'labor': { title: '👷 ชีต: ยอดเบิกจ่ายค่าแรงช่าง', defaultUnit: 'วัน', placeholder: 'เช่น ค่าแรงช่างติดตั้ง, ค่าเหมาเดินท่อ...' }
+        const allExpenseCats = getProjectExpenseCategories();
+        const catInfo = allExpenseCats.find(c => c.key === catKey) || { 
+            name: catKey, 
+            tabLabel: '📋 ' + catKey, 
+            defaultUnit: 'รายการ', 
+            placeholder: 'พิมพ์รายการ...' 
         };
 
-        const config = catConfig[catKey] || { title: 'ค่าใช้จ่าย', defaultUnit: 'รายการ', placeholder: 'พิมพ์รายการ...' };
         const list = expenses.filter(e => e.category === catKey);
         const total = list.reduce((s, e) => s + Number(e.amount || 0), 0);
 
@@ -1029,7 +1150,7 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <div>
-                        <h2>${config.title}</h2>
+                        <h2>${catInfo.tabLabel ? catInfo.tabLabel : '📋 ' + catInfo.name}</h2>
                         <div style="font-size: 13px; color: var(--slate-600); margin-top: 3px;">
                             คำนวณจาก: <strong>จำนวน &times; ราคาต่อหน่วย = รวมเงิน</strong>
                         </div>
@@ -1063,7 +1184,7 @@
                                     <td class="t-center">${idx + 1}</td>
                                     <td>${e.item_name}</td>
                                     <td class="t-center font-bold">${qty}</td>
-                                    <td class="t-center">${e.unit || config.defaultUnit}</td>
+                                    <td class="t-center">${e.unit || catInfo.defaultUnit}</td>
                                     <td class="t-right">${unitPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-right font-bold text-rose">${totalAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-center">${e.expense_date || '-'}</td>
@@ -1078,9 +1199,9 @@
                             }).join('')}
                             <tr class="no-print" style="background: var(--slate-50);">
                                 <td class="t-center font-bold text-primary">+</td>
-                                <td><input type="text" id="add-exp-name" class="clean-input" placeholder="${config.placeholder}"></td>
+                                <td><input type="text" id="add-exp-name" class="clean-input" placeholder="${catInfo.placeholder || 'พิมพ์รายการ...'}"></td>
                                 <td><input type="number" id="add-exp-qty" class="clean-input t-center" value="1" oninput="calcInlineExpTotal()"></td>
-                                <td><input type="text" id="add-exp-unit" class="clean-input t-center" value="${config.defaultUnit}"></td>
+                                <td><input type="text" id="add-exp-unit" class="clean-input t-center" value="${catInfo.defaultUnit || 'รายการ'}"></td>
                                 <td><input type="number" id="add-exp-price" class="clean-input t-right" value="0" placeholder="ราคา/หน่วย" oninput="calcInlineExpTotal()"></td>
                                 <td class="t-right font-bold text-rose" id="lbl-inline-total" style="vertical-align:middle; padding-right:14px;">0.00</td>
                                 <td><input type="date" id="add-exp-date" class="clean-input t-center"></td>
@@ -1322,23 +1443,18 @@
 
     function openBatchExpenseModal(catKey) {
         currentBatchExpenseCategory = catKey;
-        const catTitles = {
-            'materials': '🪛 วัสดุอื่นๆ (ของสิ้นเปลือง)',
-            'ops': '⛽ ค่าใช้จ่ายดำเนินงาน / ค่าน้ำมัน',
-            'labor': '👷 ยอดเบิกจ่ายค่าแรงช่าง'
-        };
-        document.getElementById('batch-exp-title').innerText = `⚡ เพิ่มหลายรายการ: ${catTitles[catKey] || 'ค่าใช้จ่าย'}`;
+        const allExpenseCats = getProjectExpenseCategories();
+        const catInfo = allExpenseCats.find(c => c.key === catKey) || { name: catKey, defaultUnit: 'รายการ', placeholder: 'พิมพ์รายการ...' };
+
+        document.getElementById('batch-exp-title').innerText = `⚡ เพิ่มหลายรายการ: ${catInfo.name}`;
         const tbody = document.getElementById('tbl-batch-exp-body');
         tbody.innerHTML = '';
-        for (let i = 0; i < 5; i++) addBatchExpenseRow();
+        for (let i = 0; i < 5; i++) addBatchExpenseRow(catInfo.defaultUnit);
         document.getElementById('modalBatchExpense').style.display = 'flex';
     }
 
-    function addBatchExpenseRow() {
-        const defaultUnits = { 'materials': 'ชิ้น', 'ops': 'ครั้ง', 'labor': 'วัน' };
-        const unitDef = defaultUnits[currentBatchExpenseCategory] || 'รายการ';
+    function addBatchExpenseRow(defaultUnit = 'รายการ') {
         const today = new Date().toISOString().split('T')[0];
-
         const tbody = document.getElementById('tbl-batch-exp-body');
         const idx = tbody.children.length + 1;
         const tr = document.createElement('tr');
@@ -1346,7 +1462,7 @@
             <td class="t-center">${idx}</td>
             <td><input type="text" class="clean-input b-exp-name" placeholder="พิมพ์รายการ..."></td>
             <td><input type="number" class="clean-input t-center b-exp-qty" value="1" oninput="calcBatchExpRow(this)"></td>
-            <td><input type="text" class="clean-input t-center b-exp-unit" value="${unitDef}"></td>
+            <td><input type="text" class="clean-input t-center b-exp-unit" value="${defaultUnit}"></td>
             <td><input type="number" class="clean-input t-right b-exp-price" value="0" oninput="calcBatchExpRow(this)"></td>
             <td class="t-right font-bold text-rose b-exp-total" style="vertical-align:middle; padding-right:10px;">0.00</td>
             <td><input type="date" class="clean-input t-center b-exp-date" value="${today}"></td>
@@ -1746,7 +1862,6 @@
         if (!name) return alert('กรุณากรอกชื่อโครงการ');
 
         try {
-            // 1. สร้างโครงการใหม่
             const { data: newProj, error: pErr } = await supabaseClient.from('projects').insert([{
                 project_name: name,
                 customer_name: cust,
@@ -1756,11 +1871,9 @@
 
             if (pErr) throw pErr;
 
-            // 2. ถ้าเลือกดึงจากใบเสนอราคา -> ดึงข้อมูลรายการ & ราคาทุน cost_price อัตโนมัติ
             if (quoteId) {
                 const { data: docItems } = await supabaseClient.from('document_items').select('*').eq('document_id', quoteId);
                 
-                // ดึงแคตตาล็อกสินค้า products ทั้งหมดเพื่อนำ cost_price มาแมป
                 const prodById = new Map();
                 const prodByName = new Map();
 
@@ -1787,7 +1900,6 @@
                         const unit = item.unit || 'ชุด';
                         const unitPrice = Number(item.price || item.unit_price || 0);
 
-                        // ดึง cost_price: เช็คจาก product_id ในบิล -> เช็คจากชื่อสินค้า -> เช็คฟิลด์ในบิล
                         let unitCost = 0;
                         if (item.product_id && prodById.has(item.product_id)) {
                             unitCost = prodById.get(item.product_id);
@@ -1797,7 +1909,6 @@
                             unitCost = Number(item.cost_price || item.cost || item.unit_cost || 0);
                         }
 
-                        // บันทึกหมวดงานหลัก (Main Item)
                         const { data: mainItem, error: mErr } = await supabaseClient.from('project_main_items').insert([{
                             project_id: newProj.id,
                             item_order: idx + 1,
@@ -1807,7 +1918,6 @@
                             unit_price: unitPrice
                         }]).select().single();
 
-                        // สร้างแถวอุปกรณ์ย่อย (BOM Item) รองรับไว้ทันทีเสมอ
                         if (!mErr && mainItem) {
                             await supabaseClient.from('project_bom_items').insert([{
                                 main_item_id: mainItem.id,
