@@ -36,7 +36,7 @@
 
         * { box-sizing: border-box; }
         body { font-family: 'Prompt', 'Sarabun', sans-serif; background-color: #f1f5f9; color: var(--slate-900); margin: 0; padding: 20px; }
-        .wrapper { max-width: 1400px; margin: 0 auto; }
+        .wrapper { max-width: 1420px; margin: 0 auto; }
 
         /* Header */
         .app-header { background: #ffffff; padding: 16px 24px; border-radius: 14px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--slate-200); }
@@ -65,9 +65,9 @@
         .custom-select { padding: 9px 14px; border: 1.5px solid var(--slate-200); border-radius: 9px; font-family: 'Prompt'; font-size: 13.5px; font-weight: 500; min-width: 340px; outline: none; transition: 0.15s; }
         .custom-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,58,138,0.1); }
 
-        /* Dashboard Top KPIs */
-        .kpi-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
-        .kpi-card { background: #ffffff; padding: 18px 20px; border-radius: 14px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); position: relative; overflow: hidden; transition: transform 0.15s ease; }
+        /* Dashboard Top KPIs (6 Cards Responsive Grid) */
+        .kpi-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .kpi-card { background: #ffffff; padding: 16px 18px; border-radius: 14px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); position: relative; overflow: hidden; transition: transform 0.15s ease; }
         .kpi-card:hover { transform: translateY(-2px); }
         .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kpi-card.blue::before { background: var(--primary); }
@@ -76,12 +76,12 @@
         .kpi-card.purple::before { background: var(--purple-600); }
         .kpi-card.amber::before { background: var(--amber-600); }
 
-        .kpi-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-        .kpi-title { font-size: 12px; font-weight: 600; color: var(--slate-600); text-transform: uppercase; letter-spacing: 0.5px; }
-        .kpi-icon-badge { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .kpi-val { font-size: 22px; font-weight: 700; line-height: 1.2; }
-        .kpi-sub { font-size: 11.5px; color: var(--slate-600); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-        .badge-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+        .kpi-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .kpi-title { font-size: 11.5px; font-weight: 600; color: var(--slate-600); text-transform: uppercase; letter-spacing: 0.4px; }
+        .kpi-icon-badge { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .kpi-val { font-size: 21px; font-weight: 700; line-height: 1.2; }
+        .kpi-sub { font-size: 11px; color: var(--slate-600); margin-top: 5px; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .badge-pill { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
 
         /* Tabs Navigation (Pinned Left Home) */
         .tabs-nav-wrapper { display: flex; align-items: center; gap: 8px; background: #e2e8f0; border-radius: 12px; padding: 6px; margin-bottom: 18px; }
@@ -187,8 +187,9 @@
         </div>
     </div>
 
-    <!-- ==================== DASHBOARD TOP KPIS ==================== -->
+    <!-- ==================== DASHBOARD TOP KPIS (6 CARDS) ==================== -->
     <div class="kpi-dashboard">
+        <!-- 1. ยอดรวมสัญญา -->
         <div class="kpi-card blue">
             <div class="kpi-header-row">
                 <div class="kpi-title">ยอดรวมสัญญา (รายรับ)</div>
@@ -198,6 +199,7 @@
             <div class="kpi-sub" id="kpi-customer">ผู้ว่าจ้าง: -</div>
         </div>
 
+        <!-- 2. รวมค่าใช้จ่ายทั้งโครงการ -->
         <div class="kpi-card rose">
             <div class="kpi-header-row">
                 <div class="kpi-title">รวมค่าใช้จ่ายทั้งโครงการ</div>
@@ -207,6 +209,7 @@
             <div class="kpi-sub" id="kpi-cost-sub">ทุนอุปกรณ์ + ค่าใช้จ่ายหน้างาน</div>
         </div>
 
+        <!-- 3. กำไรสุทธิโครงการ -->
         <div class="kpi-card emerald">
             <div class="kpi-header-row">
                 <div class="kpi-title" style="color: var(--emerald-700);">กำไรสุทธิโครงการ (P&L)</div>
@@ -218,6 +221,7 @@
             </div>
         </div>
 
+        <!-- 4. รวมเงินทุนที่รับเข้า -->
         <div class="kpi-card purple">
             <div class="kpi-header-row">
                 <div class="kpi-title" style="color: var(--purple-600);">รวมเงินทุนที่รับเข้า</div>
@@ -227,6 +231,7 @@
             <div class="kpi-sub" id="kpi-fund-count">0 แหล่งเงินทุน</div>
         </div>
 
+        <!-- 5. เงินสดคงเหลือจริงในมือ -->
         <div class="kpi-card" id="card-fund-balance">
             <div class="kpi-header-row">
                 <div class="kpi-title" id="lbl-fund-balance-title">เงินสดคงเหลือในมือจริง</div>
@@ -234,6 +239,16 @@
             </div>
             <div class="kpi-val" id="kpi-fund-balance">0.00</div>
             <div class="kpi-sub" id="kpi-fund-balance-status">จ่ายจริงแล้ว 0.00 | มัดจำ 0.00</div>
+        </div>
+
+        <!-- 6. เงินที่ต้องเพิ่มเข้าในโครงการ (การ์ดใหม่) -->
+        <div class="kpi-card" id="card-need-fund">
+            <div class="kpi-header-row">
+                <div class="kpi-title" id="lbl-need-fund-title">เงินที่ต้องเพิ่มเข้าโครงการ</div>
+                <div class="kpi-icon-badge" id="badge-need-fund-icon">🪙</div>
+            </div>
+            <div class="kpi-val" id="kpi-need-fund">0.00</div>
+            <div class="kpi-sub" id="kpi-need-fund-status">เงินทุนเพียงพอแล้ว</div>
         </div>
     </div>
 
@@ -834,67 +849,66 @@
         await loadFullProjectData();
     }
 
-   // อัปเกรด loadFullProjectData ให้แปลง custom_... เดิมให้เป็นชื่อภาษาไทยอัตโนมัติ
-async function loadFullProjectData() {
-    if (!currentProject) return;
+    async function loadFullProjectData() {
+        if (!currentProject) return;
 
-    document.getElementById('lbl-customer').innerText = currentProject.customer_name || 'ทั่วไป';
+        document.getElementById('lbl-customer').innerText = currentProject.customer_name || 'ทั่วไป';
 
-    // 1. ตรวจสอบและแปลง custom_xxx เดิมในฐานข้อมูลให้กลายเป็นชื่อภาษาไทย
-    try {
-        let customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
-        for (const c of customCats) {
-            if (c.key && c.key.startsWith('custom_') && c.name) {
-                await supabaseClient.from('project_expenses')
-                    .update({ category: c.name })
-                    .eq('project_id', currentProject.id)
-                    .eq('category', c.key);
-                c.key = c.name;
+        // 1. ตรวจสอบและแปลง custom_xxx เดิมให้กลายเป็นชื่อภาษาไทย
+        try {
+            let customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
+            for (const c of customCats) {
+                if (c.key && c.key.startsWith('custom_') && c.name) {
+                    await supabaseClient.from('project_expenses')
+                        .update({ category: c.name })
+                        .eq('project_id', currentProject.id)
+                        .eq('category', c.key);
+                    c.key = c.name;
+                }
             }
+            localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
+        } catch (err) {}
+
+        // 2. Load Main Items
+        const resMain = await supabaseClient.from('project_main_items').select('*').eq('project_id', currentProject.id).order('item_order');
+        mainItems = resMain.data || [];
+
+        // 3. Load BOMs
+        const mainIds = mainItems.map(m => m.id);
+        if (mainIds.length > 0) {
+            const resBom = await supabaseClient.from('project_bom_items').select('*').in('main_item_id', mainIds).order('item_order');
+            bomItems = (resBom.data || []).map(b => ({ ...b, is_paid: b.is_paid === true }));
+        } else {
+            bomItems = [];
         }
-        localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
-    } catch (err) {}
 
-    // 2. Load Main Items
-    const resMain = await supabaseClient.from('project_main_items').select('*').eq('project_id', currentProject.id).order('item_order');
-    mainItems = resMain.data || [];
+        // 4. Load Expenses
+        const resExp = await supabaseClient.from('project_expenses').select('*').eq('project_id', currentProject.id).order('expense_date');
+        expenses = (resExp.data || []).map(e => ({ ...e, is_paid: e.is_paid === true }));
 
-    // 3. Load BOMs
-    const mainIds = mainItems.map(m => m.id);
-    if (mainIds.length > 0) {
-        const resBom = await supabaseClient.from('project_bom_items').select('*').in('main_item_id', mainIds).order('item_order');
-        bomItems = (resBom.data || []).map(b => ({ ...b, is_paid: b.is_paid === true }));
-    } else {
-        bomItems = [];
+        // 5. Load Cashflow
+        const resFund = await supabaseClient.from('project_cashflow').select('*').eq('project_id', currentProject.id).order('flow_date');
+        const allCashflows = resFund.data || [];
+
+        fundings = allCashflows.filter(f => f.flow_type !== 'deposit' && f.flow_type !== 'out').map(f => ({
+            id: f.id,
+            funding_date: f.flow_date,
+            source_owner: f.item_name || 'เงินทุน',
+            description: f.notes || f.description || '',
+            amount: f.amount || 0
+        }));
+
+        deposits = allCashflows.filter(f => f.flow_type === 'deposit' || f.flow_type === 'out').map(f => ({
+            id: f.id,
+            deposit_date: f.flow_date,
+            supplier_name: f.item_name || 'มัดจำสินค้า',
+            description: f.notes || f.description || '',
+            amount: f.amount || 0
+        }));
+
+        renderTabs();
+        renderActiveSheet();
     }
-
-    // 4. Load Expenses
-    const resExp = await supabaseClient.from('project_expenses').select('*').eq('project_id', currentProject.id).order('expense_date');
-    expenses = (resExp.data || []).map(e => ({ ...e, is_paid: e.is_paid === true }));
-
-    // 5. Load Cashflow
-    const resFund = await supabaseClient.from('project_cashflow').select('*').eq('project_id', currentProject.id).order('flow_date');
-    const allCashflows = resFund.data || [];
-
-    fundings = allCashflows.filter(f => f.flow_type !== 'deposit' && f.flow_type !== 'out').map(f => ({
-        id: f.id,
-        funding_date: f.flow_date,
-        source_owner: f.item_name || 'เงินทุน',
-        description: f.notes || f.description || '',
-        amount: f.amount || 0
-    }));
-
-    deposits = allCashflows.filter(f => f.flow_type === 'deposit' || f.flow_type === 'out').map(f => ({
-        id: f.id,
-        deposit_date: f.flow_date,
-        supplier_name: f.item_name || 'มัดจำสินค้า',
-        description: f.notes || f.description || '',
-        amount: f.amount || 0
-    }));
-
-    renderTabs();
-    renderActiveSheet();
-}
 
     function renderTabs() {
         const homeBtn = document.getElementById('btn-tab-home');
@@ -905,6 +919,7 @@ async function loadFullProjectData() {
         const container = document.getElementById('sheet-tabs-container');
         container.innerHTML = '';
 
+        // BOM Tabs
         mainItems.forEach(item => {
             const tab = document.createElement('button');
             tab.className = `tab-pill ${activeSheetKey === 'bom-' + item.id ? 'active' : ''}`;
@@ -913,6 +928,7 @@ async function loadFullProjectData() {
             container.appendChild(tab);
         });
 
+        // Dynamic Expense Tabs
         const allExpenseCats = getProjectExpenseCategories();
         allExpenseCats.forEach(cat => {
             const tab = document.createElement('button');
@@ -922,6 +938,7 @@ async function loadFullProjectData() {
             container.appendChild(tab);
         });
 
+        // Funding Tab
         const fundTab = document.createElement('button');
         fundTab.className = `tab-pill ${activeSheetKey === 'funding' ? 'active' : ''}`;
         fundTab.innerHTML = '💰 ทะเบียนเงินทุน';
@@ -981,6 +998,7 @@ async function loadFullProjectData() {
         await supabaseClient.from('project_expenses').update({ is_paid: newStatus }).eq('id', id);
     }
 
+    // --- RENDER MASTER SUMMARY & UPDATE TOP DASHBOARD ---
     function renderMasterSummary() {
         const tbody = document.getElementById('tbl-main-items-body');
         tbody.innerHTML = '';
@@ -1029,6 +1047,7 @@ async function loadFullProjectData() {
             tbody.appendChild(tr);
         });
 
+        // Table 2: Dynamic Expense Categories
         const tbodyExp = document.getElementById('tbl-expense-categories-body');
         tbodyExp.innerHTML = '';
 
@@ -1063,16 +1082,23 @@ async function loadFullProjectData() {
             tbodyExp.appendChild(tr);
         });
 
+        // Total Cost (Budget) & P&L Profit
         const totalProjectCost = sumBomCost + totalSiteExpenses;
         const netProfit = sumSelling - totalProjectCost;
 
+        // Cash Flow / Real Payments
         const actualPaidTotal = paidBomTotal + paidSiteExpenses;
         const totalDepositsOut = deposits.reduce((s, d) => s + Number(d.amount || 0), 0);
         const unpaidPendingTotal = totalProjectCost - actualPaidTotal;
 
+        // Funding Summary
         const totalFundIn = fundings.reduce((sum, f) => sum + Number(f.amount || 0), 0);
         const cashBalanceInHand = totalFundIn - actualPaidTotal - totalDepositsOut;
 
+        // NEW: คำนวณเงินที่ต้องเพิ่มเข้าในโครงการ (Required Cash Injection)
+        const neededFund = Math.max(0, unpaidPendingTotal - cashBalanceInHand);
+
+        // Update Summary Tables
         document.getElementById('sum-f11').innerText = sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('sum-h11').innerText = sumBomCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('sum-i11').innerText = sumGrossProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -1080,6 +1106,7 @@ async function loadFullProjectData() {
         document.getElementById('val-i18').innerText = totalSiteExpenses.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('val-net-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
 
+        // Update Top Dashboard KPIs (Cards 1 - 4)
         document.getElementById('kpi-selling').innerText = sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-customer').innerText = `ผู้ว่าจ้าง: ${currentProject.customer_name || 'ไม่ระบุ'}`;
         
@@ -1093,13 +1120,14 @@ async function loadFullProjectData() {
         document.getElementById('kpi-fund-in').innerText = totalFundIn.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-fund-count').innerText = `${fundings.length} แหล่งเงินทุนที่เติมเข้ามา`;
 
+        // Card 5: Real Cash in Hand
         const cardFund = document.getElementById('card-fund-balance');
         const valFund = document.getElementById('kpi-fund-balance');
         const statusFund = document.getElementById('kpi-fund-balance-status');
         const badgeFund = document.getElementById('badge-fund-icon');
 
         valFund.innerText = cashBalanceInHand.toLocaleString('en-US', {minimumFractionDigits: 2});
-        statusFund.innerHTML = `จ่ายจริงแล้ว ${actualPaidTotal.toLocaleString()} | มัดจำ ${totalDepositsOut.toLocaleString()} | รอจ่าย ${unpaidPendingTotal.toLocaleString()}`;
+        statusFund.innerHTML = `จ่ายจริงแล้ว ${actualPaidTotal.toLocaleString()} | มัดจำ ${totalDepositsOut.toLocaleString()}`;
 
         if (cashBalanceInHand < 0) {
             cardFund.className = 'kpi-card rose';
@@ -1115,6 +1143,32 @@ async function loadFullProjectData() {
             valFund.className = 'kpi-val text-emerald';
             badgeFund.style.background = '#ecfdf5';
             badgeFund.style.color = '#047857';
+        }
+
+        // Card 6: เงินที่ต้องเพิ่มเข้าโครงการ (NEW)
+        const cardNeedFund = document.getElementById('card-need-fund');
+        const valNeedFund = document.getElementById('kpi-need-fund');
+        const statusNeedFund = document.getElementById('kpi-need-fund-status');
+        const badgeNeedFund = document.getElementById('badge-need-fund-icon');
+
+        valNeedFund.innerText = neededFund.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        if (neededFund > 0) {
+            cardNeedFund.className = 'kpi-card amber';
+            cardNeedFund.style.background = '#fffbeb';
+            cardNeedFund.style.borderColor = '#fde68a';
+            valNeedFund.className = 'kpi-val text-amber';
+            badgeNeedFund.style.background = '#fef3c7';
+            badgeNeedFund.style.color = '#d97706';
+            statusNeedFund.innerHTML = `<span style="color:var(--amber-600);font-weight:600;">⚠️ ต้องเตรียมเติมเงินสดเพิ่มอีก</span>`;
+        } else {
+            cardNeedFund.className = 'kpi-card emerald';
+            cardNeedFund.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)';
+            cardNeedFund.style.borderColor = '#bbf7d0';
+            valNeedFund.className = 'kpi-val text-emerald';
+            badgeNeedFund.style.background = '#ecfdf5';
+            badgeNeedFund.style.color = '#047857';
+            statusNeedFund.innerHTML = `<span style="color:var(--emerald-700);font-weight:600;">🟢 เงินทุนเพียงพอครอบคลุมทั้งโครงการ</span>`;
         }
     }
 
@@ -1593,35 +1647,33 @@ async function loadFullProjectData() {
         document.getElementById('modalAddExpenseCategory').style.display = 'flex';
     }
 
-   // อัปเดตฟังก์ชันสร้างหมวดหมู่ใหม่: ใช้ชื่อภาษาไทยโดยตรง
-function submitAddExpenseCategory() {
-    if (!currentProject) return;
-    const name = document.getElementById('add-cat-name').value.trim();
-    const unit = document.getElementById('add-cat-unit').value.trim() || 'รายการ';
+    function submitAddExpenseCategory() {
+        if (!currentProject) return;
+        const name = document.getElementById('add-cat-name').value.trim();
+        const unit = document.getElementById('add-cat-unit').value.trim() || 'รายการ';
 
-    if (!name) return alert('กรุณากรอกชื่อหมวดหมู่ค่าใช้จ่าย');
+        if (!name) return alert('กรุณากรอกชื่อหมวดหมู่ค่าใช้จ่าย');
 
-    // ใช้ชื่อภาษาไทยเป็น key เพื่อให้บันทึกลง Supabase อย่างถูกต้อง
-    const key = name;
-    let customCats = [];
-    try {
-        customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
-    } catch(e) {}
+        const key = name;
+        let customCats = [];
+        try {
+            customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
+        } catch(e) {}
 
-    if (!customCats.some(c => c.key === key)) {
-        customCats.push({
-            key: key,
-            name: name,
-            tabLabel: '📋 ' + name,
-            defaultUnit: unit,
-            placeholder: 'พิมพ์รายการ...'
-        });
-        localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
+        if (!customCats.some(c => c.key === key)) {
+            customCats.push({
+                key: key,
+                name: name,
+                tabLabel: '📋 ' + name,
+                defaultUnit: unit,
+                placeholder: 'พิมพ์รายการ...'
+            });
+            localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
+        }
+
+        closeModal('modalAddExpenseCategory');
+        switchSheet('exp-' + key);
     }
-
-    closeModal('modalAddExpenseCategory');
-    switchSheet('exp-' + key);
-}
 
     async function deleteCustomExpenseCategory(catKey) {
         const hasExpenses = expenses.some(e => e.category === catKey);
@@ -2153,6 +2205,7 @@ function submitAddExpenseCategory() {
         await loadFullProjectData();
     }
 
+    // ==================== AUTO-FETCH QUOTATION & PRODUCTS (COST_PRICE) ====================
     function openNewProjectModal() { document.getElementById('modalNewProject').style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
