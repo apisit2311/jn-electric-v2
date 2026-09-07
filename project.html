@@ -834,51 +834,67 @@
         await loadFullProjectData();
     }
 
-    async function loadFullProjectData() {
-        if (!currentProject) return;
+   // อัปเกรด loadFullProjectData ให้แปลง custom_... เดิมให้เป็นชื่อภาษาไทยอัตโนมัติ
+async function loadFullProjectData() {
+    if (!currentProject) return;
 
-        document.getElementById('lbl-customer').innerText = currentProject.customer_name || 'ทั่วไป';
+    document.getElementById('lbl-customer').innerText = currentProject.customer_name || 'ทั่วไป';
 
-        // 1. Load Main Items
-        const resMain = await supabaseClient.from('project_main_items').select('*').eq('project_id', currentProject.id).order('item_order');
-        mainItems = resMain.data || [];
-
-        // 2. Load BOMs
-        const mainIds = mainItems.map(m => m.id);
-        if (mainIds.length > 0) {
-            const resBom = await supabaseClient.from('project_bom_items').select('*').in('main_item_id', mainIds).order('item_order');
-            bomItems = (resBom.data || []).map(b => ({ ...b, is_paid: b.is_paid === true }));
-        } else {
-            bomItems = [];
+    // 1. ตรวจสอบและแปลง custom_xxx เดิมในฐานข้อมูลให้กลายเป็นชื่อภาษาไทย
+    try {
+        let customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
+        for (const c of customCats) {
+            if (c.key && c.key.startsWith('custom_') && c.name) {
+                await supabaseClient.from('project_expenses')
+                    .update({ category: c.name })
+                    .eq('project_id', currentProject.id)
+                    .eq('category', c.key);
+                c.key = c.name;
+            }
         }
+        localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
+    } catch (err) {}
 
-        // 3. Load Expenses
-        const resExp = await supabaseClient.from('project_expenses').select('*').eq('project_id', currentProject.id).order('expense_date');
-        expenses = (resExp.data || []).map(e => ({ ...e, is_paid: e.is_paid === true }));
+    // 2. Load Main Items
+    const resMain = await supabaseClient.from('project_main_items').select('*').eq('project_id', currentProject.id).order('item_order');
+    mainItems = resMain.data || [];
 
-        // 4. Load Cashflow
-        const resFund = await supabaseClient.from('project_cashflow').select('*').eq('project_id', currentProject.id).order('flow_date');
-        const allCashflows = resFund.data || [];
-
-        fundings = allCashflows.filter(f => f.flow_type !== 'deposit' && f.flow_type !== 'out').map(f => ({
-            id: f.id,
-            funding_date: f.flow_date,
-            source_owner: f.item_name || 'เงินทุน',
-            description: f.notes || f.description || '',
-            amount: f.amount || 0
-        }));
-
-        deposits = allCashflows.filter(f => f.flow_type === 'deposit' || f.flow_type === 'out').map(f => ({
-            id: f.id,
-            deposit_date: f.flow_date,
-            supplier_name: f.item_name || 'มัดจำสินค้า',
-            description: f.notes || f.description || '',
-            amount: f.amount || 0
-        }));
-
-        renderTabs();
-        renderActiveSheet();
+    // 3. Load BOMs
+    const mainIds = mainItems.map(m => m.id);
+    if (mainIds.length > 0) {
+        const resBom = await supabaseClient.from('project_bom_items').select('*').in('main_item_id', mainIds).order('item_order');
+        bomItems = (resBom.data || []).map(b => ({ ...b, is_paid: b.is_paid === true }));
+    } else {
+        bomItems = [];
     }
+
+    // 4. Load Expenses
+    const resExp = await supabaseClient.from('project_expenses').select('*').eq('project_id', currentProject.id).order('expense_date');
+    expenses = (resExp.data || []).map(e => ({ ...e, is_paid: e.is_paid === true }));
+
+    // 5. Load Cashflow
+    const resFund = await supabaseClient.from('project_cashflow').select('*').eq('project_id', currentProject.id).order('flow_date');
+    const allCashflows = resFund.data || [];
+
+    fundings = allCashflows.filter(f => f.flow_type !== 'deposit' && f.flow_type !== 'out').map(f => ({
+        id: f.id,
+        funding_date: f.flow_date,
+        source_owner: f.item_name || 'เงินทุน',
+        description: f.notes || f.description || '',
+        amount: f.amount || 0
+    }));
+
+    deposits = allCashflows.filter(f => f.flow_type === 'deposit' || f.flow_type === 'out').map(f => ({
+        id: f.id,
+        deposit_date: f.flow_date,
+        supplier_name: f.item_name || 'มัดจำสินค้า',
+        description: f.notes || f.description || '',
+        amount: f.amount || 0
+    }));
+
+    renderTabs();
+    renderActiveSheet();
+}
 
     function renderTabs() {
         const homeBtn = document.getElementById('btn-tab-home');
@@ -1577,19 +1593,22 @@
         document.getElementById('modalAddExpenseCategory').style.display = 'flex';
     }
 
-    function submitAddExpenseCategory() {
-        if (!currentProject) return;
-        const name = document.getElementById('add-cat-name').value.trim();
-        const unit = document.getElementById('add-cat-unit').value.trim() || 'รายการ';
+   // อัปเดตฟังก์ชันสร้างหมวดหมู่ใหม่: ใช้ชื่อภาษาไทยโดยตรง
+function submitAddExpenseCategory() {
+    if (!currentProject) return;
+    const name = document.getElementById('add-cat-name').value.trim();
+    const unit = document.getElementById('add-cat-unit').value.trim() || 'รายการ';
 
-        if (!name) return alert('กรุณากรอกชื่อหมวดหมู่ค่าใช้จ่าย');
+    if (!name) return alert('กรุณากรอกชื่อหมวดหมู่ค่าใช้จ่าย');
 
-        const key = 'custom_' + Date.now();
-        let customCats = [];
-        try {
-            customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
-        } catch(e) {}
+    // ใช้ชื่อภาษาไทยเป็น key เพื่อให้บันทึกลง Supabase อย่างถูกต้อง
+    const key = name;
+    let customCats = [];
+    try {
+        customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
+    } catch(e) {}
 
+    if (!customCats.some(c => c.key === key)) {
         customCats.push({
             key: key,
             name: name,
@@ -1597,11 +1616,12 @@
             defaultUnit: unit,
             placeholder: 'พิมพ์รายการ...'
         });
-
         localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
-        closeModal('modalAddExpenseCategory');
-        switchSheet('exp-' + key);
     }
+
+    closeModal('modalAddExpenseCategory');
+    switchSheet('exp-' + key);
+}
 
     async function deleteCustomExpenseCategory(catKey) {
         const hasExpenses = expenses.some(e => e.category === catKey);
