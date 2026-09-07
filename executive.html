@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สรุปภาพรวมโครงการสำหรับผู้บริหาร - Executive Overview</title>
+    <title>สรุปภาพรวมโครงการ ค่าใช้จ่าย - Executive Overview</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@
 
         * { box-sizing: border-box; }
         body { font-family: 'Prompt', 'Sarabun', sans-serif; background-color: #f8fafc; color: var(--slate-900); margin: 0; padding: 20px 15px; }
-        .wrapper { max-width: 1080px; margin: 0 auto; }
+        .wrapper { max-width: 1120px; margin: 0 auto; }
 
         .exec-header { background: #ffffff; padding: 20px 24px; border-radius: 16px; box-shadow: var(--card-shadow); margin-bottom: 20px; border: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .header-title-box { display: flex; align-items: center; gap: 14px; }
@@ -49,19 +49,21 @@
         .btn-emerald { background: var(--emerald-600); color: #fff; }
         .btn-emerald:hover { background: var(--emerald-700); }
 
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 22px; }
-        .kpi-card { background: #ffffff; padding: 20px; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); position: relative; overflow: hidden; }
+        /* KPI Dashboard Cards Grid */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 22px; }
+        .kpi-card { background: #ffffff; padding: 18px 20px; border-radius: 16px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); position: relative; overflow: hidden; }
         .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
         .kpi-card.blue::before { background: var(--primary); }
         .kpi-card.rose::before { background: var(--rose-600); }
         .kpi-card.emerald::before { background: var(--emerald-600); }
         .kpi-card.emerald { background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border-color: #bbf7d0; }
         .kpi-card.purple::before { background: var(--purple-600); }
+        .kpi-card.amber::before { background: var(--amber-600); }
 
         .kpi-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .kpi-label { font-size: 12px; font-weight: 600; color: var(--slate-600); text-transform: uppercase; letter-spacing: 0.5px; }
-        .kpi-val { font-size: 24px; font-weight: 700; line-height: 1.2; margin-top: 4px; }
-        .kpi-sub { font-size: 12px; color: var(--slate-600); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+        .kpi-label { font-size: 11.5px; font-weight: 600; color: var(--slate-600); text-transform: uppercase; letter-spacing: 0.4px; }
+        .kpi-val { font-size: 22px; font-weight: 700; line-height: 1.2; margin-top: 4px; }
+        .kpi-sub { font-size: 11.5px; color: var(--slate-600); margin-top: 6px; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .section-card { background: #ffffff; border-radius: 16px; padding: 22px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); margin-bottom: 20px; }
         .section-title { font-size: 15.5px; font-weight: 700; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1.5px solid var(--slate-100); padding-bottom: 10px; }
@@ -128,29 +130,33 @@
             </div>
         </div>
 
+        <!-- 5 Key Executive KPIs Grid -->
         <div class="kpi-grid">
+            <!-- 1. ยอดสัญญา -->
             <div class="kpi-card blue">
                 <div class="kpi-head">
                     <span class="kpi-label">ยอดรวมสัญญา (รายรับ)</span>
-                    <span style="font-size: 18px;">📄</span>
+                    <span style="font-size: 16px;">📄</span>
                 </div>
                 <div class="kpi-val text-primary" id="kpi-selling">0.00</div>
                 <div class="kpi-sub">มูลค่างานตามใบเสนอราคา</div>
             </div>
 
+            <!-- 2. ต้นทุนโครงการรวม -->
             <div class="kpi-card rose">
                 <div class="kpi-head">
                     <span class="kpi-label">งบประมาณต้นทุนรวม</span>
-                    <span style="font-size: 18px;">💸</span>
+                    <span style="font-size: 16px;">💸</span>
                 </div>
                 <div class="kpi-val text-rose" id="kpi-cost">0.00</div>
                 <div class="kpi-sub" id="kpi-cost-sub">ทุนอุปกรณ์ + ค่าใช้จ่ายหน้างาน</div>
             </div>
 
+            <!-- 3. กำไรสุทธิคงเหลือ -->
             <div class="kpi-card emerald">
                 <div class="kpi-head">
-                    <span class="kpi-label" style="color:var(--emerald-700);">กำไรสุทธิคงเหลือ (P&L)</span>
-                    <span style="font-size: 18px;">💰</span>
+                    <span class="kpi-label" style="color:var(--emerald-700);">กำไรสุทธิโครงการ (P&L)</span>
+                    <span style="font-size: 16px;">💰</span>
                 </div>
                 <div class="kpi-val text-emerald" id="kpi-profit">0.00</div>
                 <div class="kpi-sub">
@@ -158,16 +164,28 @@
                 </div>
             </div>
 
+            <!-- 4. เงินสดคงเหลือจริงในมือ -->
             <div class="kpi-card purple" id="card-fund">
                 <div class="kpi-head">
-                    <span class="kpi-label" style="color:var(--purple-600);">เงินสดคงเหลือจริงในมือ</span>
-                    <span style="font-size: 18px;">💳</span>
+                    <span class="kpi-label" style="color:var(--purple-600);">เงินสดคงเหลือในมือจริง</span>
+                    <span style="font-size: 16px;">💳</span>
                 </div>
                 <div class="kpi-val text-purple" id="kpi-cash-balance">0.00</div>
-                <div class="kpi-sub" id="kpi-cash-sub">เงินทุนรับเข้า - จ่ายจริง - มัดจำ</div>
+                <div class="kpi-sub" id="kpi-cash-sub">รับเข้า - จ่ายจริง - มัดจำ</div>
+            </div>
+
+            <!-- 5. เงินที่ต้องเพิ่มเข้าในโครงการ (การ์ดใหม่) -->
+            <div class="kpi-card" id="card-need-fund">
+                <div class="kpi-head">
+                    <span class="kpi-label" id="lbl-need-fund-title">เงินที่ต้องเพิ่มเข้าโครงการ</span>
+                    <span style="font-size: 16px;">🪙</span>
+                </div>
+                <div class="kpi-val" id="kpi-need-fund">0.00</div>
+                <div class="kpi-sub" id="kpi-need-fund-status">เงินทุนเพียงพอแล้ว</div>
             </div>
         </div>
 
+        <!-- Section 1: สรุปต้นทุนและกำไรตามหมวดงานหลัก -->
         <div class="section-card">
             <div class="section-title">📊 1. รายการตามสัญญา & ต้นทุนอุปกรณ์หลัก (BOM Summary)</div>
             <div class="table-wrap">
@@ -195,6 +213,7 @@
             </div>
         </div>
 
+        <!-- Section 2: สรุปค่าใช้จ่ายหน้างานจริง -->
         <div class="section-card">
             <div class="section-title">🛠️ 2. สรุปค่าใช้จ่ายหน้างานจริง & สรุปกำไรสุทธิ</div>
             <div class="table-wrap">
@@ -223,6 +242,7 @@
             </div>
         </div>
 
+        <!-- Section 3: สรุปสถานะเงินสด & เงินมัดจำสินค้า -->
         <div class="section-card">
             <div class="section-title">📥 3. สถานะเงินทุนรับเข้า & เงินมัดจำสินค้าชั่วคราว</div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
@@ -416,7 +436,11 @@
         const totalFundIn = fundInList.reduce((s, c) => s + Number(c.amount || 0), 0);
         const totalDeposits = depositList.reduce((s, c) => s + Number(c.amount || 0), 0);
         const actualPaidTotal = sumBomPaid + sumSitePaid;
+        const unpaidPendingTotal = totalProjectCost - actualPaidTotal;
         const cashBalance = totalFundIn - actualPaidTotal - totalDeposits;
+
+        // คำนวณเงินที่ต้องเพิ่มเข้าในโครงการ
+        const neededFund = Math.max(0, unpaidPendingTotal - cashBalance);
 
         const tbodyFund = document.getElementById('tbl-fund-body');
         tbodyFund.innerHTML = fundInList.map(f => `
@@ -434,6 +458,7 @@
             </tr>
         `).join('') || `<tr><td colspan="2" class="t-center" style="color:#94a3b8;">ไม่มีเงินมัดจำค้างอยู่</td></tr>`;
 
+        // Update Top KPIs
         document.getElementById('kpi-selling').innerText = sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-cost').innerText = totalProjectCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -441,6 +466,27 @@
 
         document.getElementById('kpi-cash-balance').innerText = cashBalance.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-cash-sub').innerText = `รับเข้า ${totalFundIn.toLocaleString()} | จ่ายจริง ${actualPaidTotal.toLocaleString()}`;
+
+        // Card 5: เงินที่ต้องเพิ่มเข้าในโครงการ
+        const cardNeedFund = document.getElementById('card-need-fund');
+        const valNeedFund = document.getElementById('kpi-need-fund');
+        const statusNeedFund = document.getElementById('kpi-need-fund-status');
+
+        valNeedFund.innerText = neededFund.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        if (neededFund > 0) {
+            cardNeedFund.className = 'kpi-card amber';
+            cardNeedFund.style.background = '#fffbeb';
+            cardNeedFund.style.borderColor = '#fde68a';
+            valNeedFund.className = 'kpi-val text-amber';
+            statusNeedFund.innerHTML = `<span style="color:var(--amber-600);font-weight:600;">⚠️ ต้องเตรียมเติมเงินสดเพิ่ม</span>`;
+        } else {
+            cardNeedFund.className = 'kpi-card emerald';
+            cardNeedFund.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)';
+            cardNeedFund.style.borderColor = '#bbf7d0';
+            valNeedFund.className = 'kpi-val text-emerald';
+            statusNeedFund.innerHTML = `<span style="color:var(--emerald-700);font-weight:600;">🟢 เงินทุนเพียงพอครอบคลุมแล้ว</span>`;
+        }
     }
 
     function copyLineSummary() {
@@ -450,6 +496,7 @@
         const profit = document.getElementById('kpi-profit').innerText;
         const margin = document.getElementById('kpi-margin-tag').innerText;
         const cash = document.getElementById('kpi-cash-balance').innerText;
+        const need = document.getElementById('kpi-need-fund').innerText;
 
         const text = `📊 สรุปภาพรวมโครงการ: ${project.project_name}
 🏢 ผู้ว่าจ้าง: ${project.customer_name || 'ทั่วไป'}
@@ -458,6 +505,7 @@
 💸 งบต้นทุนรวม: ${cost} บาท
 💰 กำไรสุทธิ: ${profit} บาท (${margin})
 💳 เงินสดในมือจริง: ${cash} บาท
+🪙 เงินที่ต้องเติมเพิ่ม: ${need} บาท
 -----------------------------
 🔗 ดูรายงานฉบับเต็ม: ${window.location.href}`;
 
