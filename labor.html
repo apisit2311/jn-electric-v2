@@ -31,80 +31,73 @@
             --radius-lg: 16px;
             --radius-md: 12px;
             --radius-sm: 8px;
-            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
             --card-shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Prompt', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 16px; line-height: 1.4; }
-        .wrapper { max-width: 1200px; margin: 0 auto; }
+        body { font-family: 'Prompt', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 14px 14px 80px 14px; line-height: 1.4; }
+        .wrapper { max-width: 680px; margin: 0 auto; }
 
-        /* Header */
-        .app-header { background: var(--surface); padding: 16px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-        .header-title { display: flex; align-items: center; gap: 12px; }
-        .header-logo-icon { width: 44px; height: 44px; background: #e0f2fe; color: #0284c7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; }
-        .header-title h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--primary); }
-        .header-title p { margin: 2px 0 0 0; font-size: 12px; color: var(--text-sub); }
-        .btn-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .btn { padding: 8px 14px; border-radius: 9px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: all 0.15s ease; }
+        /* Minimal Header */
+        .app-header { background: var(--surface); padding: 14px 18px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--card-shadow); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .header-title { display: flex; align-items: center; gap: 10px; }
+        .header-logo-icon { width: 38px; height: 38px; background: #e0f2fe; color: #0284c7; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+        .header-title h1 { margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); }
+        .header-title p { margin: 1px 0 0 0; font-size: 11.5px; color: var(--text-sub); }
+        .btn-group { display: flex; gap: 6px; align-items: center; }
+        .btn { padding: 7px 12px; border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent; transition: all 0.15s ease; }
         .btn-primary { background: var(--primary-accent); color: #fff; }
-        .btn-primary:hover { background: #1d4ed8; }
         .btn-white { background: #fff; border-color: var(--border); color: var(--text-main); }
-        .btn-white:hover { background: var(--bg); }
         .btn-emerald { background: var(--emerald); color: #fff; }
-        .btn-emerald:hover { background: #047857; }
         .btn-purple { background: var(--purple); color: #fff; }
-        .btn-danger { background: var(--rose-bg); color: var(--rose); border-color: #fecdd3; }
-        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 7px; }
+        .btn-sm { padding: 4px 8px; font-size: 11.5px; border-radius: 6px; }
 
-        /* KPI Dashboard */
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
-        .kpi-card { background: var(--surface); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--card-shadow); position: relative; overflow: hidden; }
-        .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-        .kpi-card.amber::before { background: var(--amber); }
-        .kpi-card.emerald::before { background: var(--emerald); }
-        .kpi-card.purple::before { background: var(--purple); }
-        .kpi-title { font-size: 11.5px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; }
-        .kpi-val { font-size: 22px; font-weight: 700; }
-        .kpi-sub { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
+        /* KPI Mini Cards */
+        .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+        .kpi-card { background: var(--surface); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border); box-shadow: var(--card-shadow); }
+        .kpi-card.amber { border-left: 4px solid var(--amber); }
+        .kpi-card.emerald { border-left: 4px solid var(--emerald); }
+        .kpi-title { font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; margin-bottom: 2px; }
+        .kpi-val { font-size: 19px; font-weight: 700; }
+        .kpi-sub { font-size: 10.5px; color: var(--text-sub); margin-top: 2px; }
 
-        /* Main Workspace */
-        .layout-grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
-        @media (max-width: 900px) { .layout-grid { grid-template-columns: 1fr; } }
+        /* Segmented Tab Switcher */
+        .tab-switcher { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 14px; }
+        .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 9px; font-family: 'Prompt'; font-size: 13px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 700; }
 
-        .panel-box { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 18px; box-shadow: var(--card-shadow); }
-        .panel-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px; }
-        .panel-head h2 { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary); }
+        /* Filter Row */
+        .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+        .custom-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; outline: none; background: #fff; flex: 1; max-width: 240px; }
 
-        /* Technician List */
-        .tech-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.15s; }
-        .tech-card:hover, .tech-card.active { border-color: var(--primary-accent); background: #eff6ff; }
-        .tech-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
-        .tech-sub { font-size: 11.5px; color: var(--text-sub); }
+        /* Minimal Cards */
+        .card-list { display: flex; flex-direction: column; gap: 8px; }
+        .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; box-shadow: var(--card-shadow); transition: 0.15s; }
+        .item-card.paid { background: #f0fdf4; border-color: var(--emerald-border); }
+        .item-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+        .item-card-title { font-size: 13.5px; font-weight: 700; color: var(--text-main); line-height: 1.3; }
+        .item-card-val { font-size: 14.5px; font-weight: 700; text-align: right; white-space: nowrap; }
+        .item-card-body { font-size: 11.5px; color: var(--text-sub); display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border); padding-top: 6px; margin-top: 6px; }
+        .item-card-actions { display: flex; align-items: center; gap: 8px; }
 
-        /* Table & Cards */
-        .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md); }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
-        th { background: #f8fafc; color: var(--text-sub); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--border); }
-        td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
-        tr:last-child td { border-bottom: none; }
-        tbody tr:hover { background-color: #f8fafc; }
-        .t-center { text-align: center; }
-        .t-right { text-align: right; }
-        .font-bold { font-weight: 700; }
         .pay-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--emerald); }
+        .btn-icon { border: none; background: none; cursor: pointer; padding: 4px 6px; border-radius: 4px; font-size: 12px; }
 
-        /* Forms & Inputs */
-        .clean-input { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 13px; outline: none; transition: 0.15s; }
-        .clean-input:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-        .form-item { margin-bottom: 12px; }
-        .form-item label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-main); }
+        /* Floating Bottom Action */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border-top: 1px solid var(--border); padding: 10px 14px; z-index: 99; }
+        .bottom-bar-inner { max-width: 680px; margin: 0 auto; display: flex; gap: 8px; }
+        .btn-main-action { flex: 1; background: var(--emerald); color: #fff; border: none; padding: 11px; border-radius: var(--radius-md); font-family: 'Prompt'; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
 
-        /* Modals */
+        /* Form Inputs & Modals */
+        .clean-input { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 13px; outline: none; }
+        .clean-input:focus { border-color: var(--primary-accent); }
+        .form-item { margin-bottom: 10px; }
+        .form-item label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 3px; color: var(--text-main); }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; }
-        .modal-box { background: #fff; width: 500px; max-width: 92%; border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--card-shadow-lg); max-height: 90vh; overflow-y: auto; }
-        .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 14px; }
-        .modal-head h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); }
+        .modal-box { background: #fff; width: 480px; max-width: 92%; border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--card-shadow-lg); max-height: 90vh; overflow-y: auto; }
+        .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; }
+        .modal-head h3 { margin: 0; font-size: 15.5px; font-weight: 700; color: var(--primary); }
     </style>
 </head>
 <body>
@@ -115,135 +108,127 @@
         <div class="header-title">
             <div class="header-logo-icon">👷</div>
             <div>
-                <h1>Labor & Subcontractor Hub</h1>
-                <p>ระบบจัดการสมุดทะเบียนช่าง บันทึกชั่วโมงงาน และควบคุมยอดเบิกจ่ายค่าแรง</p>
+                <h1>ระบบจัดการค่าแรงช่าง</h1>
+                <p>JN Electric & Technology</p>
             </div>
         </div>
         <div class="btn-group">
-            <button class="btn btn-emerald" onclick="openNewJobLogModal()">⚡ ลงบันทึกค่าแรงใหม่</button>
-            <button class="btn btn-purple" onclick="openNewTechModal()">➕ เพิ่มช่างใหม่</button>
-            <a href="project.html" class="btn btn-white">📁 หน้าโครงการ</a>
+            <a href="project.html" class="btn btn-white">📁 โครงการ</a>
             <a href="index.html" class="btn btn-white">⬅️ ออกบิล</a>
         </div>
     </div>
 
-    <!-- KPIs -->
+    <!-- Mini KPIs -->
     <div class="kpi-grid">
         <div class="kpi-card amber">
-            <div class="kpi-title">ยอดค่าแรงรอเบิกจ่าย (Pending)</div>
+            <div class="kpi-title">ยอดค้างจ่ายช่าง</div>
             <div class="kpi-val" style="color: var(--amber);" id="kpi-pending-labor">0.00 ฿</div>
-            <div class="kpi-sub" id="kpi-pending-count">0 รายการที่ยังไม่จ่าย</div>
+            <div class="kpi-sub" id="kpi-pending-count">0 รายการรอโอน</div>
         </div>
         <div class="kpi-card emerald">
-            <div class="kpi-title">ยอดค่าแรงที่จ่ายแล้วทั้งหมด</div>
+            <div class="kpi-title">จ่ายค่าแรงแล้ว</div>
             <div class="kpi-val" style="color: var(--emerald);" id="kpi-paid-labor">0.00 ฿</div>
-            <div class="kpi-sub" id="kpi-paid-count">0 รายการที่โอนแล้ว</div>
-        </div>
-        <div class="kpi-card purple">
-            <div class="kpi-title">จำนวนช่างในระบบ</div>
-            <div class="kpi-val" style="color: var(--purple);" id="kpi-tech-count">0 คน</div>
-            <div class="kpi-sub">พร้อมรับงานติดตั้ง</div>
+            <div class="kpi-sub" id="kpi-paid-count">0 รายการโอนแล้ว</div>
         </div>
     </div>
 
-    <!-- Layout -->
-    <div class="layout-grid">
-        <!-- Left: Technician Roster -->
-        <div class="panel-box">
-            <div class="panel-head">
-                <h2>📋 ทะเบียนรายชื่อช่าง</h2>
-                <button class="btn btn-purple btn-sm" onclick="openNewTechModal()">➕ เพิ่ม</button>
-            </div>
-            <div id="tech-list-container" style="max-height: 520px; overflow-y: auto;">
-                <div style="text-align: center; color: var(--text-sub); padding: 20px;">กำลังโหลดรายชื่อช่าง...</div>
-            </div>
+    <!-- Segmented Tabs Switcher -->
+    <div class="tab-switcher">
+        <button class="tab-btn active" id="tab-btn-logs" onclick="switchLaborTab('logs')">
+            🕒 รายการเบิกค่าแรง (<span id="cnt-logs">0</span>)
+        </button>
+        <button class="tab-btn" id="tab-btn-techs" onclick="switchLaborTab('techs')">
+            👷 ทะเบียนรายชื่อช่าง (<span id="cnt-techs">0</span>)
+        </button>
+    </div>
+
+    <!-- PANE 1: Labor Logs -->
+    <div id="pane-logs">
+        <div class="filter-row">
+            <select id="sel-filter-proj" class="custom-select" onchange="loadLaborLogs()">
+                <option value="">-- กรองทุกโครงการ --</option>
+            </select>
+            <button class="btn btn-emerald btn-sm" onclick="openNewJobLogModal()">⚡ ลงค่าแรงด่วน</button>
         </div>
+        <div class="card-list" id="labor-logs-list">
+            <div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">กำลังโหลดข้อมูล...</div>
+        </div>
+    </div>
 
-        <!-- Right: Labor Logs Table -->
-        <div class="panel-box">
-            <div class="panel-head">
-                <h2>🕒 ประวัติการทำงานและเบิกค่าแรง</h2>
-                <div style="display:flex; gap:6px;">
-                    <select id="sel-filter-proj" class="clean-input" style="padding:4px 8px; font-size:12px;" onchange="loadLaborLogs()">
-                        <option value="">-- ทุกโครงการ --</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 5%;" class="t-center">#</th>
-                            <th style="width: 12%;" class="t-center">วันที่</th>
-                            <th style="width: 18%;">ชื่อช่าง</th>
-                            <th style="width: 22%;">โครงการ</th>
-                            <th style="width: 18%;">รายละเอียดงาน</th>
-                            <th style="width: 13%;" class="t-right">รวมเงิน (บาท)</th>
-                            <th style="width: 6%;" class="t-center">จ่ายแล้ว</th>
-                            <th style="width: 6%;" class="t-center">จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="labor-logs-body"></tbody>
-                </table>
-            </div>
+    <!-- PANE 2: Technicians Roster (ซ่อนอยู่ในแท็บนี้) -->
+    <div id="pane-techs" style="display: none;">
+        <div class="filter-row">
+            <div style="font-size:12.5px; font-weight:600; color:var(--text-sub);">รายชื่อช่างทั้งหมดในระบบ:</div>
+            <button class="btn btn-purple btn-sm" onclick="openNewTechModal()">➕ เพิ่มช่างใหม่</button>
+        </div>
+        <div class="card-list" id="tech-list-container">
+            <div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">กำลังโหลดรายชื่อช่าง...</div>
         </div>
     </div>
 </div>
 
-<!-- Modal: New Technician -->
+<!-- Floating Action Bar -->
+<div class="bottom-bar">
+    <div class="bottom-bar-inner">
+        <button class="btn-main-action" onclick="openNewJobLogModal()">⚡ ลงบันทึกค่าแรงช่างเข้าโครงการ</button>
+    </div>
+</div>
+
+<!-- Modal: New/Edit Technician -->
 <div class="modal-overlay" id="modalTech">
     <div class="modal-box">
         <div class="modal-head">
-            <h3 id="modal-tech-title">➕ เพิ่มทะเบียนช่างใหม่</h3>
+            <h3 id="modal-tech-title">➕ ข้อมูลช่าง</h3>
             <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalTech')">&times;</span>
         </div>
         <input type="hidden" id="inp-tech-id">
-        <div class="form-item"><label>ชื่อ-นามสกุล / ชื่อเล่น:</label><input type="text" id="inp-tech-name" class="clean-input" placeholder="เช่น ช่างเอก (งานตู้คอนโทรล)"></div>
+        <div class="form-item"><label>ชื่อช่าง / ชื่อเล่น:</label><input type="text" id="inp-tech-name" class="clean-input" placeholder="เช่น ช่างเอก (ตู้คอนโทรล)"></div>
         <div class="form-item"><label>เบอร์โทรศัพท์:</label><input type="text" id="inp-tech-phone" class="clean-input" placeholder="08x-xxx-xxxx"></div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-item"><label>ธนาคาร:</label><input type="text" id="inp-tech-bank" class="clean-input" placeholder="เช่น กสิกรไทย, กรุงเทพ"></div>
-            <div class="form-item"><label>เลขที่บัญชี:</label><input type="text" id="inp-tech-acc" class="clean-input" placeholder="xxx-x-xxxxx-x"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="form-item"><label>ธนาคาร:</label><input type="text" id="inp-tech-bank" class="clean-input" placeholder="กสิกรไทย"></div>
+            <div class="form-item"><label>เลขบัญชี:</label><input type="text" id="inp-tech-acc" class="clean-input" placeholder="xxx-x-xxxxx-x"></div>
         </div>
         <div class="form-item"><label>ค่าแรงเริ่มต้นต่อวัน (บาท):</label><input type="number" id="inp-tech-rate" class="clean-input" value="500"></div>
-        <div class="form-item"><label>ความชำนาญ / หมายเหตุ:</label><input type="text" id="inp-tech-skills" class="clean-input" placeholder="เช่น ช่างเดินท่อ, เข้าหัวสาย"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+        <div class="form-item"><label>ความชำนาญ / หมายเหตุ:</label><input type="text" id="inp-tech-skills" class="clean-input" placeholder="เช่น เดินท่อ, ดึงสาย"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
             <button class="btn btn-white" onclick="closeModal('modalTech')">ยกเลิก</button>
-            <button class="btn btn-purple font-bold" onclick="submitTechnician()">💾 บันทึกข้อมูลช่าง</button>
+            <button class="btn btn-purple font-bold" onclick="submitTechnician()">💾 บันทึกช่าง</button>
         </div>
     </div>
 </div>
 
-<!-- Modal: Record Labor Log (Sync to project_expenses) -->
+<!-- Modal: Record Labor Log -->
 <div class="modal-overlay" id="modalJobLog">
     <div class="modal-box">
         <div class="modal-head">
-            <h3>⚡ ลงบันทึกค่าแรงช่างเข้าโครงการ</h3>
+            <h3>⚡ ลงบันทึกค่าแรงช่าง</h3>
             <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalJobLog')">&times;</span>
         </div>
         <div class="form-item"><label>เลือกโครงการ:</label><select id="inp-log-proj" class="clean-input"></select></div>
         <div class="form-item"><label>เลือกช่าง:</label><select id="inp-log-tech" class="clean-input" onchange="onTechSelectChanged()"></select></div>
         <div class="form-item"><label>วันที่ทำงาน:</label><input type="date" id="inp-log-date" class="clean-input"></div>
         <div class="form-item">
-            <label>รูปแบบการคิดค่าแรง:</label>
+            <label>รูปแบบค่าแรง:</label>
             <select id="inp-log-type" class="clean-input" onchange="calcJobLogTotal()">
-                <option value="daily">คิดเป็นรายวัน (จำนวนวัน × ค่าแรง/วัน)</option>
-                <option value="task">คิดเหมางาน / รายจุด (จำนวนจุด × ราคา/จุด)</option>
+                <option value="daily">รายวัน (จำนวนวัน &times; ค่าแรง/วัน)</option>
+                <option value="task">เหมาจุด / ชิ้นงาน (จำนวนจุด &times; ราคา/จุด)</option>
             </select>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-item"><label id="lbl-unit-qty">จำนวนวัน:</label><input type="number" id="inp-log-units" class="clean-input" min="0.5" step="0.5" value="1" oninput="calcJobLogTotal()"></div>
-            <div class="form-item"><label id="lbl-unit-rate">ค่าแรง/หน่วย (บาท):</label><input type="number" id="inp-log-rate" class="clean-input" min="0" value="500" oninput="calcJobLogTotal()"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="form-item"><label>จำนวน (วัน/จุด):</label><input type="number" id="inp-log-units" class="clean-input" min="0.5" step="0.5" value="1" oninput="calcJobLogTotal()"></div>
+            <div class="form-item"><label>ค่าแรง/หน่วย (บาท):</label><input type="number" id="inp-log-rate" class="clean-input" min="0" value="500" oninput="calcJobLogTotal()"></div>
         </div>
-        <div class="form-item"><label>ค่าล่วงเวลา / เบี้ยเลี้ยงพิเศษ (OT):</label><input type="number" id="inp-log-ot" class="clean-input" min="0" value="0" oninput="calcJobLogTotal()"></div>
-        <div class="form-item"><label>รายละเอียดงานที่ทำ:</label><input type="text" id="inp-log-details" class="clean-input" placeholder="เช่น ติดตั้งตู้ควบคุม 2 ชุด"></div>
-        <div style="background: var(--amber-bg); border: 1px solid var(--amber-border); padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: 600; color: var(--amber); font-size: 13px;">ยอดรวมค่าแรงงวดนี้:</span>
-            <strong style="font-size: 18px; color: var(--amber);" id="lbl-log-total">0.00 ฿</strong>
+        <div class="form-item"><label>ค่าล่วงเวลา / เบี้ยเลี้ยง (OT):</label><input type="number" id="inp-log-ot" class="clean-input" min="0" value="0" oninput="calcJobLogTotal()"></div>
+        <div class="form-item"><label>รายละเอียดงาน:</label><input type="text" id="inp-log-details" class="clean-input" placeholder="เช่น ติดตั้งตู้ควบคุม 2 จุด"></div>
+        
+        <div style="background: var(--amber-bg); border: 1px solid var(--amber-border); padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600; color: var(--amber); font-size: 12.5px;">ยอดรวมค่าแรงงวดนี้:</span>
+            <strong style="font-size: 17px; color: var(--amber);" id="lbl-log-total">0.00 ฿</strong>
         </div>
+
         <div style="display: flex; justify-content: flex-end; gap: 8px;">
             <button class="btn btn-white" onclick="closeModal('modalJobLog')">ยกเลิก</button>
-            <button class="btn btn-emerald font-bold" id="btn-submit-log" onclick="submitLaborLog()">💾 บันทึกและเชื่อมเข้าโครงการ</button>
+            <button class="btn btn-emerald font-bold" onclick="submitLaborLog()">💾 บันทึกค่าแรง</button>
         </div>
     </div>
 </div>
@@ -256,6 +241,7 @@
     let technicians = [];
     let projects = [];
     let laborLogs = [];
+    let activeTab = 'logs';
 
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -264,6 +250,14 @@
         await loadTechnicians();
         await loadLaborLogs();
     };
+
+    function switchLaborTab(tab) {
+        activeTab = tab;
+        document.getElementById('tab-btn-logs').className = `tab-btn ${tab === 'logs' ? 'active' : ''}`;
+        document.getElementById('tab-btn-techs').className = `tab-btn ${tab === 'techs' ? 'active' : ''}`;
+        document.getElementById('pane-logs').style.display = tab === 'logs' ? 'block' : 'none';
+        document.getElementById('pane-techs').style.display = tab === 'techs' ? 'block' : 'none';
+    }
 
     async function loadProjects() {
         const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
@@ -296,23 +290,29 @@
         container.innerHTML = '';
         selLogTech.innerHTML = '<option value="">-- เลือกช่าง --</option>';
 
-        document.getElementById('kpi-tech-count').innerText = `${technicians.length} คน`;
+        document.getElementById('cnt-techs').innerText = technicians.length;
 
         if (technicians.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub); font-size:12px;">ยังไม่มีช่างในระบบ กดปุ่ม "➕ เพิ่ม" ด้านบน</div>`;
+            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">ยังไม่มีช่างในระบบ กดปุ่ม "➕ เพิ่มช่างใหม่" ด้านบน</div>`;
             return;
         }
 
         technicians.forEach(t => {
             const card = document.createElement('div');
-            card.className = 'tech-card';
+            card.className = 'item-card';
             card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div class="item-card-top">
                     <div>
-                        <div class="tech-name">${t.tech_name}</div>
-                        <div class="tech-sub">📞 ${t.phone || '-'} • 🏦 ${t.bank_name || ''} ${t.bank_account || ''}</div>
+                        <div class="item-card-title">${t.tech_name}</div>
+                        <div style="font-size:11.5px; color:var(--text-sub); margin-top:2px;">
+                            📞 ${t.phone || '-'} • 🏦 ${t.bank_name || ''} <strong>${t.bank_account || ''}</strong>
+                        </div>
                     </div>
-                    <button class="btn-icon edit" onclick="openEditTechModal('${t.id}')">✏️</button>
+                    <button class="btn-icon" onclick="openEditTechModal('${t.id}')">✏️</button>
+                </div>
+                <div class="item-card-body">
+                    <span>เรทเริ่มต้น: <strong style="color:var(--primary-accent);">${Number(t.default_daily_rate || 500).toLocaleString()} ฿/วัน</strong></span>
+                    <span>${t.skills || 'ช่างทั่วไป'}</span>
                 </div>
             `;
             container.appendChild(card);
@@ -337,10 +337,15 @@
         let sumPaid = 0;
         let cntPaid = 0;
 
-        const tbody = document.getElementById('labor-logs-body');
-        tbody.innerHTML = '';
+        const container = document.getElementById('labor-logs-list');
+        container.innerHTML = '';
+        document.getElementById('cnt-logs').innerText = laborLogs.length;
 
-        laborLogs.forEach((l, idx) => {
+        if (laborLogs.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">ยังไม่มีการบันทึกค่าแรง</div>`;
+        }
+
+        laborLogs.forEach(l => {
             const amt = Number(l.total_amount || 0);
             if (l.is_paid) {
                 sumPaid += amt;
@@ -350,28 +355,43 @@
                 cntPending++;
             }
 
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="t-center">${idx + 1}</td>
-                <td class="t-center">${l.work_date || '-'}</td>
-                <td class="font-bold">${l.technicians?.tech_name || 'ช่าง'}</td>
-                <td>${l.projects?.project_name || '-'}</td>
-                <td>${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : `${l.units} จุด`)}</td>
-                <td class="t-right font-bold" style="color: ${l.is_paid ? 'var(--emerald)' : 'var(--amber)'};">${amt.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                <td class="t-center">
-                    <input type="checkbox" class="pay-checkbox" ${l.is_paid ? 'checked' : ''} onchange="toggleLaborPaid('${l.id}', '${l.expense_id}', ${l.is_paid})">
-                </td>
-                <td class="t-center">
-                    <button class="btn-icon del" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')">🗑️</button>
-                </td>
+            const card = document.createElement('div');
+            card.className = `item-card ${l.is_paid ? 'paid' : ''}`;
+            card.innerHTML = `
+                <div class="item-card-top">
+                    <div>
+                        <div class="item-card-title">${l.technicians?.tech_name || 'ช่าง'}</div>
+                        <div style="font-size:12px; color:var(--primary-accent); font-weight:600; margin-top:2px;">
+                            📁 ${l.projects?.project_name || '-'}
+                        </div>
+                    </div>
+                    <div class="item-card-val" style="color:${l.is_paid ? 'var(--emerald)' : 'var(--amber)'};">
+                        ${amt.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿
+                    </div>
+                </div>
+                <div style="font-size:12px; color:var(--text-main); margin: 4px 0;">
+                    ${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : `${l.units} จุด`)}
+                    ${Number(l.ot_amount || 0) > 0 ? `<span style="font-size:11px; color:var(--purple); margin-left:4px;">(+OT ${Number(l.ot_amount).toLocaleString()} ฿)</span>` : ''}
+                </div>
+                <div class="item-card-body">
+                    <span>🗓️ ${l.work_date || '-'}</span>
+                    <div class="item-card-actions">
+                        <label style="display:flex; align-items:center; gap:4px; font-size:11.5px; font-weight:600; cursor:pointer;">
+                            <input type="checkbox" class="pay-checkbox" ${l.is_paid ? 'checked' : ''} onchange="toggleLaborPaid('${l.id}', '${l.expense_id}', ${l.is_paid})">
+                            <span style="color:${l.is_paid ? 'var(--emerald)' : 'var(--text-sub)'};">${l.is_paid ? 'โอนแล้ว ✅' : 'รอโอน'}</span>
+                        </label>
+                        <button class="btn-icon" onclick="copyLaborPayToLine('${l.id}')" title="ส่งข้อมูลโอนเงินเข้า LINE">📱</button>
+                        <button class="btn-icon" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')">🗑️</button>
+                    </div>
+                </div>
             `;
-            tbody.appendChild(tr);
+            container.appendChild(card);
         });
 
         document.getElementById('kpi-pending-labor').innerText = `${sumPending.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
-        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการที่ยังไม่จ่าย`;
+        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอโอนเงิน`;
         document.getElementById('kpi-paid-labor').innerText = `${sumPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
-        document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการที่โอนแล้ว`;
+        document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการโอนแล้ว`;
     }
 
     function onTechSelectChanged() {
@@ -407,7 +427,7 @@
         const tech = technicians.find(t => t.id === techId);
         const expItemName = `ค่าแรง: ${tech?.tech_name || 'ช่าง'} (${details || (type === 'daily' ? `${units} วัน` : `${units} จุด`)})`;
 
-        // 1. สร้างรายการลง project_expenses ในหมวด labor ทันที
+        // 1. Sync เข้า project_expenses (หมวด labor)
         const { data: expData, error: expErr } = await supabaseClient.from('project_expenses').insert([{
             project_id: projId,
             category: 'labor',
@@ -420,9 +440,9 @@
             is_paid: false
         }]).select().single();
 
-        if (expErr) return alert('❌ ไม่สามารถสร้างรายการค่าใช้จ่ายได้: ' + expErr.message);
+        if (expErr) return alert('❌ ไม่สามารถบันทึกค่าใช้จ่ายได้: ' + expErr.message);
 
-        // 2. สร้างประวัติลง project_labor_logs พร้อมผูก expense_id
+        // 2. บันทึกประวัติลง project_labor_logs
         await supabaseClient.from('project_labor_logs').insert([{
             project_id: projId,
             technician_id: techId,
@@ -441,7 +461,6 @@
         await loadLaborLogs();
     }
 
-    // 2-Way Status Sync: ติ๊กจ่ายแล้ว อัปเดตทั้งใน project_labor_logs และ project_expenses
     async function toggleLaborPaid(logId, expenseId, currentStatus) {
         const newStatus = !currentStatus;
         await supabaseClient.from('project_labor_logs').update({ is_paid: newStatus }).eq('id', logId);
@@ -452,7 +471,7 @@
     }
 
     async function deleteLaborLog(logId, expenseId) {
-        if (!confirm('ยืนยันลบรายการค่าแรงนี้? (ข้อมูลในหน้าโครงการจะถูกลบด้วย)')) return;
+        if (!confirm('ยืนยันลบรายการค่าแรงนี้? (ข้อมูลในโครงการจะถูกลบด้วย)')) return;
         await supabaseClient.from('project_labor_logs').delete().eq('id', logId);
         if (expenseId) {
             await supabaseClient.from('project_expenses').delete().eq('id', expenseId);
@@ -460,7 +479,6 @@
         await loadLaborLogs();
     }
 
-    // Technician Modal Handlers
     function openNewTechModal() {
         document.getElementById('modal-tech-title').innerText = '➕ เพิ่มทะเบียนช่างใหม่';
         document.getElementById('inp-tech-id').value = '';
@@ -497,7 +515,6 @@
         const skills = document.getElementById('inp-tech-skills').value.trim();
 
         if (!name) return alert('⚠️ กรุณากรอกชื่อช่าง');
-
         const payload = { tech_name: name, phone: phone, bank_name: bank, bank_account: acc, default_daily_rate: rate, skills: skills };
 
         if (id) {
@@ -516,6 +533,21 @@
         document.getElementById('inp-log-ot').value = '0';
         calcJobLogTotal();
         document.getElementById('modalJobLog').style.display = 'flex';
+    }
+
+    function copyLaborPayToLine(logId) {
+        const l = laborLogs.find(x => x.id === logId);
+        if (!l) return;
+        const text = `💸 สลิปเบิกค่าแรง: ${l.technicians?.tech_name || 'ช่าง'}
+📁 โครงการ: ${l.projects?.project_name || '-'}
+🗓️ วันที่: ${l.work_date || '-'}
+📝 งาน: ${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : `${l.units} จุด`)}
+💰 ยอดรวม: ${Number(l.total_amount).toLocaleString()} บาท
+🏦 บัญชีโอน: ${l.technicians?.bank_name || ''} ${l.technicians?.bank_account || '-'}`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            alert('คัดลอกข้อมูลสรุปค่าแรงเรียบร้อยแล้ว นำไปส่งใน LINE ได้ทันที!');
+        });
     }
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
