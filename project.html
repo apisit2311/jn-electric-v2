@@ -140,7 +140,7 @@
         .m-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
         .m-card-title { font-size: 13.5px; font-weight: 600; color: var(--slate-900); line-height: 1.3; }
         .m-card-val { font-size: 13.5px; font-weight: 700; text-align: right; white-space: nowrap; }
-        .m-card-body { font-size: 12px; color: var(--slate-600); display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--slate-200); padding-top: 6px; margin-top: 4px; }
+        .m-card-body { font-size: 12px; color: var(--slate-600); }
         .m-card-actions { display: flex; align-items: center; gap: 8px; }
 
         /* Project Launcher Hub Modal */
@@ -631,16 +631,13 @@
 
         // 🌟 SMART AUTO-LOAD LOGIC:
         if (activeProjects.length === 1) {
-            // กรณีมี 1 โครงการที่ Active -> โหลดเลยทันที
             await selectProjectFromLauncher(activeProjects[0].id);
             return;
         } else if (lastSavedId && activeProjects.some(p => p.id === lastSavedId)) {
-            // กรณีเคยเปิดโครงการ Active ไว้ล่าสุด -> โหลดโครงการล่าสุดเลย
             await selectProjectFromLauncher(lastSavedId);
             return;
         }
 
-        // หากมีหลายโครงการและยังไม่มีตัวเลือก ให้เปิด Launcher ทันที
         renderLauncherList();
         document.getElementById('modalLauncher').style.display = 'flex';
     }
@@ -926,15 +923,39 @@
             const costTotal = Number(item.qty || 0) * unitCost;
             const grossProfit = sellingTotal - costTotal;
 
+            // 🌟 คำนวณยอดที่จ่ายจริงแล้วของหมวดนี้
+            let itemPaidTotal = 0;
+            subs.forEach(s => {
+                if (s.is_paid) {
+                    itemPaidTotal += (Number(item.qty || 1) * Number(s.qty || 1) * Number(s.unit_cost || 0));
+                }
+            });
+
             sumSelling += sellingTotal;
             sumBomCost += costTotal;
             sumGrossProfit += grossProfit;
+            paidBomTotal += itemPaidTotal;
 
-            subs.forEach(s => {
-                if (s.is_paid) paidBomTotal += (Number(item.qty || 1) * Number(s.qty || 1) * Number(s.unit_cost || 0));
-            });
+            // 🎨 กำหนดสไตล์และข้อความป้ายกำกับ
+            let paymentClass = '';
+            let paymentBadge = '';
+            
+            if (costTotal > 0) {
+                if (itemPaidTotal >= costTotal) {
+                    paymentClass = 'text-emerald';
+                    paymentBadge = `<span style="display:inline-block; padding:2px 6px; border-radius:6px; font-size:10px; font-weight:600; background:#dcfce7; color:#166534; margin-left:6px; border:1px solid #bbf7d0;">จ่ายครบ ✅</span>`;
+                } else if (itemPaidTotal > 0) {
+                    paymentClass = 'text-amber';
+                    paymentBadge = `<span style="display:inline-block; padding:2px 6px; border-radius:6px; font-size:10px; font-weight:600; background:#fef3c7; color:#b45309; margin-left:6px; border:1px solid #fde68a;">ยังไม่ครบ ⏳</span>`;
+                } else {
+                    paymentClass = 'text-amber';
+                    paymentBadge = `<span style="display:inline-block; padding:2px 6px; border-radius:6px; font-size:10px; font-weight:600; background:#fffbeb; color:#b45309; margin-left:6px; border:1px solid #fde68a;">รอจ่าย ⚠️</span>`;
+                }
+            } else {
+                paymentClass = 'text-slate-400';
+            }
 
-            return { item, idx, subs, unitCost, sellingTotal, costTotal, grossProfit };
+            return { item, idx, subs, unitCost, sellingTotal, costTotal, grossProfit, itemPaidTotal, paymentClass, paymentBadge };
         });
 
         if (currentViewMode === 'table') {
@@ -944,19 +965,19 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%;" class="t-center">ลำดับ</th>
-                                <th style="width: 32%;">รายการ</th>
-                                <th style="width: 8%;" class="t-center">จำนวน</th>
-                                <th style="width: 7%;" class="t-center">หน่วย</th>
-                                <th style="width: 11%;" class="t-right">ราคา/หน่วย</th>
-                                <th style="width: 11%;" class="t-right">จำนวนเงิน</th>
-                                <th style="width: 10%;" class="t-right text-amber">ราคาทุน/หน่วย</th>
-                                <th style="width: 10%;" class="t-right text-amber">ราคาทุนรวม</th>
-                                <th style="width: 11%;" class="t-right text-emerald">กำไรรวมค่าแรง</th>
-                                <th style="width: 7%;" class="t-center no-print">จัดการ</th>
+                                <th style="width: 26%;">รายการ</th>
+                                <th style="width: 6%;" class="t-center">จำนวน</th>
+                                <th style="width: 6%;" class="t-center">หน่วย</th>
+                                <th style="width: 10%;" class="t-right">ราคา/หน่วย</th>
+                                <th style="width: 10%;" class="t-right">จำนวนเงิน</th>
+                                <th style="width: 10%;" class="t-right text-amber">ราคาทุนรวมงบ</th>
+                                <th style="width: 12%;" class="t-right text-emerald">จ่ายจริงแล้ว</th>
+                                <th style="width: 10%;" class="t-right text-primary">กำไรขั้นต้น</th>
+                                <th style="width: 5%;" class="t-center no-print">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${calculatedMainItems.map(({ item, idx, unitCost, sellingTotal, costTotal, grossProfit }) => `
+                            ${calculatedMainItems.map(({ item, idx, sellingTotal, costTotal, grossProfit, itemPaidTotal, paymentClass, paymentBadge }) => `
                                 <tr>
                                     <td class="t-center">${idx + 1}</td>
                                     <td><a href="javascript:void(0)" onclick="switchSheet('bom-${item.id}')" style="color:var(--primary);font-weight:500;text-decoration:none;">${item.item_name}</a></td>
@@ -964,8 +985,11 @@
                                     <td class="t-center">${item.unit || 'จุด'}</td>
                                     <td class="t-right">${Number(item.unit_price).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-right font-bold">${sellingTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                                    <td class="t-right text-amber">${unitCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-right font-bold text-amber">${costTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                    <td class="t-right">
+                                        <div class="font-bold ${paymentClass}">${itemPaidTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                                        <div style="margin-top:3px;">${paymentBadge}</div>
+                                    </td>
                                     <td class="t-right font-bold text-emerald">${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-center no-print">
                                         <div class="action-btns">
@@ -980,8 +1004,8 @@
                             <tr class="row-total-master">
                                 <td colspan="5" class="t-center font-bold">รวมยอดขายและต้นทุนอุปกรณ์ (ส่วนที่ 1)</td>
                                 <td class="t-right text-primary font-bold">${sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                                <td class="t-right">-</td>
                                 <td class="t-right text-amber font-bold">${sumBomCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                <td class="t-right text-emerald font-bold">${paidBomTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td class="t-right text-emerald font-bold">${sumGrossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td class="no-print"></td>
                             </tr>
@@ -992,7 +1016,7 @@
         } else {
             containerMain.innerHTML = `
                 <div class="mobile-card-list">
-                    ${calculatedMainItems.map(({ item, idx, sellingTotal, costTotal, grossProfit }) => `
+                    ${calculatedMainItems.map(({ item, idx, sellingTotal, costTotal, grossProfit, itemPaidTotal, paymentClass, paymentBadge }) => `
                         <div class="m-item-card">
                             <div class="m-card-head">
                                 <div class="m-card-title">
@@ -1002,19 +1026,27 @@
                                 </div>
                                 <div class="m-card-val text-primary">${sellingTotal.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</div>
                             </div>
-                            <div class="m-card-body">
-                                <span>${item.qty} ${item.unit || 'ชุด'} • ทุน: <strong class="text-amber">${costTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></span>
-                                <div class="m-card-actions">
-                                    <strong class="text-emerald">+${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</strong>
-                                    <button class="btn-icon edit" onclick="openEditMainTabModal('${item.id}')">✏️</button>
-                                    <button class="btn-icon del" onclick="deleteMainItem('${item.id}', '${item.item_name}')">🗑️</button>
+                            <div class="m-card-body" style="display:block;">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:6px;">
+                                    <span>${item.qty} ${item.unit || 'ชุด'} • ทุน: <strong class="text-amber">${costTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></span>
+                                    <div style="text-align:right;">
+                                        <div style="font-size:11px; margin-bottom:2px;">จ่ายแล้ว: <strong class="${paymentClass}">${itemPaidTotal.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</strong></div>
+                                        ${paymentBadge}
+                                    </div>
+                                </div>
+                                <div class="m-card-actions" style="justify-content:space-between; border-top:1px dashed var(--slate-200); padding-top:6px;">
+                                    <strong class="text-emerald">กำไร: +${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</strong>
+                                    <div>
+                                        <button class="btn-icon edit" onclick="openEditMainTabModal('${item.id}')">✏️</button>
+                                        <button class="btn-icon del" onclick="deleteMainItem('${item.id}', '${item.item_name}')">🗑️</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     `).join('')}
                     <div style="display:flex; justify-content:space-between; padding:10px 14px; background:#f8fafc; border-radius:10px; font-weight:700; border:1px solid var(--slate-200); font-size:13px;">
-                        <span>รวมอุปกรณ์ส่วนที่ 1</span>
-                        <span class="text-primary">${sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿ (ทุน ${sumBomCost.toLocaleString()} ฿)</span>
+                        <span>รวมจ่ายอุปกรณ์ส่วนที่ 1 แล้ว</span>
+                        <span class="text-emerald">${paidBomTotal.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿ (จากงบ ${sumBomCost.toLocaleString()} ฿)</span>
                     </div>
                 </div>
             `;
