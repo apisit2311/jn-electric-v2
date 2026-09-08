@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>สรุปโครงการ - Executive Overview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-accent: #2563eb;
+            --surface: #ffffff;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --emerald: #059669;
+            --emerald-bg: #ecfdf5;
+            --rose: #e11d48;
+            --rose-bg: #fff1f2;
+            --amber: #d97706;
+            --amber-bg: #fffbeb;
+            --purple: #7c3aed;
+            --purple-bg: #faf5ff;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-subtle: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+            --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.03);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Prompt', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 16px 16px 90px 16px; line-height: 1.4; }
+        .wrapper { max-width: 540px; margin: 0 auto; }
+
+        /* Header */
+        .header-card { background: var(--surface); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-subtle); margin-bottom: 14px; }
+        .badge-live { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 2px 8px; background: #e0f2fe; color: #0369a1; border-radius: 20px; margin-bottom: 8px; }
+        .badge-live::before { content: ''; width: 6px; height: 6px; background: #0284c7; border-radius: 50%; }
+        .proj-title { font-size: 17px; font-weight: 700; color: var(--primary); margin: 0; line-height: 1.3; }
+        .proj-meta { font-size: 12.5px; color: var(--text-sub); margin-top: 4px; }
+
+        /* Hero Profit Card */
+        .hero-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border-radius: var(--radius-lg); padding: 20px; margin-bottom: 14px; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2); }
+        .hero-label { font-size: 12px; color: #94a3b8; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-value { font-size: 30px; font-weight: 700; color: #34d399; margin: 2px 0 12px 0; letter-spacing: -0.5px; }
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 12px; border-top: 1px solid #334155; }
+        .hero-sub-val { font-size: 15px; font-weight: 600; color: #f8fafc; }
+        .hero-sub-lbl { font-size: 11px; color: #94a3b8; }
+
+        /* Metric Tiles */
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+        .m-tile { background: var(--surface); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border); box-shadow: var(--shadow-subtle); display: flex; flex-direction: column; justify-content: space-between; }
+        .m-tile-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .m-tile-lbl { font-size: 11.5px; font-weight: 500; color: var(--text-sub); }
+        .m-tile-val { font-size: 17px; font-weight: 700; }
+        .m-tile-foot { font-size: 10.5px; margin-top: 4px; }
+
+        .tile-purple { border-left: 3.5px solid var(--purple); }
+        .tile-purple .m-tile-val { color: var(--purple); }
+        .tile-amber { border-left: 3.5px solid var(--amber); }
+        .tile-amber .m-tile-val { color: var(--amber); }
+
+        /* Section Container */
+        .section-box { background: var(--surface); border-radius: var(--radius-lg); padding: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-subtle); margin-bottom: 14px; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .section-name { font-size: 14px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+        .section-sum { font-size: 12px; font-weight: 600; color: var(--text-sub); }
+
+        /* Item Rows (Card-List View) */
+        .item-row { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 8px; }
+        .item-row:last-child { margin-bottom: 0; }
+        .item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+        .item-title { font-size: 13px; font-weight: 600; color: var(--text-main); line-height: 1.3; }
+        .item-price { font-size: 13px; font-weight: 700; color: var(--primary-accent); text-align: right; white-space: nowrap; }
+        .item-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-sub); margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e2e8f0; }
+
+        /* Bottom Floating Bar */
+        .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border-top: 1px solid var(--border); padding: 10px 16px; z-index: 99; }
+        .action-bar-inner { max-width: 540px; margin: 0 auto; display: flex; gap: 8px; }
+        .btn-line { flex: 1; background: #06c755; color: #ffffff; border: none; padding: 12px; border-radius: var(--radius-md); font-family: 'Prompt'; font-size: 13.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 6px -1px rgba(6, 199, 85, 0.2); }
+        .btn-print { background: var(--bg); border: 1px solid var(--border); color: var(--text-main); padding: 12px 16px; border-radius: var(--radius-md); font-family: 'Prompt'; font-size: 13.5px; font-weight: 500; cursor: pointer; }
+
+        /* State Views */
+        #loading-view, #error-view { text-align: center; padding: 60px 20px; }
+        .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--primary-accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media print {
+            .action-bar, .no-print { display: none !important; }
+            body { padding: 0; background: #fff; }
+            .hero-card { background: #0f172a !important; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div id="loading-view">
+        <div class="spinner"></div>
+        <div style="font-size: 13px; color: var(--text-sub);">กำลังสรุปข้อมูลโครงการ...</div>
+    </div>
+
+    <div id="error-view" style="display: none;">
+        <h3 style="color: var(--rose); margin: 0 0 6px 0;">ไม่พบข้อมูลโครงการ</h3>
+        <p style="font-size: 13px; color: var(--text-sub); margin: 0;">กรุณาตรวจสอบลิงก์หรือติดต่อผู้ดูแลระบบ</p>
+    </div>
+
+    <div id="main-content" style="display: none;">
+        <!-- Header -->
+        <div class="header-card">
+            <div class="badge-live">Executive Snapshot</div>
+            <h1 class="proj-title" id="lbl-proj-name">-</h1>
+            <div class="proj-meta">ผู้ว่าจ้าง: <strong id="lbl-proj-cust" style="color: var(--text-main);">-</strong> • อัปเดต: <span id="lbl-proj-date">-</span></div>
+        </div>
+
+        <!-- Hero Financial Summary -->
+        <div class="hero-card">
+            <div class="hero-label">กำไรสุทธิคงเหลือ (Net Profit)</div>
+            <div class="hero-value" id="kpi-profit">0.00</div>
+            <div class="hero-grid">
+                <div>
+                    <div class="hero-sub-lbl">มูลค่าสัญญา (รายรับ)</div>
+                    <div class="hero-sub-val" id="kpi-selling">0.00</div>
+                </div>
+                <div>
+                    <div class="hero-sub-lbl">งบต้นทุนรวม (<span id="kpi-margin-tag">0%</span>)</div>
+                    <div class="hero-sub-val" id="kpi-cost" style="color: #f87171;">0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cashflow Metrics -->
+        <div class="metrics-grid">
+            <div class="m-tile tile-purple">
+                <div class="m-tile-head">
+                    <span class="m-tile-lbl">เงินสดคงเหลือจริง</span>
+                    <span>💳</span>
+                </div>
+                <div class="m-tile-val" id="kpi-cash-balance">0.00</div>
+                <div class="m-tile-foot" style="color: var(--text-sub);" id="kpi-cash-sub">หักจ่ายจริง & มัดจำแล้ว</div>
+            </div>
+            <div class="m-tile tile-amber" id="card-need-fund">
+                <div class="m-tile-head">
+                    <span class="m-tile-lbl">ต้องเพิ่มเงินสด</span>
+                    <span>🪙</span>
+                </div>
+                <div class="m-tile-val" id="kpi-need-fund">0.00</div>
+                <div class="m-tile-foot" id="kpi-need-fund-status">เงินทุนเพียงพอ</div>
+            </div>
+        </div>
+
+        <!-- Section 1: Main Items -->
+        <div class="section-box">
+            <div class="section-header">
+                <span class="section-name">📦 หมวดงานตามสัญญา (BOM)</span>
+                <span class="section-sum text-sub" id="lbl-main-count">0 หมวด</span>
+            </div>
+            <div id="list-main-items"></div>
+        </div>
+
+        <!-- Section 2: Site Expenses -->
+        <div class="section-box">
+            <div class="section-header">
+                <span class="section-name">🛠️ ค่าใช้จ่ายหน้างานจริง</span>
+                <span class="section-sum text-sub" id="lbl-exp-total">0.00</span>
+            </div>
+            <div id="list-expenses"></div>
+        </div>
+
+        <!-- Section 3: Cash & Deposit Track -->
+        <div class="section-box">
+            <div class="section-header">
+                <span class="section-name">📥 ทะเบียนเงินทุน & มัดจำ</span>
+            </div>
+            
+            <div style="font-size: 11.5px; font-weight: 600; color: var(--purple); margin-bottom: 6px;">เงินทุนรับเข้ามาแล้ว:</div>
+            <div id="list-fund-items" style="margin-bottom: 12px;"></div>
+
+            <div style="font-size: 11.5px; font-weight: 600; color: var(--amber); margin-bottom: 6px;">มัดจำรอเคลียร์บิล:</div>
+            <div id="list-deposit-items"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Action Bar -->
+<div class="action-bar no-print" id="action-bar" style="display: none;">
+    <div class="action-bar-inner">
+        <button class="btn-line" onclick="copyLineSummary()">📱 ส่งสรุปเข้า LINE</button>
+        <button class="btn-print" onclick="window.print()">🖨️ พิมพ์</button>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let project = null;
+    let mainItems = [];
+    let bomItems = [];
+    let expenses = [];
+    let cashflows = [];
+
+    window.onload = async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('id');
+        if (!projectId) {
+            document.getElementById('loading-view').style.display = 'none';
+            document.getElementById('error-view').style.display = 'block';
+            return;
+        }
+        await loadExecutiveData(projectId);
+    };
+
+    async function loadExecutiveData(projectId) {
+        try {
+            const { data: pData, error: pErr } = await supabaseClient.from('projects').select('*').eq('id', projectId).single();
+            if (pErr || !pData) throw new Error("Project not found");
+            project = pData;
+
+            const { data: mData } = await supabaseClient.from('project_main_items').select('*').eq('project_id', projectId).order('item_order');
+            mainItems = mData || [];
+
+            const mainIds = mainItems.map(m => m.id);
+            if (mainIds.length > 0) {
+                const { data: bData } = await supabaseClient.from('project_bom_items').select('*').in('main_item_id', mainIds).order('item_order');
+                bomItems = bData || [];
+            }
+
+            const { data: eData } = await supabaseClient.from('project_expenses').select('*').eq('project_id', projectId).order('expense_date');
+            expenses = eData || [];
+
+            const { data: cData } = await supabaseClient.from('project_cashflow').select('*').eq('project_id', projectId).order('flow_date');
+            cashflows = cData || [];
+
+            renderMinimalDashboard();
+            document.getElementById('loading-view').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('action-bar').style.display = 'block';
+        } catch (err) {
+            document.getElementById('loading-view').style.display = 'none';
+            document.getElementById('error-view').style.display = 'block';
+        }
+    }
+
+    function renderMinimalDashboard() {
+        document.getElementById('lbl-proj-name').innerText = project.project_name;
+        document.getElementById('lbl-proj-cust').innerText = project.customer_name || 'ลูกค้าทั่วไป';
+        document.getElementById('lbl-proj-date').innerText = new Date(project.created_at || Date.now()).toLocaleDateString('th-TH');
+
+        // Main BOM Calculations
+        let sumSelling = 0;
+        let sumBomCost = 0;
+        let sumBomPaid = 0;
+        const listMain = document.getElementById('list-main-items');
+        listMain.innerHTML = '';
+        document.getElementById('lbl-main-count').innerText = `${mainItems.length} หมวดงาน`;
+
+        mainItems.forEach(item => {
+            const subs = bomItems.filter(b => b.main_item_id === item.id);
+            const unitCost = subs.reduce((s, b) => s + (Number(b.qty || 1) * Number(b.unit_cost || 0)), 0);
+            const sellingTotal = Number(item.qty || 0) * Number(item.unit_price || 0);
+            const costTotal = Number(item.qty || 0) * unitCost;
+            const profit = sellingTotal - costTotal;
+
+            sumSelling += sellingTotal;
+            sumBomCost += costTotal;
+
+            subs.forEach(b => {
+                if (b.is_paid) sumBomPaid += (Number(item.qty || 1) * Number(b.qty || 1) * Number(b.unit_cost || 0));
+            });
+
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <div class="item-top">
+                    <div class="item-title">${item.item_name}</div>
+                    <div class="item-price">${sellingTotal.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</div>
+                </div>
+                <div class="item-meta">
+                    <span>จำนวน: ${item.qty} ${item.unit || 'ชุด'}</span>
+                    <span>ทุน: ${costTotal.toLocaleString('en-US', {minimumFractionDigits: 2})} | <strong style="color:var(--emerald);">กำไร: ${profit.toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></span>
+                </div>
+            `;
+            listMain.appendChild(row);
+        });
+
+        // Site Expenses Calculations
+        const catMap = { 'materials': 'วัสดุสิ้นเปลืองอื่นๆ', 'ops': 'ค่าใช้จ่ายดำเนินงาน / น้ำมัน', 'labor': 'ยอดเบิกจ่ายค่าแรงช่าง' };
+        const categories = [...new Set(expenses.map(e => e.category || 'materials'))];
+        const listExp = document.getElementById('list-expenses');
+        listExp.innerHTML = '';
+
+        let sumSiteCost = 0;
+        let sumSitePaid = 0;
+
+        categories.forEach(catKey => {
+            const list = expenses.filter(e => (e.category || 'materials') === catKey);
+            const total = list.reduce((s, e) => s + Number(e.amount || 0), 0);
+            const paid = list.filter(e => e.is_paid).reduce((s, e) => s + Number(e.amount || 0), 0);
+
+            sumSiteCost += total;
+            sumSitePaid += paid;
+
+            let displayName = catMap[catKey] || catKey;
+            if (displayName.startsWith('custom_')) displayName = 'หมวดค่าใช้จ่ายเพิ่มเติม';
+
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <div class="item-top">
+                    <div class="item-title">${displayName}</div>
+                    <div class="item-price" style="color:var(--rose);">${total.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</div>
+                </div>
+                <div class="item-meta">
+                    <span>${list.length} รายการ</span>
+                    <span style="color:var(--emerald); font-weight:500;">จ่ายแล้ว: ${paid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</span>
+                </div>
+            `;
+            listExp.appendChild(row);
+        });
+        document.getElementById('lbl-exp-total').innerText = `รวม ${sumSiteCost.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+
+        // Financial KPIs
+        const totalProjectCost = sumBomCost + sumSiteCost;
+        const netProfit = sumSelling - totalProjectCost;
+        const marginPct = sumSelling > 0 ? ((netProfit / sumSelling) * 100).toFixed(1) : 0;
+
+        document.getElementById('kpi-profit').innerText = `${netProfit.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        document.getElementById('kpi-selling').innerText = `${sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        document.getElementById('kpi-cost').innerText = `${totalProjectCost.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        document.getElementById('kpi-margin-tag').innerText = `กำไร ${marginPct}%`;
+
+        // Cashflow & Deposits
+        const fundInList = cashflows.filter(c => c.flow_type !== 'deposit' && c.flow_type !== 'out');
+        const depositList = cashflows.filter(c => c.flow_type === 'deposit' || c.flow_type === 'out');
+
+        const totalFundIn = fundInList.reduce((s, c) => s + Number(c.amount || 0), 0);
+        const totalDeposits = depositList.reduce((s, c) => s + Number(c.amount || 0), 0);
+        const actualPaidTotal = sumBomPaid + sumSitePaid;
+        const unpaidPendingTotal = totalProjectCost - actualPaidTotal;
+        const cashBalance = totalFundIn - actualPaidTotal - totalDeposits;
+
+        const netPendingToPay = Math.max(0, unpaidPendingTotal - totalDeposits);
+        const neededFund = Math.max(0, netPendingToPay - cashBalance);
+
+        document.getElementById('kpi-cash-balance').innerText = `${cashBalance.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        document.getElementById('kpi-cash-sub').innerText = `รับเข้า ${totalFundIn.toLocaleString()} | จ่ายแล้ว ${actualPaidTotal.toLocaleString()}`;
+
+        const cardNeed = document.getElementById('card-need-fund');
+        const valNeed = document.getElementById('kpi-need-fund');
+        const statusNeed = document.getElementById('kpi-need-fund-status');
+
+        valNeed.innerText = `${neededFund.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        if (neededFund > 0) {
+            cardNeed.style.background = 'var(--amber-bg)';
+            valNeed.style.color = 'var(--amber)';
+            statusNeed.innerHTML = `<span style="color:var(--amber); font-weight:600;">⚠️ ต้องเตรียมเติมเพิ่ม</span>`;
+        } else {
+            cardNeed.style.background = 'var(--emerald-bg)';
+            valNeed.style.color = 'var(--emerald)';
+            statusNeed.innerHTML = `<span style="color:var(--emerald); font-weight:600;">🟢 เงินทุนครอบคลุมแล้ว</span>`;
+        }
+
+        // Fund & Deposit Lists
+        const listFund = document.getElementById('list-fund-items');
+        listFund.innerHTML = fundInList.map(f => `
+            <div style="display:flex; justify-content:space-between; font-size:12px; padding:4px 0; border-bottom:1px solid #f1f5f9;">
+                <span>${f.item_name || 'เงินทุน'}</span>
+                <strong style="color:var(--purple);">${Number(f.amount).toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</strong>
+            </div>
+        `).join('') || `<div style="font-size:11.5px; color:var(--text-sub);">ยังไม่มีการบันทึกเงินทุน</div>`;
+
+        const listDep = document.getElementById('list-deposit-items');
+        listDep.innerHTML = depositList.map(d => `
+            <div style="display:flex; justify-content:space-between; font-size:12px; padding:4px 0; border-bottom:1px solid #f1f5f9;">
+                <span>${d.item_name || 'มัดจำสินค้า'}</span>
+                <strong style="color:var(--amber);">${Number(d.amount).toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</strong>
+            </div>
+        `).join('') || `<div style="font-size:11.5px; color:var(--text-sub);">ไม่มีเงินมัดจำค้างอยู่</div>`;
+    }
+
+    function copyLineSummary() {
+        if (!project) return;
+        const selling = document.getElementById('kpi-selling').innerText;
+        const cost = document.getElementById('kpi-cost').innerText;
+        const profit = document.getElementById('kpi-profit').innerText;
+        const margin = document.getElementById('kpi-margin-tag').innerText;
+        const cash = document.getElementById('kpi-cash-balance').innerText;
+        const need = document.getElementById('kpi-need-fund').innerText;
+
+        const text = `📊 สรุปภาพรวมโครงการ: ${project.project_name}
+🏢 ผู้ว่าจ้าง: ${project.customer_name || 'ทั่วไป'}
+-----------------------------
+📄 ยอดรวมสัญญา: ${selling}
+💸 งบต้นทุนรวม: ${cost}
+💰 กำไรสุทธิ: ${profit} (${margin})
+💳 เงินสดในมือจริง: ${cash}
+🪙 เงินที่ต้องเติมเพิ่ม: ${need}
+-----------------------------
+🔗 ลิงก์รายงาน: ${window.location.href}`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            alert('คัดลอกสรุปเรียบร้อยแล้ว วางส่งใน LINE ได้ทันที!');
+        });
+    }
+</script>
+</body>
+</html>
