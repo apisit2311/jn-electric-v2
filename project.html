@@ -91,14 +91,14 @@
         .tabs-nav { display: flex; gap: 4px; overflow-x: auto; align-items: center; flex: 1; min-width: 0; -webkit-overflow-scrolling: touch; }
         .tab-pill { padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; white-space: nowrap; border: none; background: transparent; transition: 0.15s; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .tab-pill:hover { background: rgba(255,255,255,0.6); }
-        .tab-pill.active { background: #ffffff; color: var(--primary); font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+        .tab-pill.active { background: #ffffff; color: var(--primary) !important; font-weight: 700 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
         .tab-pill.home-btn { font-weight: 600; }
         .btn-add-tab { flex-shrink: 0; padding: 7px 11px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #ffffff; color: var(--emerald-700); border: 1px dashed var(--emerald-600); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 
         /* Workspace */
         .workspace { background: #ffffff; border-radius: 14px; padding: 20px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); }
         .sheet-pane { display: none; }
-        .sheet-pane.active { display: block; }
+        .sheet-pane.active { display: block !important; }
         .pane-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--slate-200); flex-wrap: wrap; gap: 8px; }
         .pane-head h2 { margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); }
 
@@ -305,7 +305,7 @@
     </div>
 </div>
 
-<!-- ==================== MODAL: PROJECT LAUNCHER (หน้าต่างเลือกโครงการตอนเข้า) ==================== -->
+<!-- ==================== MODAL: PROJECT LAUNCHER ==================== -->
 <div class="modal-overlay" id="modalLauncher" style="display: flex;">
     <div class="modal-box" style="width: 580px;">
         <div class="modal-head">
@@ -325,7 +325,7 @@
     </div>
 </div>
 
-<!-- ==================== MODALS (OTHER ACTIONS) ==================== -->
+<!-- ==================== MODALS ==================== -->
 
 <div class="modal-overlay" id="modalDeposit">
     <div class="modal-box">
@@ -644,7 +644,6 @@
             container.appendChild(card);
         });
 
-        // เปิด Modal เลือกโครงการเสมอเมื่อเข้าหน้าเว็บ
         document.getElementById('modalLauncher').style.display = 'flex';
     }
 
@@ -655,6 +654,7 @@
     async function selectProjectFromLauncher(projectId) {
         currentProject = projects.find(p => p.id === projectId);
         if (!currentProject) return;
+        activeSheetKey = 'main-summary'; // 🌟 รีเซ็ตแท็บกลับมาหน้าหลักเสมอเมื่อเปิดโครงการ
         document.getElementById('lbl-current-project-name').innerText = currentProject.project_name;
         document.getElementById('modalLauncher').style.display = 'none';
         await loadFullProjectData();
@@ -774,18 +774,24 @@
     }
 
     function renderActiveSheet() {
+        // 🌟 ซ่อนหน้าทั้งหมดก่อนเปิดหน้าที่เลือก
         document.querySelectorAll('.sheet-pane').forEach(p => p.classList.remove('active'));
+        const dynContainer = document.getElementById('dynamic-panes-container');
+        dynContainer.innerHTML = '';
 
         if (activeSheetKey === 'main-summary') {
             document.getElementById('pane-main-summary').classList.add('active');
             renderMasterSummary();
         } else if (activeSheetKey.startsWith('bom-')) {
+            document.getElementById('pane-main-summary').classList.remove('active');
             const mainItemId = activeSheetKey.replace('bom-', '');
             renderBomSheet(mainItemId);
         } else if (activeSheetKey.startsWith('exp-')) {
+            document.getElementById('pane-main-summary').classList.remove('active');
             const cat = activeSheetKey.replace('exp-', '');
             renderExpenseSheet(cat);
         } else if (activeSheetKey === 'funding') {
+            document.getElementById('pane-main-summary').classList.remove('active');
             renderFundingSheet();
         }
     }
@@ -1645,6 +1651,7 @@
             closeModalSafe('modalNewProject');
             closeModalSafe('modalLauncher');
             currentProject = newProj;
+            activeSheetKey = 'main-summary';
             document.getElementById('lbl-current-project-name').innerText = currentProject.project_name;
             await loadProjectLauncherList();
             await loadFullProjectData();
@@ -1655,7 +1662,7 @@
         }
     }
 
-    // 2. Delete Project (High Safety: Must confirm with project name)
+    // 2. Delete Project
     async function deleteCurrentProject() {
         if (!currentProject) return;
         const confirmName = prompt(`⚠️ คำเตือนระดับสูงสุด!\nหากลบโครงการนี้ ข้อมูลอุปกรณ์ (BOM), ค่าใช้จ่ายหน้างาน, และเงินทุนทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้\n\nพิมพ์ชื่อโครงการ "${currentProject.project_name}" เพื่อยืนยันการลบ:`);
@@ -1668,6 +1675,7 @@
             await supabaseClient.from('projects').delete().eq('id', currentProject.id);
             alert('🗑️ ลบโครงการเรียบร้อยแล้ว');
             currentProject = null;
+            activeSheetKey = 'main-summary';
             document.getElementById('lbl-current-project-name').innerText = '- ยังไม่ได้เลือก -';
             await loadProjectLauncherList();
         } catch (err) {
@@ -1781,7 +1789,7 @@
         await loadFullProjectData();
     }
 
-    // 5. Batch Handlers (Main, BOM, Expenses, Funding, Deposits)
+    // 5. Batch Handlers
     function openBatchMainTabModal() {
         const tbody = document.getElementById('tbl-batch-main-body');
         tbody.innerHTML = '';
@@ -2089,15 +2097,15 @@
     function renumberRows(tbodyId) {
         Array.from(document.getElementById(tbodyId).children).forEach((tr, idx) => { tr.children[0].innerText = idx + 1; });
     }
+
     function openChecklistForCurrentProject() {
-    if (!currentProject || !currentProject.id) {
-        alert('⚠️ กรุณาคลิกเลือกโครงการก่อนเปิดหน้าเช็คลิสต์ครับ');
-        openProjectLauncherModal(); // เด้งหน้าต่างให้เลือกโครงการทันที
-        return;
+        if (!currentProject || !currentProject.id) {
+            alert('⚠️ กรุณาคลิกเลือกโครงการก่อนเปิดหน้าเช็คลิสต์ครับ');
+            openProjectLauncherModal();
+            return;
+        }
+        window.location.href = `checklist.html?id=${encodeURIComponent(currentProject.id)}`;
     }
-    // ส่ง ID ของโครงการปัจจุบันไปแน่นอน 100%
-    window.location.href = `checklist.html?id=${encodeURIComponent(currentProject.id)}`;
-}
 </script>
 </body>
 </html>
