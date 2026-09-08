@@ -180,7 +180,7 @@
         <div class="header-title">
             <div>
                 <h1>Project ERP & Cost Management</h1>
-                <p>ระบบบริหารโครงการ ถอดแบบอุปกรณ์ (BOM) บันทึกเงินทุน และกระแสเงินสด</p>
+                <p>ระบบบริหารโครงการ ถอดแบบอุปกรณ์ (BOM) บันทึกเงินทุน และกระแสเงินทุน</p>
             </div>
         </div>
         <div class="btn-group no-print">
@@ -249,7 +249,7 @@
 
         <div class="kpi-card" id="card-fund-balance">
             <div class="kpi-header-row">
-                <div class="kpi-title" id="lbl-fund-balance-title">เงินสดคงเหลือในมือจริง</div>
+                <div class="kpi-title" id="lbl-fund-balance-title">เงินทุนคงเหลือในมือจริง</div>
                 <div class="kpi-icon-badge" id="badge-fund-icon">💳</div>
             </div>
             <div class="kpi-val" id="kpi-fund-balance">0.00</div>
@@ -340,7 +340,7 @@
             <h3 id="modal-deposit-title">📦 บันทึกเงินมัดจำสินค้าชั่วคราว</h3>
             <span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalDeposit')">&times;</span>
         </div>
-        <div style="font-size: 12px; color: var(--slate-600); margin-bottom: 12px;">* รายการนี้จะตัดเฉพาะเงินสดในมือชั่วคราว และไม่ถูกนำไปคิดเป็นต้นทุนโครงการ</div>
+        <div style="font-size: 12px; color: var(--slate-600); margin-bottom: 12px;">* รายการนี้จะตัดเฉพาะเงินทุนในมือชั่วคราว และไม่ถูกนำไปคิดเป็นต้นทุนโครงการ</div>
         <input type="hidden" id="deposit-edit-id">
         <div class="form-item"><label>วันที่โอนมัดจำ:</label><input type="date" id="deposit-date" class="clean-input"></div>
         <div class="form-item"><label>รายการ / ร้านค้า / ซัพพลายเออร์:</label><input type="text" id="deposit-source" class="clean-input" placeholder="เช่น มัดจำตู้ Outdoor..."></div>
@@ -1210,7 +1210,7 @@
             valNeedFund.className = 'kpi-val text-amber';
             badgeNeedFund.style.background = '#fef3c7';
             badgeNeedFund.style.color = '#d97706';
-            statusNeedFund.innerHTML = `<span style="color:var(--amber-600);font-weight:600;">⚠️ ต้องเตรียมเติมเงินสดเพิ่มอีก</span>`;
+            statusNeedFund.innerHTML = `<span style="color:var(--amber-600);font-weight:600;">⚠️ ต้องเตรียมเติมเงินทุนเพิ่มอีก</span>`;
         } else {
             cardNeedFund.className = 'kpi-card emerald';
             cardNeedFund.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)';
@@ -1640,7 +1640,7 @@
                     <div>
                         <h2>💰 ชีต: ทะเบียนแหล่งเงินทุน & ควบคุมเงินมัดจำ</h2>
                         <div style="font-size: 13px; color: var(--slate-600); margin-top: 3px;">
-                            เงินสดคงเหลือจริง: <strong class="${remainingFund < 0 ? 'text-rose' : 'text-emerald'}">${remainingFund.toLocaleString('en-US', {minimumFractionDigits: 2})} บาท</strong>
+                            เงินทุนคงเหลือจริง: <strong class="${remainingFund < 0 ? 'text-rose' : 'text-emerald'}">${remainingFund.toLocaleString('en-US', {minimumFractionDigits: 2})} บาท</strong>
                         </div>
                     </div>
                     <button class="btn btn-white btn-sm no-print" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
