@@ -188,7 +188,7 @@
             <button class="btn btn-mode-toggle" id="btn-view-mode" onclick="toggleViewMode()">📱 โหมดการ์ดมือถือ</button>
             <button class="btn btn-purple" onclick="shareExecutiveLink()">🔗 ลิงก์ผู้บริหาร</button>
             <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์</button>
-            <a href="checklist.html" class="btn btn-white">🛒 เช็คของ</a>
+            <button class="btn btn-white" onclick="openChecklistForCurrentProject()">🛒 เช็คของ</button>
             <a href="index.html" class="btn btn-primary">⬅️ ออกบิล</a>
         </div>
     </div>
@@ -2089,6 +2089,10 @@
     function renumberRows(tbodyId) {
         Array.from(document.getElementById(tbodyId).children).forEach((tr, idx) => { tr.children[0].innerText = idx + 1; });
     }
+    function openChecklistForCurrentProject() {
+    if (!currentProject) return alert('กรุณาเลือกโครงการก่อนเปิดเช็คลิสต์');
+    window.location.href = `checklist.html?id=${currentProject.id}`;
+}
 </script>
 </body>
 </html>
