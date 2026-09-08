@@ -28,6 +28,7 @@
             --radius-md: 12px;
             --radius-sm: 8px;
             --shadow-subtle: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+            --card-shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -73,6 +74,12 @@
         .btn-line { flex: 1; background: #06c755; color: #ffffff; border: none; padding: 12px; border-radius: var(--radius-md); font-family: 'Prompt'; font-size: 13.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-back { background: var(--bg); border: 1px solid var(--border); color: var(--text-main); padding: 12px 16px; border-radius: var(--radius-md); font-family: 'Prompt'; font-size: 13.5px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
 
+        /* Modal Launcher */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; }
+        .modal-box { background: #fff; width: 520px; max-width: 92%; border-radius: 14px; padding: 20px; box-shadow: var(--card-shadow-lg); max-height: 85vh; overflow-y: auto; }
+        .launcher-card { background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.15s; }
+        .launcher-card:hover { border-color: var(--primary-accent); background: #eff6ff; }
+
         /* Loader */
         #loading-view, #error-view { text-align: center; padding: 60px 20px; }
         .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--primary-accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px auto; }
@@ -89,14 +96,20 @@
 
     <div id="error-view" style="display: none;">
         <h3 style="color: var(--rose); margin: 0 0 6px 0;">ไม่พบข้อมูลโครงการ</h3>
-        <p style="font-size: 13px; color: var(--text-sub); margin: 0;">กรุณาเลือกโครงการจากหน้าจัดการโครงการ</p>
-        <div style="margin-top: 15px;"><a href="project.html" style="color:var(--primary-accent); font-weight:600; text-decoration:none;">⬅️ กลับหน้าโครงการ</a></div>
+        <p style="font-size: 13px; color: var(--text-sub); margin: 0;">กรุณาเลือกโครงการที่ต้องการตรวจนับอุปกรณ์</p>
+        <div style="margin-top: 15px; display: flex; gap: 8px; justify-content: center;">
+            <button onclick="openProjectChooserModal()" style="background: var(--primary-accent); color:#fff; border:none; padding:8px 14px; border-radius:8px; font-family:'Prompt'; cursor:pointer;">📂 เลือกโครงการ</button>
+            <a href="project.html" style="background: var(--surface); border:1px solid var(--border); color:var(--text-main); padding:8px 14px; border-radius:8px; font-family:'Prompt'; text-decoration:none;">⬅️ หน้าโครงการ</a>
+        </div>
     </div>
 
     <div id="main-content" style="display: none;">
         <!-- Header -->
         <div class="header-card">
-            <div class="badge-tag">🛒 BOM Project Checklist</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="badge-tag">🛒 BOM Project Checklist</div>
+                <button onclick="openProjectChooserModal()" style="border:none; background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:11.5px; font-family:'Prompt'; color:var(--primary-accent); cursor:pointer; font-weight:600;">สลับโครงการ 🔁</button>
+            </div>
             <h1 class="proj-name" id="lbl-proj-name">-</h1>
             <div class="proj-meta">ผู้ว่าจ้าง: <strong id="lbl-proj-cust" style="color: var(--text-main);">-</strong></div>
         </div>
@@ -121,6 +134,19 @@
 
         <!-- Checklist Items -->
         <div class="checklist-container" id="checklist-items"></div>
+    </div>
+</div>
+
+<!-- Modal: Project Chooser -->
+<div class="modal-overlay" id="modalChooser">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:12px;">
+            <h3 style="margin:0; font-size:16px; font-weight:700; color:var(--primary);">📂 เลือกโครงการที่จะเช็คของ</h3>
+            <span style="cursor:pointer; font-size:18px;" onclick="document.getElementById('modalChooser').style.display='none'">&times;</span>
+        </div>
+        <div id="chooser-list" style="max-height: 360px; overflow-y:auto;">
+            <div style="text-align:center; padding:20px; color:var(--text-sub);">กำลังโหลดโครงการ...</div>
+        </div>
     </div>
 </div>
 
@@ -149,12 +175,46 @@
         if (!projectId) {
             document.getElementById('loading-view').style.display = 'none';
             document.getElementById('error-view').style.display = 'block';
+            await loadChooserProjects();
             return;
         }
 
         document.getElementById('btn-back-proj').href = `project.html`;
         await loadChecklistData();
     };
+
+    async function loadChooserProjects() {
+        const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
+        const list = data || [];
+        const container = document.getElementById('chooser-list');
+        container.innerHTML = '';
+
+        if (list.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">ยังไม่มีโครงการในระบบ</div>`;
+            return;
+        }
+
+        list.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'launcher-card';
+            card.onclick = () => {
+                window.location.href = `checklist.html?id=${p.id}`;
+            };
+            card.innerHTML = `
+                <div>
+                    <div style="font-size:14px; font-weight:700; color:var(--primary);">${p.project_name}</div>
+                    <div style="font-size:12px; color:var(--text-sub);">ผู้ว่าจ้าง: ${p.customer_name || 'ทั่วไป'}</div>
+                </div>
+                <button style="background:var(--primary-accent); color:#fff; border:none; padding:5px 10px; border-radius:6px; font-family:'Prompt'; font-size:12px; cursor:pointer;">เลือก</button>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function openProjectChooserModal() {
+        document.getElementById('modalChooser').style.display = 'flex';
+        loadChooserProjects();
+    }
 
     async function loadChecklistData() {
         try {
@@ -175,10 +235,9 @@
             const { data: expItems } = await supabaseClient.from('project_expenses').select('*').eq('project_id', projectId);
             const eList = expItems || [];
 
-            // รวมรายการอุปกรณ์และคำนวณจำนวนจริง (Consolidation)
             const mapItems = new Map();
 
-            // 1. นำเข้าจาก BOM
+            // 1. BOM Items
             rawBom.forEach(b => {
                 const parent = mList.find(m => m.id === b.main_item_id);
                 const parentQty = Number(parent?.qty || 1);
@@ -201,7 +260,7 @@
                 }
             });
 
-            // 2. นำเข้าจากหมวดค่าใช้จ่ายหน้างาน (วัสดุสิ้นเปลือง)
+            // 2. Site Expenses Items
             eList.forEach(e => {
                 const key = e.item_name.trim().toLowerCase();
                 const qty = Number(e.qty || 1);
@@ -221,7 +280,6 @@
                 }
             });
 
-            // ดึงสถานะที่เคยติ๊กเก็บไว้ใน LocalStorage ของโครงการนี้
             const savedChecks = JSON.parse(localStorage.getItem(`checklist_status_${projectId}`) || '{}');
 
             checklist = Array.from(mapItems.values()).map(item => ({
@@ -231,12 +289,14 @@
 
             renderChecklistView();
             document.getElementById('loading-view').style.display = 'none';
+            document.getElementById('error-view').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             document.getElementById('bottom-bar').style.display = 'block';
         } catch (err) {
             console.error(err);
             document.getElementById('loading-view').style.display = 'none';
             document.getElementById('error-view').style.display = 'block';
+            loadChooserProjects();
         }
     }
 
@@ -245,7 +305,6 @@
         if (!target) return;
         target.is_checked = !target.is_checked;
 
-        // บันทึกลง LocalStorage
         const savedChecks = JSON.parse(localStorage.getItem(`checklist_status_${projectId}`) || '{}');
         savedChecks[itemName] = target.is_checked;
         localStorage.setItem(`checklist_status_${projectId}`, JSON.stringify(savedChecks));
