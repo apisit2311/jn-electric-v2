@@ -254,7 +254,7 @@
         document.getElementById('lbl-proj-name').innerText = project.project_name;
         document.getElementById('lbl-proj-cust').innerText = project.customer_name || 'ลูกค้าทั่วไป';
         document.getElementById('lbl-proj-date').innerText = new Date(project.created_at || Date.now()).toLocaleDateString('th-TH');
-        document.title = `📊 รายงานสรุป: ${project.project_name}`;
+        document.title = `รายงาน: ${project.project_name}`;
 
         // Main BOM Calculations
         let sumSelling = 0;
