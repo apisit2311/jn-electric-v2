@@ -259,27 +259,33 @@
         document.getElementById('pane-techs').style.display = tab === 'techs' ? 'block' : 'none';
     }
 
-    async function loadProjects() {
-        const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
-        projects = data || [];
-        const selFilter = document.getElementById('sel-filter-proj');
-        const selLogProj = document.getElementById('inp-log-proj');
+   async function loadProjects() {
+    // ดึงเฉพาะโครงการที่กำลังดำเนินงาน (Active) เรียงจากล่าสุด
+    const { data } = await supabaseClient
+        .from('projects')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
         
-        selFilter.innerHTML = '<option value="">-- ทุกโครงการ --</option>';
-        selLogProj.innerHTML = '<option value="">-- เลือกโครงการ --</option>';
-        
-        projects.forEach(p => {
-            const opt1 = document.createElement('option');
-            opt1.value = p.id;
-            opt1.textContent = p.project_name;
-            selFilter.appendChild(opt1);
+    projects = data || [];
+    const selFilter = document.getElementById('sel-filter-proj');
+    const selLogProj = document.getElementById('inp-log-proj');
+    
+    selFilter.innerHTML = '<option value="">-- กรองเฉพาะโครงการ Active --</option>';
+    selLogProj.innerHTML = '<option value="">-- เลือกโครงการที่กำลังดำเนินงาน --</option>';
+    
+    projects.forEach(p => {
+        const opt1 = document.createElement('option');
+        opt1.value = p.id;
+        opt1.textContent = `🟢 ${p.project_name}`;
+        selFilter.appendChild(opt1);
 
-            const opt2 = document.createElement('option');
-            opt2.value = p.id;
-            opt2.textContent = p.project_name;
-            selLogProj.appendChild(opt2);
-        });
-    }
+        const opt2 = document.createElement('option');
+        opt2.value = p.id;
+        opt2.textContent = `🟢 ${p.project_name}`;
+        selLogProj.appendChild(opt2);
+    });
+}
 
     async function loadTechnicians() {
         const { data } = await supabaseClient.from('technicians').select('*').order('tech_name');
