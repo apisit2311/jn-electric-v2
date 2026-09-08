@@ -999,7 +999,7 @@
         mainItems.forEach(item => {
             const tab = document.createElement('button');
             tab.className = `tab-pill ${activeSheetKey === 'bom-' + item.id ? 'active' : ''}`;
-            tab.innerHTML = `🛠️ ${item.item_name.substring(0, 15)}`;
+            tab.innerHTML = `▶ ${item.item_name.substring(0, 15)}`;
             tab.onclick = () => switchSheet('bom-' + item.id);
             container.appendChild(tab);
         });
@@ -1503,7 +1503,7 @@
             <div class="sheet-pane active">
                 <div class="pane-head">
                     <div>
-                        <h2>🛠️ ชีต: ${item.item_name}</h2>
+                        <h2>▶ ชีต: ${item.item_name}</h2>
                         <div style="font-size: 13px; color: var(--slate-600); margin-top: 3px;">
                             จำนวน: <strong style="color:var(--primary);">${item.qty} ${item.unit}</strong> | 
                             ราคาขาย: <strong>${Number(item.unit_price).toLocaleString()}.-</strong> |
