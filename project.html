@@ -189,7 +189,7 @@
             <button class="btn btn-white" onclick="openChecklistForCurrentProject()">🛒 เช็คของ</button>
             <button class="btn btn-white" onclick="shareExecutiveLink()">🔗 แชร์รายงาน</button>
             <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์</button>
-            <a href="index.html" class="btn btn-primary">⬅️ ออกบิล</a>
+            <a href="index.html" class="btn btn-primary">⬅️ไปหน้าออกบิล</a>
         </div>
     </div>
 
@@ -726,7 +726,7 @@
         
         const btnToggleStatus = document.getElementById('btn-toggle-status');
         if (currentProject.status === 'active') {
-            btnToggleStatus.innerText = '📁 ย้ายเข้าคลังประวัติ';
+            btnToggleStatus.innerText = '📁 เก็บเข้าคลังประวัติ';
             btnToggleStatus.title = 'ปิดและซ่อนโครงการนี้ออกจากหน้าหลัก';
         } else {
             btnToggleStatus.innerText = '🟢 กู้คืนเป็นโครงการหลัก';
