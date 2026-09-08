@@ -187,7 +187,7 @@
             <button class="btn btn-mode-toggle" id="btn-view-mode" onclick="toggleViewMode()">📱 โหมดการ์ดมือถือ</button>
             <a href="labor.html" class="btn btn-purple">👷 จัดการค่าแรง</a>
             <button class="btn btn-white" onclick="openChecklistForCurrentProject()">🛒 เช็คของ</button>
-            <button class="btn btn-white" onclick="shareExecutiveLink()">🔗แชร์รายงาน</button>
+            <button class="btn btn-white" onclick="shareExecutiveLink()">🔗 แชร์รายงาน</button>
             <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์</button>
             <a href="index.html" class="btn btn-primary">⬅️ ออกบิล</a>
         </div>
@@ -200,6 +200,11 @@
             <div class="current-proj-pill" id="lbl-current-project-name">⚡ กำลังโหลด...</div>
             <button class="btn btn-white btn-sm" onclick="openProjectLauncherModal()">📂 สลับโครงการ</button>
             <button class="btn btn-sm" id="btn-toggle-status" style="background:#f1f5f9; border:1px solid var(--slate-300);" onclick="toggleCurrentProjectStatus()">📁 ปิดโครงการนี้</button>
+            
+            <!-- 🌟 ปุ่มแปลงโครงการเป็นใบเสนอราคา -->
+            <button class="btn btn-primary btn-sm" id="btn-quote-action" onclick="handleProjectQuoteAction()" style="background:#2563eb; color:#fff; font-weight:600;">
+                📄 แปลงเป็นใบเสนอราคา
+            </button>
         </div>
         <div class="btn-group">
             <button class="btn btn-emerald" onclick="openNewProjectModal()">➕ สร้างโครงการใหม่</button>
@@ -229,7 +234,7 @@
 
         <div class="kpi-card emerald">
             <div class="kpi-header-row">
-                <div class="kpi-title" style="color: var(--emerald-700);">กำไรสุทธิโครงการ(ขยับตามค่าใช้จ่ายหน้างาน)</div>
+                <div class="kpi-title" style="color: var(--emerald-700);">กำไรสุทธิโครงการ</div>
                 <div class="kpi-icon-badge" style="background: var(--emerald-50); color: var(--emerald-700);">💰</div>
             </div>
             <div class="kpi-val text-emerald" id="kpi-net-profit">0.00</div>
@@ -306,7 +311,7 @@
     </div>
 </div>
 
-<!-- ==================== MODAL: PROJECT LAUNCHER (Active/Archived Tabs) ==================== -->
+<!-- ==================== MODAL: PROJECT LAUNCHER ==================== -->
 <div class="modal-overlay" id="modalLauncher">
     <div class="modal-box" style="width: 600px;">
         <div class="modal-head">
@@ -314,7 +319,6 @@
             <span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalLauncher')">&times;</span>
         </div>
         
-        <!-- Search & Status Filter Tabs -->
         <div style="margin-bottom: 12px;">
             <input type="text" id="inp-search-proj" class="clean-input" placeholder="🔍 ค้นหาตามชื่อโครงการ หรือชื่อลูกค้า..." oninput="filterLauncherProjects()" style="margin-bottom: 8px;">
             <div style="display: flex; gap: 6px; background: #f1f5f9; padding: 4px; border-radius: 10px;">
@@ -333,7 +337,6 @@
 </div>
 
 <!-- ==================== OTHER MODALS ==================== -->
-
 <div class="modal-overlay" id="modalDeposit">
     <div class="modal-box">
         <div class="modal-head">
@@ -584,11 +587,11 @@
     let fundings = [];
     let deposits = [];
     let quotes = [];
+    let linkedDoc = null;
     let activeSheetKey = 'main-summary';
     let launcherFilter = 'active';
 
     let currentViewMode = localStorage.getItem('erp_view_mode') || (window.innerWidth < 768 ? 'card' : 'table');
-
     let currentBatchMainItemId = null;
     let currentBatchExpenseCategory = null;
 
@@ -628,7 +631,6 @@
         const activeProjects = projects.filter(p => p.status === 'active');
         const lastSavedId = localStorage.getItem('erp_last_selected_project');
 
-        // 🌟 SMART AUTO-LOAD LOGIC:
         if (activeProjects.length === 1) {
             await selectProjectFromLauncher(activeProjects[0].id);
             return;
@@ -745,7 +747,6 @@
         await supabaseClient.from('projects').update({ status: newStatus }).eq('id', currentProject.id);
         currentProject.status = newStatus;
         
-        // อัปเดตลิสต์ในหน่วยความจำ
         const pObj = projects.find(p => p.id === currentProject.id);
         if (pObj) pObj.status = newStatus;
 
@@ -815,8 +816,175 @@
             amount: f.amount || 0
         }));
 
+        // 🌟 ตรวจสอบเอกสารใบเสนอราคาที่ผูกไว้
+        linkedDoc = null;
+        if (currentProject.document_id) {
+            const { data: dData } = await supabaseClient.from('documents').select('*').eq('id', currentProject.document_id).single();
+            linkedDoc = dData || null;
+        }
+
+        updateQuoteActionButton();
         renderTabs();
         renderActiveSheet();
+    }
+
+    function updateQuoteActionButton() {
+        const btn = document.getElementById('btn-quote-action');
+        if (!btn) return;
+        if (linkedDoc) {
+            btn.innerHTML = `👁️ ใบเสนอราคา (${linkedDoc.doc_num})`;
+            btn.style.background = '#059669';
+            btn.title = 'คลิกเพื่อเปิดดูใบเสนอราคาใบนี้ในหน้าออกบิล';
+        } else {
+            btn.innerHTML = `📄 แปลงเป็นใบเสนอราคา`;
+            btn.style.background = '#2563eb';
+            btn.title = 'แปลงหมวดงานในโครงการนี้เป็นใบเสนอราคาใหม่';
+        }
+    }
+
+    async function handleProjectQuoteAction() {
+        if (!currentProject) return;
+
+        if (linkedDoc) {
+            // เปิดดูใบเสนอราคาเดิม
+            const { data: custData } = await supabaseClient.from('customers').select('*').eq('id', linkedDoc.customer_id).single();
+            const { data: itmData } = await supabaseClient.from('document_items').select('*').eq('document_id', linkedDoc.id);
+            
+            const payload = {
+                docId: linkedDoc.id,
+                docType: linkedDoc.doc_type || 'ใบเสนอราคา',
+                docNum: linkedDoc.doc_num,
+                docDate: linkedDoc.doc_date,
+                dueDate: linkedDoc.due_date,
+                customerName: custData?.customer_name || currentProject.customer_name || '',
+                customerAddress: custData?.address || '',
+                customerExtra: `โครงการ: ${currentProject.project_name}`,
+                discount: linkedDoc.discount || 0,
+                hasDiscount: Number(linkedDoc.discount || 0) > 0,
+                items: (itmData || []).map(i => ({
+                    desc: i.description || '',
+                    sn: i.sn || '',
+                    qty: i.qty || 1,
+                    unit: i.unit || 'ชุด',
+                    price: i.price || 0
+                }))
+            };
+
+            localStorage.setItem("jn_selected_cloud_doc", JSON.stringify(payload));
+            window.location.href = "index.html";
+        } else {
+            // สร้างใบเสนอราคาใหม่จากโครงการ
+            await generateQuotationFromProject();
+        }
+    }
+
+    async function generateQuotationFromProject() {
+        if (mainItems.length === 0) {
+            return alert('⚠️ โครงการนี้ยังไม่มีหมวดงานหลัก (Main Items) กรุณาเพิ่มหมวดงานก่อนแปลงเป็นใบเสนอราคาครับ');
+        }
+
+        if (!confirm(`ยืนยันการสร้างใบเสนอราคาใหม่จากโครงการ "${currentProject.project_name}"?`)) return;
+
+        const btn = document.getElementById('btn-quote-action');
+        btn.innerHTML = '⏳ กำลังสร้าง...';
+        btn.disabled = true;
+
+        try {
+            // 1. วันที่ไทย
+            const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            const d = new Date();
+            const docDate = d.getDate() + ' ' + m[d.getMonth()] + ' ' + (d.getFullYear() + 543);
+            
+            // 2. รันเลขที่เอกสาร
+            const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+            const randomStr = Math.floor(100 + Math.random() * 900);
+            const docNum = `QUO-${dateStr}-${randomStr}`;
+
+            // 3. รวมยอดเงินจาก Main Items
+            let subtotal = 0;
+            const docItemsPayload = [];
+
+            mainItems.forEach(item => {
+                const qty = Number(item.qty || 1);
+                const price = Number(item.unit_price || 0);
+                const total = qty * price;
+                subtotal += total;
+
+                docItemsPayload.push({
+                    description: item.item_name,
+                    sn: '',
+                    qty: qty,
+                    unit: item.unit || 'ชุด',
+                    price: price
+                });
+            });
+
+            // 4. บันทึกลูกค้า
+            let customerId = null;
+            const { data: custData, error: custErr } = await supabaseClient
+                .from('customers')
+                .insert([{ customer_name: currentProject.customer_name || 'ลูกค้าทั่วไป', address: '' }])
+                .select();
+            if (custErr) throw custErr;
+            customerId = custData[0].id;
+
+            // 5. บันทึกหัวเอกสารใบเสนอราคาลง documents
+            const { data: docData, error: docErr } = await supabaseClient
+                .from('documents')
+                .insert([{
+                    doc_num: docNum,
+                    doc_type: 'ใบเสนอราคา',
+                    doc_date: docDate,
+                    due_date: '',
+                    customer_id: customerId,
+                    subtotal: subtotal,
+                    discount: 0,
+                    grand_total: subtotal
+                }])
+                .select();
+            if (docErr) throw docErr;
+            const newDocId = docData[0].id;
+
+            // 6. บันทึกแถวรายการสินค้าลง document_items
+            const itemsToInsert = docItemsPayload.map(i => ({
+                document_id: newDocId,
+                product_id: null,
+                description: i.description,
+                sn: i.sn,
+                qty: i.qty,
+                unit: i.unit,
+                price: i.price
+            }));
+            await supabaseClient.from('document_items').insert(itemsToInsert);
+
+            // 7. ผูก document_id กลับเข้าโครงการ
+            await supabaseClient.from('projects').update({ document_id: newDocId }).eq('id', currentProject.id);
+            currentProject.document_id = newDocId;
+
+            // 8. ส่งข้อมูลไปยังหน้า index.html ทันที
+            const forwardPayload = {
+                docId: newDocId,
+                docType: 'ใบเสนอราคา',
+                docNum: docNum,
+                docDate: docDate,
+                dueDate: '',
+                customerName: currentProject.customer_name || 'ลูกค้าทั่วไป',
+                customerAddress: '',
+                customerExtra: `โครงการ: ${currentProject.project_name}`,
+                discount: 0,
+                hasDiscount: false,
+                items: docItemsPayload
+            };
+
+            localStorage.setItem("jn_selected_cloud_doc", JSON.stringify(forwardPayload));
+            alert(`✅ สร้างใบเสนอราคาเลขที่ "${docNum}" เรียบร้อยแล้ว!\nระบบกำลังนำคุณไปยังหน้าออกบิล...`);
+            window.location.href = "index.html";
+
+        } catch (err) {
+            alert('❌ เกิดข้อผิดพลาดในการสร้างใบเสนอราคา: ' + err.message);
+            updateQuoteActionButton();
+            btn.disabled = false;
+        }
     }
 
     function renderTabs() {
@@ -922,7 +1090,6 @@
             const costTotal = Number(item.qty || 0) * unitCost;
             const grossProfit = sellingTotal - costTotal;
 
-            // 🌟 คำนวณยอดที่จ่ายจริงแล้วของหมวดนี้
             let itemPaidTotal = 0;
             subs.forEach(s => {
                 if (s.is_paid) {
@@ -935,7 +1102,6 @@
             sumGrossProfit += grossProfit;
             paidBomTotal += itemPaidTotal;
 
-            // 🎨 กำหนดสไตล์และข้อความป้ายกำกับ
             let paymentClass = '';
             let paymentBadge = '';
             
@@ -1671,7 +1837,6 @@
     }
 
     // ==================== SAFETY CRUD & VALIDATIONS ====================
-
     function closeModalSafe(modalId) {
         document.getElementById(modalId).style.display = 'none';
     }
@@ -1689,7 +1854,6 @@
         }
     }
 
-    // 1. Create Project
     function openNewProjectModal() { 
         document.getElementById('modalNewProject').style.display = 'flex'; 
     }
@@ -1784,7 +1948,6 @@
         }
     }
 
-    // 2. Delete Project
     async function deleteCurrentProject() {
         if (!currentProject) return;
         const confirmName = prompt(`⚠️ คำเตือนระดับสูงสุด!\nหากลบโครงการนี้ ข้อมูลอุปกรณ์ (BOM), ค่าใช้จ่ายหน้างาน, และเงินทุนทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้\n\nพิมพ์ชื่อโครงการ "${currentProject.project_name}" เพื่อยืนยันการลบ:`);
@@ -1806,7 +1969,6 @@
         }
     }
 
-    // 3. Main Item CRUD
     function openAddMainTabModal() {
         document.getElementById('add-main-name').value = '';
         document.getElementById('add-main-qty').value = '1';
@@ -1873,7 +2035,6 @@
         }
     }
 
-    // 4. Custom Expense Category Delete
     async function deleteCustomExpenseCategory(catKey) {
         const hasExpenses = expenses.some(e => e.category === catKey);
         if (!confirm(hasExpenses ? `หมวด "${catKey}" มีรายการค่าใช้จ่ายอยู่ ยืนยันลบทั้งหมวดและรายการทั้งหมด?` : `ยืนยันลบหมวดหมู่ "${catKey}"?`)) return;
@@ -1893,7 +2054,6 @@
         }
     }
 
-    // 5. BOM Items CRUD
     async function addBomRow(mainItemId) {
         const name = document.getElementById('add-sub-name').value.trim();
         const qty = parseFloat(document.getElementById('add-sub-qty').value) || 1;
@@ -1938,7 +2098,6 @@
         await loadFullProjectData();
     }
 
-    // 6. Expense & Funding CRUD
     function openBatchMainTabModal() {
         const tbody = document.getElementById('tbl-batch-main-body');
         tbody.innerHTML = '';
@@ -2267,7 +2426,6 @@
         await loadFullProjectData();
     }
 
-    // 7. Deposit Handlers
     function openDepositModal(id = null) {
         if (id) {
             const d = deposits.find(x => x.id === id);
