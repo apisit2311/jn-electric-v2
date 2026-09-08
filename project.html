@@ -60,14 +60,12 @@
         .btn-danger:hover { background: #ffe4e6; }
         .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 7px; }
 
-        /* Mode Switcher Button */
         .btn-mode-toggle { background: #0f172a; color: #f8fafc; font-weight: 600; border-radius: 9px; }
         .btn-mode-toggle:hover { background: #334155; }
 
         /* Project Select Bar */
         .project-bar { background: #ffffff; padding: 12px 18px; border-radius: 14px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid var(--slate-200); flex-wrap: wrap; }
-        .custom-select { padding: 9px 12px; border: 1.5px solid var(--slate-200); border-radius: 9px; font-family: 'Prompt'; font-size: 13.5px; font-weight: 500; min-width: 280px; flex: 1; outline: none; transition: 0.15s; }
-        .custom-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,58,138,0.1); }
+        .current-proj-pill { background: var(--primary-light); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 600; border: 1px solid #bfdbfe; display: inline-flex; align-items: center; gap: 6px; }
 
         /* Dashboard Top KPIs */
         .kpi-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-bottom: 16px; }
@@ -135,7 +133,7 @@
         .btn-icon.edit { color: var(--primary); background: var(--primary-light); }
         .btn-icon.del { color: var(--rose-600); background: var(--rose-50); }
 
-        /* ==================== MOBILE CARD VIEW STYLES ==================== */
+        /* Mobile Card View */
         .mobile-card-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
         .m-item-card { background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 10px; padding: 12px; transition: 0.15s; }
         .m-item-card.paid { background: #f0fdf4; border-color: #bbf7d0; }
@@ -145,8 +143,14 @@
         .m-card-body { font-size: 12px; color: var(--slate-600); display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--slate-200); padding-top: 6px; margin-top: 4px; }
         .m-card-actions { display: flex; align-items: center; gap: 8px; }
 
+        /* Project Launcher Hub Modal */
+        .launcher-card { background: #ffffff; border: 1px solid var(--slate-200); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: all 0.15s ease; cursor: pointer; }
+        .launcher-card:hover { border-color: var(--primary); transform: translateY(-1px); box-shadow: var(--card-shadow); background: var(--primary-light); }
+        .launcher-title { font-size: 14.5px; font-weight: 700; color: var(--primary); margin-bottom: 3px; }
+        .launcher-meta { font-size: 12px; color: var(--slate-600); }
+
         /* Modals */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; }
         .modal-box { background: #fff; width: 500px; max-width: 92%; border-radius: 14px; padding: 20px; box-shadow: var(--card-shadow-lg); max-height: 90vh; overflow-y: auto; }
         .modal-box.modal-lg { width: 940px; max-width: 95vw; }
         .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--slate-200); padding-bottom: 8px; margin-bottom: 12px; }
@@ -158,7 +162,6 @@
             body { padding: 10px; }
             .workspace { padding: 14px; }
             .kpi-dashboard { grid-template-columns: repeat(2, 1fr); }
-            .custom-select { min-width: 100%; }
         }
 
         @media print {
@@ -182,7 +185,6 @@
             </div>
         </div>
         <div class="btn-group no-print">
-            <!-- Mode Switcher -->
             <button class="btn btn-mode-toggle" id="btn-view-mode" onclick="toggleViewMode()">📱 โหมดการ์ดมือถือ</button>
             <button class="btn btn-purple" onclick="shareExecutiveLink()">🔗 ลิงก์ผู้บริหาร</button>
             <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์</button>
@@ -191,19 +193,20 @@
         </div>
     </div>
 
-    <!-- Project Selector -->
+    <!-- Project Switcher Bar -->
     <div class="project-bar no-print">
         <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 260px;">
-            <span style="font-size: 13px; font-weight: 600; color: var(--slate-700); white-space: nowrap;">📁 โครงการ:</span>
-            <select id="project-select" class="custom-select" onchange="switchProject()"></select>
+            <span style="font-size: 13px; font-weight: 600; color: var(--slate-700);">📁 โครงการปัจจุบัน:</span>
+            <div class="current-proj-pill" id="lbl-current-project-name">⚡ กำลังโหลด...</div>
+            <button class="btn btn-white btn-sm" onclick="openProjectLauncherModal()">📂 สลับโครงการ</button>
         </div>
         <div class="btn-group">
             <button class="btn btn-emerald" onclick="openNewProjectModal()">➕ สร้างโครงการใหม่</button>
-            <button class="btn btn-danger" onclick="deleteCurrentProject()">🗑️ ลบโครงการ</button>
+            <button class="btn btn-danger" onclick="deleteCurrentProject()">🗑️ ลบโครงการนี้</button>
         </div>
     </div>
 
-    <!-- ==================== DASHBOARD TOP KPIS (6 CARDS) ==================== -->
+    <!-- Top Dashboard KPIs -->
     <div class="kpi-dashboard">
         <div class="kpi-card blue">
             <div class="kpi-header-row">
@@ -262,32 +265,26 @@
         </div>
     </div>
 
-    <!-- ==================== TABS BAR ==================== -->
+    <!-- Tabs Nav Bar -->
     <div class="tabs-nav-wrapper no-print">
         <div class="pinned-tab-wrap">
             <button class="tab-pill home-btn active" id="btn-tab-home" onclick="switchSheet('main-summary')">
                 🏠 หน้าหลัก
             </button>
         </div>
-        
         <div class="tabs-divider-v"></div>
-
         <div class="tabs-nav" id="sheet-tabs-container"></div>
-
         <button class="btn-add-tab" onclick="openBatchMainTabModal()">➕ เพิ่มหลายหมวดงาน</button>
     </div>
 
-    <!-- Workspace -->
+    <!-- Workspace Area -->
     <div class="workspace">
-        
-        <!-- SHEET: หน้าหลัก -->
         <div class="sheet-pane active" id="pane-main-summary">
             <div class="pane-head">
                 <h2>📊 หน้าหลัก: ตารางสรุปรายรับ ต้นทุน และกำไรโครงการ</h2>
                 <div style="font-size: 13px; color: #64748b;">ผู้ว่าจ้าง: <strong id="lbl-customer" style="color:#0f172a;">-</strong></div>
             </div>
 
-            <!-- Table 1: ตามใบเสนอราคา -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <div style="font-size: 13.5px; font-weight: 600; color: var(--primary);">1. รายการตามใบเสนอราคา (ส่วนที่ 1: ต้นทุนอุปกรณ์หลัก)</div>
                 <div class="btn-group no-print">
@@ -295,17 +292,12 @@
                     <button class="btn btn-white btn-sm" onclick="openAddMainTabModal()">➕ เพิ่ม 1 หมวด</button>
                 </div>
             </div>
-
-            <!-- Mode Container 1: BOM Summary -->
             <div id="container-main-items"></div>
 
-            <!-- Table 2: ค่าใช้จ่ายหน้างานจริง -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; margin-top: 14px;">
                 <div style="font-size: 13.5px; font-weight: 600; color: var(--rose-600);">2. ค่าใช้จ่ายหน้างานจริง (ส่วนที่ 2)</div>
                 <button class="btn btn-emerald btn-sm no-print" onclick="openAddExpenseCategoryModal()">➕ เพิ่มหมวดค่าใช้จ่าย</button>
             </div>
-
-            <!-- Mode Container 2: Site Expenses Summary -->
             <div id="container-expense-categories"></div>
         </div>
 
@@ -313,23 +305,43 @@
     </div>
 </div>
 
-<!-- ==================== MODALS ==================== -->
+<!-- ==================== MODAL: PROJECT LAUNCHER (หน้าต่างเลือกโครงการตอนเข้า) ==================== -->
+<div class="modal-overlay" id="modalLauncher" style="display: flex;">
+    <div class="modal-box" style="width: 580px;">
+        <div class="modal-head">
+            <h3>⚡ เลือกโครงการที่ต้องการจัดการ</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalLauncher')">&times;</span>
+        </div>
+        <div style="font-size: 12.5px; color: var(--slate-600); margin-bottom: 12px;">กรุณาคลิกเลือกโครงการเพื่อเริ่มต้นตรวจสอบต้นทุนและกระแสเงินสด:</div>
+        
+        <div id="launcher-project-list" style="max-height: 380px; overflow-y: auto; margin-bottom: 14px;">
+            <div style="text-align: center; padding: 20px; color: var(--slate-600);">กำลังโหลดรายการโครงการ...</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--slate-200); padding-top: 12px;">
+            <a href="index.html" class="btn btn-white">⬅️ กลับหน้าออกบิล</a>
+            <button class="btn btn-emerald font-bold" onclick="openNewProjectModal()">➕ สร้างโครงการใหม่</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODALS (OTHER ACTIONS) ==================== -->
 
 <div class="modal-overlay" id="modalDeposit">
     <div class="modal-box">
         <div class="modal-head">
             <h3 id="modal-deposit-title">📦 บันทึกเงินมัดจำสินค้าชั่วคราว</h3>
-            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalDeposit')">&times;</span>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalDeposit')">&times;</span>
         </div>
         <div style="font-size: 12px; color: var(--slate-600); margin-bottom: 12px;">* รายการนี้จะตัดเฉพาะเงินสดในมือชั่วคราว และไม่ถูกนำไปคิดเป็นต้นทุนโครงการ</div>
         <input type="hidden" id="deposit-edit-id">
         <div class="form-item"><label>วันที่โอนมัดจำ:</label><input type="date" id="deposit-date" class="clean-input"></div>
         <div class="form-item"><label>รายการ / ร้านค้า / ซัพพลายเออร์:</label><input type="text" id="deposit-source" class="clean-input" placeholder="เช่น มัดจำตู้ Outdoor..."></div>
         <div class="form-item"><label>รายละเอียด / สัดส่วนมัดจำ:</label><input type="text" id="deposit-desc" class="clean-input" placeholder="เช่น มัดจำ 30%"></div>
-        <div class="form-item"><label>จำนวนเงินมัดจำ (บาท):</label><input type="number" id="deposit-amt" class="clean-input" value="0"></div>
+        <div class="form-item"><label>จำนวนเงินมัดจำ (บาท):</label><input type="number" id="deposit-amt" class="clean-input" min="0" value="0"></div>
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
-            <button class="btn btn-white" onclick="closeModal('modalDeposit')">ยกเลิก</button>
-            <button class="btn btn-amber" onclick="submitDeposit()">บันทึกเงินมัดจำ</button>
+            <button class="btn btn-white" onclick="closeModalSafe('modalDeposit')">ยกเลิก</button>
+            <button class="btn btn-amber font-bold" id="btn-submit-deposit" onclick="submitDeposit()">บันทึกเงินมัดจำ</button>
         </div>
     </div>
 </div>
@@ -338,7 +350,7 @@
     <div class="modal-box modal-lg">
         <div class="modal-head">
             <h3>⚡ บันทึกเงินมัดจำสินค้าหลายรายการ</h3>
-            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalBatchDeposit')">&times;</span>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalBatchDeposit')">&times;</span>
         </div>
         <div class="table-wrap" style="max-height: 380px; overflow-y: auto;">
             <table>
@@ -351,8 +363,8 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
             <button class="btn btn-white btn-sm" onclick="addBatchDepositRow()">➕ เพิ่มแถวอีก</button>
             <div class="btn-group">
-                <button class="btn btn-white" onclick="closeModal('modalBatchDeposit')">ยกเลิก</button>
-                <button class="btn btn-amber font-bold" onclick="submitBatchDeposit()">💾 บันทึก</button>
+                <button class="btn btn-white" onclick="closeModalSafe('modalBatchDeposit')">ยกเลิก</button>
+                <button class="btn btn-amber font-bold" id="btn-submit-batch-deposit" onclick="submitBatchDeposit()">💾 บันทึกทั้งหมด</button>
             </div>
         </div>
     </div>
@@ -360,16 +372,19 @@
 
 <div class="modal-overlay" id="modalAddExpenseCategory">
     <div class="modal-box">
-        <div class="modal-head"><h3>➕ เพิ่มหมวดหมู่ค่าใช้จ่าย</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalAddExpenseCategory')">&times;</span></div>
-        <div class="form-item"><label>ชื่อหมวดหมู่:</label><input type="text" id="add-cat-name" class="clean-input"></div>
+        <div class="modal-head"><h3>➕ เพิ่มหมวดหมู่ค่าใช้จ่าย</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalAddExpenseCategory')">&times;</span></div>
+        <div class="form-item"><label>ชื่อหมวดหมู่:</label><input type="text" id="add-cat-name" class="clean-input" placeholder="เช่น ค่าเครื่องมือพิเศษ..."></div>
         <div class="form-item"><label>หน่วยนับ:</label><input type="text" id="add-cat-unit" class="clean-input" value="รายการ"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;"><button class="btn btn-white" onclick="closeModal('modalAddExpenseCategory')">ยกเลิก</button><button class="btn btn-emerald" onclick="submitAddExpenseCategory()">บันทึก</button></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalAddExpenseCategory')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" onclick="submitAddExpenseCategory()">บันทึกหมวดหมู่</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalBatchMain">
     <div class="modal-box modal-lg">
-        <div class="modal-head"><h3>⚡ เพิ่มหมวดงานหลายรายการ</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalBatchMain')">&times;</span></div>
+        <div class="modal-head"><h3>⚡ เพิ่มหมวดงานหลายรายการ</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalBatchMain')">&times;</span></div>
         <div class="table-wrap" style="max-height: 380px; overflow-y: auto;">
             <table>
                 <thead><tr><th style="width: 6%;" class="t-center">#</th><th style="width: 44%;">ชื่อหมวดงาน</th><th style="width: 14%;" class="t-center">จำนวน</th><th style="width: 12%;" class="t-center">หน่วย</th><th style="width: 18%;" class="t-right">ราคาขาย/หน่วย</th><th style="width: 6%;" class="t-center"></th></tr></thead>
@@ -378,14 +393,17 @@
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
             <button class="btn btn-white btn-sm" onclick="addBatchMainRow()">➕ เพิ่มแถว</button>
-            <div class="btn-group"><button class="btn btn-white" onclick="closeModal('modalBatchMain')">ยกเลิก</button><button class="btn btn-emerald font-bold" onclick="submitBatchMain()">💾 บันทึก</button></div>
+            <div class="btn-group">
+                <button class="btn btn-white" onclick="closeModalSafe('modalBatchMain')">ยกเลิก</button>
+                <button class="btn btn-emerald font-bold" id="btn-submit-batch-main" onclick="submitBatchMain()">💾 บันทึกทั้งหมด</button>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalBatchBom">
     <div class="modal-box modal-lg">
-        <div class="modal-head"><h3 id="batch-bom-title">⚡ เพิ่มอุปกรณ์ย่อยหลายรายการ</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalBatchBom')">&times;</span></div>
+        <div class="modal-head"><h3 id="batch-bom-title">⚡ เพิ่มอุปกรณ์ย่อยหลายรายการ</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalBatchBom')">&times;</span></div>
         <div class="table-wrap" style="max-height: 380px; overflow-y: auto;">
             <table>
                 <thead><tr><th style="width: 6%;" class="t-center">#</th><th style="width: 46%;">ชื่ออุปกรณ์</th><th style="width: 14%;" class="t-center">จำนวน/จุด</th><th style="width: 16%;" class="t-right">ราคาทุน/หน่วย</th><th style="width: 12%;" class="t-right">รวมทุน</th><th style="width: 6%;" class="t-center"></th></tr></thead>
@@ -394,14 +412,17 @@
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
             <button class="btn btn-white btn-sm" onclick="addBatchBomRow()">➕ เพิ่มแถว</button>
-            <div class="btn-group"><button class="btn btn-white" onclick="closeModal('modalBatchBom')">ยกเลิก</button><button class="btn btn-emerald font-bold" onclick="submitBatchBom()">💾 บันทึก</button></div>
+            <div class="btn-group">
+                <button class="btn btn-white" onclick="closeModalSafe('modalBatchBom')">ยกเลิก</button>
+                <button class="btn btn-emerald font-bold" id="btn-submit-batch-bom" onclick="submitBatchBom()">💾 บันทึกทั้งหมด</button>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalBatchExpense">
     <div class="modal-box modal-lg">
-        <div class="modal-head"><h3 id="batch-exp-title">⚡ เพิ่มค่าใช้จ่ายหลายรายการ</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalBatchExpense')">&times;</span></div>
+        <div class="modal-head"><h3 id="batch-exp-title">⚡ เพิ่มค่าใช้จ่ายหลายรายการ</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalBatchExpense')">&times;</span></div>
         <div class="table-wrap" style="max-height: 380px; overflow-y: auto;">
             <table>
                 <thead><tr><th style="width: 5%;" class="t-center">#</th><th style="width: 32%;">รายการ</th><th style="width: 10%;" class="t-center">จำนวน</th><th style="width: 10%;" class="t-center">หน่วย</th><th style="width: 14%;" class="t-right">ราคา/หน่วย</th><th style="width: 13%;" class="t-right">รวมเงิน</th><th style="width: 12%;" class="t-center">วันที่</th><th style="width: 4%;" class="t-center"></th></tr></thead>
@@ -410,14 +431,17 @@
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
             <button class="btn btn-white btn-sm" onclick="addBatchExpenseRow()">➕ เพิ่มแถว</button>
-            <div class="btn-group"><button class="btn btn-white" onclick="closeModal('modalBatchExpense')">ยกเลิก</button><button class="btn btn-emerald font-bold" onclick="submitBatchExpense()">💾 บันทึก</button></div>
+            <div class="btn-group">
+                <button class="btn btn-white" onclick="closeModalSafe('modalBatchExpense')">ยกเลิก</button>
+                <button class="btn btn-emerald font-bold" id="btn-submit-batch-exp" onclick="submitBatchExpense()">💾 บันทึกทั้งหมด</button>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalBatchFunding">
     <div class="modal-box modal-lg">
-        <div class="modal-head"><h3>⚡ บันทึกแหล่งเงินทุนหลายรายการ</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalBatchFunding')">&times;</span></div>
+        <div class="modal-head"><h3>⚡ บันทึกแหล่งเงินทุนหลายรายการ</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalBatchFunding')">&times;</span></div>
         <div class="table-wrap" style="max-height: 380px; overflow-y: auto;">
             <table>
                 <thead><tr><th style="width: 5%;" class="t-center">#</th><th style="width: 14%;" class="t-center">วันที่</th><th style="width: 33%;">แหล่งที่มา</th><th style="width: 26%;">หมายเหตุ</th><th style="width: 16%;" class="t-right">จำนวนเงิน</th><th style="width: 6%;" class="t-center"></th></tr></thead>
@@ -426,84 +450,102 @@
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
             <button class="btn btn-white btn-sm" onclick="addBatchFundingRow()">➕ เพิ่มแถว</button>
-            <div class="btn-group"><button class="btn btn-white" onclick="closeModal('modalBatchFunding')">ยกเลิก</button><button class="btn btn-emerald font-bold" onclick="submitBatchFunding()">💾 บันทึก</button></div>
+            <div class="btn-group">
+                <button class="btn btn-white" onclick="closeModalSafe('modalBatchFunding')">ยกเลิก</button>
+                <button class="btn btn-emerald font-bold" id="btn-submit-batch-fund" onclick="submitBatchFunding()">💾 บันทึกทั้งหมด</button>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalFunding">
     <div class="modal-box">
-        <div class="modal-head"><h3 id="modal-fund-title">➕ บันทึกแหล่งเงินทุน</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalFunding')">&times;</span></div>
+        <div class="modal-head"><h3 id="modal-fund-title">➕ บันทึกแหล่งเงินทุน</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalFunding')">&times;</span></div>
         <input type="hidden" id="fund-edit-id">
         <div class="form-item"><label>วันที่รับเงิน:</label><input type="date" id="fund-date" class="clean-input"></div>
-        <div class="form-item"><label>แหล่งที่มา:</label><input type="text" id="fund-source" class="clean-input"></div>
+        <div class="form-item"><label>แหล่งที่มา:</label><input type="text" id="fund-source" class="clean-input" placeholder="เช่น เงินส่วนตัว, เบิกงวดที่ 1..."></div>
         <div class="form-item"><label>หมายเหตุ:</label><input type="text" id="fund-desc" class="clean-input"></div>
-        <div class="form-item"><label>จำนวนเงิน (บาท):</label><input type="number" id="fund-amt" class="clean-input" value="0"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;"><button class="btn btn-white" onclick="closeModal('modalFunding')">ยกเลิก</button><button class="btn btn-emerald" onclick="submitFunding()">บันทึก</button></div>
+        <div class="form-item"><label>จำนวนเงิน (บาท):</label><input type="number" id="fund-amt" class="clean-input" min="0" value="0"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalFunding')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" id="btn-submit-fund" onclick="submitFunding()">บันทึกเงินทุน</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalAddMainTab">
     <div class="modal-box">
-        <div class="modal-head"><h3>➕ เพิ่มหมวดงาน</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalAddMainTab')">&times;</span></div>
+        <div class="modal-head"><h3>➕ เพิ่มหมวดงาน</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalAddMainTab')">&times;</span></div>
         <div class="form-item"><label>ชื่อหมวดงาน:</label><input type="text" id="add-main-name" class="clean-input"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-item"><label>จำนวน:</label><input type="number" id="add-main-qty" class="clean-input" value="1"></div>
+            <div class="form-item"><label>จำนวน:</label><input type="number" id="add-main-qty" class="clean-input" min="1" value="1"></div>
             <div class="form-item"><label>หน่วย:</label><input type="text" id="add-main-unit" class="clean-input" value="ชุด"></div>
         </div>
-        <div class="form-item"><label>ราคาขายต่อหน่วย:</label><input type="number" id="add-main-price" class="clean-input" value="0"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;"><button class="btn btn-white" onclick="closeModal('modalAddMainTab')">ยกเลิก</button><button class="btn btn-emerald" onclick="submitAddMainTab()">บันทึก</button></div>
+        <div class="form-item"><label>ราคาขายต่อหน่วย:</label><input type="number" id="add-main-price" class="clean-input" min="0" value="0"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalAddMainTab')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" onclick="submitAddMainTab()">บันทึกหมวดงาน</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalEditMainTab">
     <div class="modal-box">
-        <div class="modal-head"><h3>✏️ แก้ไขข้อมูลหมวดงาน</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalEditMainTab')">&times;</span></div>
+        <div class="modal-head"><h3>✏️ แก้ไขข้อมูลหมวดงาน</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalEditMainTab')">&times;</span></div>
         <input type="hidden" id="edit-main-id">
         <div class="form-item"><label>ชื่อหมวดงาน:</label><input type="text" id="edit-main-name" class="clean-input"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-item"><label>จำนวน:</label><input type="number" id="edit-main-qty" class="clean-input"></div>
+            <div class="form-item"><label>จำนวน:</label><input type="number" id="edit-main-qty" class="clean-input" min="1"></div>
             <div class="form-item"><label>หน่วย:</label><input type="text" id="edit-main-unit" class="clean-input"></div>
         </div>
-        <div class="form-item"><label>ราคาขายต่อหน่วย:</label><input type="number" id="edit-main-price" class="clean-input"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;"><button class="btn btn-white" onclick="closeModal('modalEditMainTab')">ยกเลิก</button><button class="btn btn-emerald" onclick="submitEditMainTab()">บันทึก</button></div>
+        <div class="form-item"><label>ราคาขายต่อหน่วย:</label><input type="number" id="edit-main-price" class="clean-input" min="0"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalEditMainTab')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" onclick="submitEditMainTab()">บันทึกการแก้ไข</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalEditBomItem">
     <div class="modal-box">
-        <div class="modal-head"><h3>✏️ แก้ไขอุปกรณ์ย่อย</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalEditBomItem')">&times;</span></div>
+        <div class="modal-head"><h3>✏️ แก้ไขอุปกรณ์ย่อย</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalEditBomItem')">&times;</span></div>
         <input type="hidden" id="edit-bom-id">
         <div class="form-item"><label>ชื่ออุปกรณ์:</label><input type="text" id="edit-bom-name" class="clean-input"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-item"><label>จำนวน/จุด:</label><input type="number" id="edit-bom-qty" class="clean-input"></div>
-            <div class="form-item"><label>ราคาทุน/หน่วย:</label><input type="number" id="edit-bom-cost" class="clean-input"></div>
+            <div class="form-item"><label>จำนวน/จุด:</label><input type="number" id="edit-bom-qty" class="clean-input" min="1"></div>
+            <div class="form-item"><label>ราคาทุน/หน่วย:</label><input type="number" id="edit-bom-cost" class="clean-input" min="0"></div>
         </div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;"><button class="btn btn-white" onclick="closeModal('modalEditBomItem')">ยกเลิก</button><button class="btn btn-emerald" onclick="submitEditBomItem()">บันทึก</button></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalEditBomItem')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" onclick="submitEditBomItem()">บันทึกการแก้ไข</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalEditExpense">
     <div class="modal-box">
-        <div class="modal-head"><h3>✏️ แก้ไขค่าใช้จ่าย</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalEditExpense')">&times;</span></div>
+        <div class="modal-head"><h3>✏️ แก้ไขค่าใช้จ่าย</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalEditExpense')">&times;</span></div>
         <input type="hidden" id="edit-exp-id">
         <div class="form-item"><label>รายการ:</label><input type="text" id="edit-exp-name" class="clean-input"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-item"><label>จำนวน:</label><input type="number" id="edit-exp-qty" class="clean-input" oninput="calcModalExpTotal()"></div>
+            <div class="form-item"><label>จำนวน:</label><input type="number" id="edit-exp-qty" class="clean-input" min="1" oninput="calcModalExpTotal()"></div>
             <div class="form-item"><label>หน่วย:</label><input type="text" id="edit-exp-unit" class="clean-input"></div>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-item"><label>ราคา/หน่วย:</label><input type="number" id="edit-exp-unit-price" class="clean-input" oninput="calcModalExpTotal()"></div>
+            <div class="form-item"><label>ราคา/หน่วย:</label><input type="number" id="edit-exp-unit-price" class="clean-input" min="0" oninput="calcModalExpTotal()"></div>
             <div class="form-item"><label>รวมเงิน:</label><input type="number" id="edit-exp-amt" class="clean-input font-bold" readonly></div>
         </div>
         <div class="form-item"><label>วันที่:</label><input type="date" id="edit-exp-date" class="clean-input"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;"><button class="btn btn-white" onclick="closeModal('modalEditExpense')">ยกเลิก</button><button class="btn btn-emerald" onclick="submitEditExpense()">บันทึก</button></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalEditExpense')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" onclick="submitEditExpense()">บันทึกการแก้ไข</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="modalNewProject">
     <div class="modal-box">
-        <div class="modal-head"><h3>➕ สร้างโครงการใหม่</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalNewProject')">&times;</span></div>
+        <div class="modal-head"><h3>➕ สร้างโครงการใหม่</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalNewProject')">&times;</span></div>
         <div class="form-item">
             <label>รูปแบบ:</label>
             <select id="sel-create-type" class="clean-input" onchange="toggleCreateType()">
@@ -512,10 +554,13 @@
             </select>
         </div>
         <div class="form-item" id="row-quote-select"><label>เลือกใบเสนอราคา:</label><select id="sel-quote-doc" class="clean-input"></select></div>
-        <div class="form-item"><label>ชื่อโครงการ:</label><input type="text" id="inp-proj-name" class="clean-input"></div>
+        <div class="form-item"><label>ชื่อโครงการ:</label><input type="text" id="inp-proj-name" class="clean-input" placeholder="เช่น โครงการติดตั้งตู้คอนโทรล..."></div>
         <div class="form-item"><label>ผู้ว่าจ้าง:</label><input type="text" id="inp-proj-cust" class="clean-input"></div>
-        <div class="form-item"><label>ยอดสัญญารวม:</label><input type="number" id="inp-proj-amt" class="clean-input" value="0"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;"><button class="btn btn-white" onclick="closeModal('modalNewProject')">ยกเลิก</button><button class="btn btn-emerald" onclick="submitCreateProject()">บันทึก</button></div>
+        <div class="form-item"><label>ยอดสัญญารวม:</label><input type="number" id="inp-proj-amt" class="clean-input" min="0" value="0"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalNewProject')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" id="btn-submit-create-proj" onclick="submitCreateProject()">สร้างโครงการ</button>
+        </div>
     </div>
 </div>
 
@@ -534,7 +579,6 @@
     let quotes = [];
     let activeSheetKey = 'main-summary';
 
-    // 🌟 View Mode State: 'table' (Desktop) vs 'card' (Mobile Minimal)
     let currentViewMode = localStorage.getItem('erp_view_mode') || (window.innerWidth < 768 ? 'card' : 'table');
 
     let currentBatchMainItemId = null;
@@ -550,7 +594,7 @@
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) { window.location.href = "index.html"; return; }
         updateModeButtonText();
-        await loadProjectList();
+        await loadProjectLauncherList();
         await loadQuotesForModal();
     };
 
@@ -566,6 +610,54 @@
         if (btn) {
             btn.innerHTML = currentViewMode === 'table' ? '📱 โหมดการ์ดมือถือ' : '🖥️ โหมดตารางเต็ม';
         }
+    }
+
+    // ==================== PROJECT LAUNCHER HUB ====================
+    async function loadProjectLauncherList() {
+        const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
+        projects = data || [];
+        const container = document.getElementById('launcher-project-list');
+        container.innerHTML = '';
+
+        if (projects.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 30px; background: #f8fafc; border-radius: 12px; border: 1px dashed var(--slate-300);">
+                    <div style="font-size: 28px; margin-bottom: 6px;">📂</div>
+                    <div style="font-weight: 600; color: var(--slate-700);">ยังไม่มีโครงการในระบบ</div>
+                    <div style="font-size: 12px; color: var(--slate-600); margin-top: 4px;">กดปุ่มด้านล่างเพื่อเริ่มสร้างโครงการแรกของคุณ</div>
+                </div>
+            `;
+            return;
+        }
+
+        projects.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'launcher-card';
+            card.onclick = () => selectProjectFromLauncher(p.id);
+            card.innerHTML = `
+                <div>
+                    <div class="launcher-title">${p.project_name}</div>
+                    <div class="launcher-meta">ผู้ว่าจ้าง: <strong>${p.customer_name || 'ลูกค้าทั่วไป'}</strong> • ยอดสัญญา: <strong class="text-primary">${Number(p.contract_amount || 0).toLocaleString()} ฿</strong></div>
+                </div>
+                <button class="btn btn-primary btn-sm">📂 เปิด</button>
+            `;
+            container.appendChild(card);
+        });
+
+        // เปิด Modal เลือกโครงการเสมอเมื่อเข้าหน้าเว็บ
+        document.getElementById('modalLauncher').style.display = 'flex';
+    }
+
+    function openProjectLauncherModal() {
+        document.getElementById('modalLauncher').style.display = 'flex';
+    }
+
+    async function selectProjectFromLauncher(projectId) {
+        currentProject = projects.find(p => p.id === projectId);
+        if (!currentProject) return;
+        document.getElementById('lbl-current-project-name').innerText = currentProject.project_name;
+        document.getElementById('modalLauncher').style.display = 'none';
+        await loadFullProjectData();
     }
 
     function getProjectExpenseCategories() {
@@ -587,37 +679,6 @@
             }
         });
         return [...DEFAULT_EXPENSE_CATEGORIES, ...customCats];
-    }
-
-    async function loadProjectList() {
-        const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
-        projects = data || [];
-        const sel = document.getElementById('project-select');
-        sel.innerHTML = '';
-
-        if (projects.length === 0) {
-            sel.innerHTML = '<option value="">-- ยังไม่มีโครงการ --</option>';
-            return;
-        }
-
-        projects.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.id;
-            opt.textContent = `${p.project_name} | ${p.customer_name || 'ทั่วไป'}`;
-            sel.appendChild(opt);
-        });
-
-        if (!currentProject || !projects.some(p => p.id === currentProject.id)) {
-            currentProject = projects[0];
-        }
-        sel.value = currentProject.id;
-        await loadFullProjectData();
-    }
-
-    async function switchProject() {
-        const pId = document.getElementById('project-select').value;
-        currentProject = projects.find(p => p.id === pId);
-        await loadFullProjectData();
     }
 
     async function loadFullProjectData() {
@@ -755,7 +816,7 @@
         await supabaseClient.from('project_expenses').update({ is_paid: newStatus }).eq('id', id);
     }
 
-    // ==================== RENDER MASTER SUMMARY (TABLE & CARD MODES) ====================
+    // ==================== RENDER MASTER SUMMARY ====================
     function renderMasterSummary() {
         let sumSelling = 0;
         let sumBomCost = 0;
@@ -782,7 +843,6 @@
             return { item, idx, subs, unitCost, sellingTotal, costTotal, grossProfit };
         });
 
-        // 1. Render Main Items (Table vs Card)
         if (currentViewMode === 'table') {
             containerMain.innerHTML = `
                 <div class="table-wrap">
@@ -816,7 +876,7 @@
                                     <td class="t-center no-print">
                                         <div class="action-btns">
                                             <button class="btn-icon edit" onclick="openEditMainTabModal('${item.id}')" title="แก้ไข">✏️</button>
-                                            <button class="btn-icon del" onclick="deleteMainItem('${item.id}')" title="ลบ">🗑️</button>
+                                            <button class="btn-icon del" onclick="deleteMainItem('${item.id}', '${item.item_name}')" title="ลบ">🗑️</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -853,7 +913,7 @@
                                 <div class="m-card-actions">
                                     <strong class="text-emerald">+${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</strong>
                                     <button class="btn-icon edit" onclick="openEditMainTabModal('${item.id}')">✏️</button>
-                                    <button class="btn-icon del" onclick="deleteMainItem('${item.id}')">🗑️</button>
+                                    <button class="btn-icon del" onclick="deleteMainItem('${item.id}', '${item.item_name}')">🗑️</button>
                                 </div>
                             </div>
                         </div>
@@ -866,7 +926,6 @@
             `;
         }
 
-        // 2. Render Site Expense Categories (Table vs Card)
         const containerExp = document.getElementById('container-expense-categories');
         const allExpenseCats = getProjectExpenseCategories();
         let totalSiteExpenses = 0;
@@ -964,7 +1023,6 @@
             `;
         }
 
-        // Cashflow & KPI Calculations
         const actualPaidTotal = paidBomTotal + paidSiteExpenses;
         const totalDepositsOut = deposits.reduce((s, d) => s + Number(d.amount || 0), 0);
         const unpaidPendingTotal = totalProjectCost - actualPaidTotal;
@@ -975,7 +1033,6 @@
         const netPendingToPay = Math.max(0, unpaidPendingTotal - totalDepositsOut);
         const neededFund = Math.max(0, netPendingToPay - cashBalanceInHand);
 
-        // Update Top KPIs
         document.getElementById('kpi-selling').innerText = sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-customer').innerText = `ผู้ว่าจ้าง: ${currentProject.customer_name || 'ไม่ระบุ'}`;
         
@@ -1038,7 +1095,7 @@
         }
     }
 
-    // ==================== RENDER BOM SHEET (TABLE & CARD MODES) ====================
+    // ==================== RENDER BOM SHEET ====================
     function renderBomSheet(mainItemId) {
         const item = mainItems.find(m => m.id === mainItemId);
         if (!item) return;
@@ -1084,7 +1141,7 @@
                                     <td class="t-center no-print">
                                         <div class="action-btns">
                                             <button class="btn-icon edit" onclick="openEditBomModal('${s.id}')">✏️</button>
-                                            <button class="btn-icon del" onclick="deleteBomRow('${s.id}')">🗑️</button>
+                                            <button class="btn-icon del" onclick="deleteBomRow('${s.id}', '${s.item_name}')">🗑️</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -1093,9 +1150,9 @@
                             <tr class="no-print" style="background: var(--slate-50);">
                                 <td class="t-center font-bold text-primary">+</td>
                                 <td><input type="text" id="add-sub-name" class="clean-input" placeholder="พิมพ์ชื่ออุปกรณ์ย่อย..."></td>
-                                <td><input type="number" id="add-sub-qty" class="clean-input t-center" value="1"></td>
-                                <td><input type="number" id="add-sub-cost" class="clean-input t-right" value="0"></td>
-                                <td colspan="4" class="t-center"><button class="btn btn-emerald btn-sm" style="width:100%;" onclick="addBomRow('${mainItemId}')">➕ เพิ่มแถวเดียว</button></td>
+                                <td><input type="number" id="add-sub-qty" class="clean-input t-center" min="1" value="1"></td>
+                                <td><input type="number" id="add-sub-cost" class="clean-input t-right" min="0" value="0"></td>
+                                <td colspan="4" class="t-center"><button class="btn btn-emerald btn-sm" id="btn-add-bom-inline" style="width:100%;" onclick="addBomRow('${mainItemId}')">➕ เพิ่มแถวเดียว</button></td>
                             </tr>
                         </tbody>
                         <tfoot>
@@ -1129,7 +1186,7 @@
                                         <span style="color:${s.is_paid ? 'var(--emerald-700)' : 'var(--slate-600)'};">${s.is_paid ? 'จ่ายแล้ว ✅' : 'รอจ่าย'}</span>
                                     </label>
                                     <button class="btn-icon edit" onclick="openEditBomModal('${s.id}')">✏️</button>
-                                    <button class="btn-icon del" onclick="deleteBomRow('${s.id}')">🗑️</button>
+                                    <button class="btn-icon del" onclick="deleteBomRow('${s.id}', '${s.item_name}')">🗑️</button>
                                 </div>
                             </div>
                         </div>
@@ -1140,10 +1197,10 @@
                         <div style="font-size:12px; font-weight:600; margin-bottom:6px; color:var(--primary);">➕ เพิ่มอุปกรณ์ย่อยด่วน:</div>
                         <input type="text" id="add-sub-name" class="clean-input" placeholder="ชื่ออุปกรณ์..." style="margin-bottom:6px;">
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
-                            <input type="number" id="add-sub-qty" class="clean-input t-center" value="1" placeholder="จำนวน/จุด">
-                            <input type="number" id="add-sub-cost" class="clean-input t-right" value="0" placeholder="ราคาทุน">
+                            <input type="number" id="add-sub-qty" class="clean-input t-center" min="1" value="1" placeholder="จำนวน/จุด">
+                            <input type="number" id="add-sub-cost" class="clean-input t-right" min="0" value="0" placeholder="ราคาทุน">
                         </div>
-                        <button class="btn btn-emerald btn-sm" style="width:100%;" onclick="addBomRow('${mainItemId}')">➕ บันทึกอุปกรณ์</button>
+                        <button class="btn btn-emerald btn-sm" id="btn-add-bom-inline-m" style="width:100%;" onclick="addBomRow('${mainItemId}')">➕ บันทึกอุปกรณ์</button>
                     </div>
                 </div>
             `;
@@ -1163,7 +1220,7 @@
                     <div class="btn-group no-print">
                         <button class="btn btn-emerald btn-sm" onclick="openBatchBomModal('${item.id}')">⚡ เพิ่มหลายรายการ</button>
                         <button class="btn btn-white btn-sm" onclick="openEditMainTabModal('${item.id}')">✏️ แก้ไขหมวด</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteMainItem('${item.id}')">🗑️ ลบแท็บ</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMainItem('${item.id}', '${item.item_name}')">🗑️ ลบแท็บ</button>
                         <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
                     </div>
                 </div>
@@ -1172,7 +1229,7 @@
         `;
     }
 
-    // ==================== RENDER EXPENSE SHEET (TABLE & CARD MODES) ====================
+    // ==================== RENDER EXPENSE SHEET ====================
     function renderExpenseSheet(catKey) {
         const allExpenseCats = getProjectExpenseCategories();
         const catInfo = allExpenseCats.find(c => c.key === catKey) || { 
@@ -1225,7 +1282,7 @@
                                     <td class="t-center no-print">
                                         <div class="action-btns">
                                             <button class="btn-icon edit" onclick="openEditExpenseModal('${e.id}')">✏️</button>
-                                            <button class="btn-icon del" onclick="deleteExpenseRow('${e.id}')">🗑️</button>
+                                            <button class="btn-icon del" onclick="deleteExpenseRow('${e.id}', '${e.item_name}')">🗑️</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -1234,12 +1291,12 @@
                             <tr class="no-print" style="background: var(--slate-50);">
                                 <td class="t-center font-bold text-primary">+</td>
                                 <td><input type="text" id="add-exp-name" class="clean-input" placeholder="${catInfo.placeholder || 'พิมพ์รายการ...'}"></td>
-                                <td><input type="number" id="add-exp-qty" class="clean-input t-center" value="1" oninput="calcInlineExpTotal()"></td>
+                                <td><input type="number" id="add-exp-qty" class="clean-input t-center" min="1" value="1" oninput="calcInlineExpTotal()"></td>
                                 <td><input type="text" id="add-exp-unit" class="clean-input t-center" value="${catInfo.defaultUnit || 'รายการ'}"></td>
-                                <td><input type="number" id="add-exp-price" class="clean-input t-right" value="0" placeholder="ราคา/หน่วย" oninput="calcInlineExpTotal()"></td>
+                                <td><input type="number" id="add-exp-price" class="clean-input t-right" min="0" value="0" placeholder="ราคา/หน่วย" oninput="calcInlineExpTotal()"></td>
                                 <td class="t-right font-bold text-rose" id="lbl-inline-total" style="vertical-align:middle; padding-right:14px;">0.00</td>
                                 <td><input type="date" id="add-exp-date" class="clean-input t-center"></td>
-                                <td colspan="2" class="t-center"><button class="btn btn-emerald btn-sm" style="width:100%;" onclick="addExpenseRow('${catKey}')">➕ เพิ่ม</button></td>
+                                <td colspan="2" class="t-center"><button class="btn btn-emerald btn-sm" id="btn-add-exp-inline" style="width:100%;" onclick="addExpenseRow('${catKey}')">➕ เพิ่ม</button></td>
                             </tr>
                         </tbody>
                         <tfoot>
@@ -1272,7 +1329,7 @@
                                         <span style="color:${e.is_paid ? 'var(--emerald-700)' : 'var(--slate-600)'};">${e.is_paid ? 'จ่ายแล้ว ✅' : 'รอจ่าย'}</span>
                                     </label>
                                     <button class="btn-icon edit" onclick="openEditExpenseModal('${e.id}')">✏️</button>
-                                    <button class="btn-icon del" onclick="deleteExpenseRow('${e.id}')">🗑️</button>
+                                    <button class="btn-icon del" onclick="deleteExpenseRow('${e.id}', '${e.item_name}')">🗑️</button>
                                 </div>
                             </div>
                         </div>
@@ -1283,12 +1340,12 @@
                         <div style="font-size:12px; font-weight:600; margin-bottom:6px; color:var(--primary);">➕ บันทึกค่าใช้จ่ายด่วน:</div>
                         <input type="text" id="add-exp-name" class="clean-input" placeholder="พิมพ์รายการ..." style="margin-bottom:6px;">
                         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px; margin-bottom:6px;">
-                            <input type="number" id="add-exp-qty" class="clean-input t-center" value="1" placeholder="จำนวน" oninput="calcInlineExpTotal()">
+                            <input type="number" id="add-exp-qty" class="clean-input t-center" min="1" value="1" placeholder="จำนวน" oninput="calcInlineExpTotal()">
                             <input type="text" id="add-exp-unit" class="clean-input t-center" value="${catInfo.defaultUnit || 'รายการ'}">
-                            <input type="number" id="add-exp-price" class="clean-input t-right" value="0" placeholder="ราคา/หน่วย" oninput="calcInlineExpTotal()">
+                            <input type="number" id="add-exp-price" class="clean-input t-right" min="0" value="0" placeholder="ราคา/หน่วย" oninput="calcInlineExpTotal()">
                         </div>
                         <input type="date" id="add-exp-date" class="clean-input" style="margin-bottom:8px;">
-                        <button class="btn btn-emerald btn-sm" style="width:100%;" onclick="addExpenseRow('${catKey}')">➕ บันทึกค่าใช้จ่าย</button>
+                        <button class="btn btn-emerald btn-sm" id="btn-add-exp-inline-m" style="width:100%;" onclick="addExpenseRow('${catKey}')">➕ บันทึกค่าใช้จ่าย</button>
                     </div>
                 </div>
             `;
@@ -1323,7 +1380,7 @@
         if (lbl) lbl.innerText = total.toLocaleString('en-US', {minimumFractionDigits: 2});
     }
 
-    // ==================== RENDER FUNDING SHEET (TABLE & CARD MODES) ====================
+    // ==================== RENDER FUNDING SHEET ====================
     function renderFundingSheet() {
         const totalFundIn = fundings.reduce((s, f) => s + Number(f.amount || 0), 0);
         const totalDepositsOut = deposits.reduce((s, d) => s + Number(d.amount || 0), 0);
@@ -1364,7 +1421,7 @@
                                     <td>${f.description || '-'}</td>
                                     <td class="t-right font-bold text-purple">${Number(f.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-center no-print">
-                                        <div class="action-btns"><button class="btn-icon edit" onclick="openFundingModal('${f.id}')">✏️</button><button class="btn-icon del" onclick="deleteFunding('${f.id}')">🗑️</button></div>
+                                        <div class="action-btns"><button class="btn-icon edit" onclick="openFundingModal('${f.id}')">✏️</button><button class="btn-icon del" onclick="deleteFunding('${f.id}', '${f.source_owner}')">🗑️</button></div>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -1392,7 +1449,7 @@
                                     <td>${d.description || '-'}</td>
                                     <td class="t-right font-bold text-amber">${Number(d.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-center no-print">
-                                        <div class="action-btns"><button class="btn-icon edit" onclick="openDepositModal('${d.id}')">✏️</button><button class="btn-icon del" onclick="deleteDeposit('${d.id}')">🗑️</button></div>
+                                        <div class="action-btns"><button class="btn-icon edit" onclick="openDepositModal('${d.id}')">✏️</button><button class="btn-icon del" onclick="deleteDeposit('${d.id}', '${d.supplier_name}')">🗑️</button></div>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -1417,7 +1474,7 @@
                                 <span>${f.funding_date || '-'} • ${f.description || '-'}</span>
                                 <div class="m-card-actions">
                                     <button class="btn-icon edit" onclick="openFundingModal('${f.id}')">✏️</button>
-                                    <button class="btn-icon del" onclick="deleteFunding('${f.id}')">🗑️</button>
+                                    <button class="btn-icon del" onclick="deleteFunding('${f.id}', '${f.source_owner}')">🗑️</button>
                                 </div>
                             </div>
                         </div>
@@ -1438,7 +1495,7 @@
                                 <span>${d.deposit_date || '-'} • ${d.description || '-'}</span>
                                 <div class="m-card-actions">
                                     <button class="btn-icon edit" onclick="openDepositModal('${d.id}')">✏️</button>
-                                    <button class="btn-icon del" onclick="deleteDeposit('${d.id}')" title="ลบเมื่อจ่ายบิลเต็มแล้ว">🗑️</button>
+                                    <button class="btn-icon del" onclick="deleteDeposit('${d.id}', '${d.supplier_name}')" title="ลบเมื่อจ่ายบิลเต็มแล้ว">🗑️</button>
                                 </div>
                             </div>
                         </div>
@@ -1484,514 +1541,34 @@
         `;
     }
 
-    // ==================== MODAL & CRUD HANDLERS ====================
+    // ==================== SAFETY CRUD & VALIDATIONS ====================
 
-    function openDepositModal(id = null) {
-        if (id) {
-            const d = deposits.find(x => x.id === id);
-            if (!d) return;
-            document.getElementById('modal-deposit-title').innerText = '✏️ แก้ไขเงินมัดจำสินค้า';
-            document.getElementById('deposit-edit-id').value = d.id;
-            document.getElementById('deposit-date').value = d.deposit_date || '';
-            document.getElementById('deposit-source').value = d.supplier_name || '';
-            document.getElementById('deposit-desc').value = d.description || '';
-            document.getElementById('deposit-amt').value = d.amount || 0;
+    function closeModalSafe(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    function setBtnLoading(btnId, isLoading, originalText = 'บันทึก') {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        if (isLoading) {
+            btn.dataset.origText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ กำลังบันทึก...';
         } else {
-            document.getElementById('modal-deposit-title').innerText = '📦 บันทึกเงินมัดจำสินค้าชั่วคราว';
-            document.getElementById('deposit-edit-id').value = '';
-            document.getElementById('deposit-date').valueAsDate = new Date();
-            document.getElementById('deposit-source').value = '';
-            document.getElementById('deposit-desc').value = '';
-            document.getElementById('deposit-amt').value = '0';
+            btn.disabled = false;
+            btn.innerHTML = btn.dataset.origText || originalText;
         }
-        document.getElementById('modalDeposit').style.display = 'flex';
     }
 
-    async function submitDeposit() {
-        const id = document.getElementById('deposit-edit-id').value;
-        const date = document.getElementById('deposit-date').value;
-        const source = document.getElementById('deposit-source').value.trim();
-        const desc = document.getElementById('deposit-desc').value.trim();
-        const amt = parseFloat(document.getElementById('deposit-amt').value) || 0;
-
-        if (!source || amt <= 0) return alert('กรุณาระบุรายการ/ร้านค้า และจำนวนเงินมัดจำ');
-
-        if (id) {
-            await supabaseClient.from('project_cashflow').update({ flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'deposit' }).eq('id', id);
-        } else {
-            await supabaseClient.from('project_cashflow').insert([{ project_id: currentProject.id, flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'deposit' }]);
-        }
-        closeModal('modalDeposit');
-        await loadFullProjectData();
+    // 1. Create Project
+    function openNewProjectModal() { 
+        document.getElementById('modalNewProject').style.display = 'flex'; 
     }
 
-    async function deleteDeposit(id) {
-        if (!confirm('ยืนยันลบรายการมัดจำนี้?')) return;
-        await supabaseClient.from('project_cashflow').delete().eq('id', id);
-        await loadFullProjectData();
+    function toggleCreateType() {
+        const type = document.getElementById('sel-create-type').value;
+        document.getElementById('row-quote-select').style.display = type === 'quote' ? 'block' : 'none';
     }
-
-    function openBatchDepositModal() {
-        const tbody = document.getElementById('tbl-batch-deposit-body');
-        tbody.innerHTML = '';
-        for (let i = 0; i < 4; i++) addBatchDepositRow();
-        document.getElementById('modalBatchDeposit').style.display = 'flex';
-    }
-
-    function addBatchDepositRow() {
-        const today = new Date().toISOString().split('T')[0];
-        const tbody = document.getElementById('tbl-batch-deposit-body');
-        const idx = tbody.children.length + 1;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="t-center">${idx}</td>
-            <td><input type="date" class="clean-input t-center b-dep-date" value="${today}"></td>
-            <td><input type="text" class="clean-input b-dep-source" placeholder="เช่น มัดจำตู้..."></td>
-            <td><input type="text" class="clean-input b-dep-desc" placeholder="เช่น 30%"></td>
-            <td><input type="number" class="clean-input t-right font-bold text-amber b-dep-amt" value="0"></td>
-            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-deposit-body');">🗑️</button></td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    async function submitBatchDeposit() {
-        if (!currentProject) return;
-        const rows = document.querySelectorAll('#tbl-batch-deposit-body tr');
-        const inserts = [];
-        rows.forEach(r => {
-            const date = r.querySelector('.b-dep-date').value;
-            const source = r.querySelector('.b-dep-source').value.trim();
-            const desc = r.querySelector('.b-dep-desc').value.trim();
-            const amt = parseFloat(r.querySelector('.b-dep-amt').value) || 0;
-            if (source && amt > 0) {
-                inserts.push({ project_id: currentProject.id, flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'deposit' });
-            }
-        });
-        if (inserts.length === 0) return alert('กรุณาระบุข้อมูลอย่างน้อย 1 รายการ');
-        await supabaseClient.from('project_cashflow').insert(inserts);
-        closeModal('modalBatchDeposit');
-        await loadFullProjectData();
-    }
-
-    function openAddExpenseCategoryModal() {
-        document.getElementById('add-cat-name').value = '';
-        document.getElementById('add-cat-unit').value = 'รายการ';
-        document.getElementById('modalAddExpenseCategory').style.display = 'flex';
-    }
-
-    function submitAddExpenseCategory() {
-        if (!currentProject) return;
-        const name = document.getElementById('add-cat-name').value.trim();
-        const unit = document.getElementById('add-cat-unit').value.trim() || 'รายการ';
-        if (!name) return alert('กรุณากรอกชื่อหมวดหมู่');
-
-        const key = name;
-        let customCats = [];
-        try { customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]'); } catch(e) {}
-
-        if (!customCats.some(c => c.key === key)) {
-            customCats.push({ key: key, name: name, tabLabel: '📋 ' + name, defaultUnit: unit, placeholder: 'พิมพ์รายการ...' });
-            localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
-        }
-        closeModal('modalAddExpenseCategory');
-        switchSheet('exp-' + key);
-    }
-
-    async function deleteCustomExpenseCategory(catKey) {
-        const hasExpenses = expenses.some(e => e.category === catKey);
-        if (!confirm(hasExpenses ? 'หมวดนี้มีค่าใช้จ่ายอยู่ ยืนยันลบทั้งหมด?' : 'ยืนยันลบหมวดหมู่นี้?')) return;
-        if (hasExpenses) {
-            await supabaseClient.from('project_expenses').delete().eq('project_id', currentProject.id).eq('category', catKey);
-        }
-        let customCats = [];
-        try { customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]'); } catch(e) {}
-        customCats = customCats.filter(c => c.key !== catKey);
-        localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
-        activeSheetKey = 'main-summary';
-        await loadFullProjectData();
-    }
-
-    function renumberRows(tbodyId) {
-        Array.from(document.getElementById(tbodyId).children).forEach((tr, idx) => { tr.children[0].innerText = idx + 1; });
-    }
-
-    function openBatchMainTabModal() {
-        const tbody = document.getElementById('tbl-batch-main-body');
-        tbody.innerHTML = '';
-        for (let i = 0; i < 4; i++) addBatchMainRow();
-        document.getElementById('modalBatchMain').style.display = 'flex';
-    }
-
-    function addBatchMainRow() {
-        const tbody = document.getElementById('tbl-batch-main-body');
-        const idx = tbody.children.length + 1;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="t-center">${idx}</td>
-            <td><input type="text" class="clean-input b-main-name" placeholder="ชื่อหมวดงาน..."></td>
-            <td><input type="number" class="clean-input t-center b-main-qty" value="1"></td>
-            <td><input type="text" class="clean-input t-center b-main-unit" value="ชุด"></td>
-            <td><input type="number" class="clean-input t-right b-main-price" value="0"></td>
-            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-main-body');">🗑️</button></td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    async function submitBatchMain() {
-        if (!currentProject) return;
-        const rows = document.querySelectorAll('#tbl-batch-main-body tr');
-        const inserts = [];
-        let orderStart = mainItems.length + 1;
-        rows.forEach(r => {
-            const name = r.querySelector('.b-main-name').value.trim();
-            const qty = parseFloat(r.querySelector('.b-main-qty').value) || 1;
-            const unit = r.querySelector('.b-main-unit').value.trim() || 'ชุด';
-            const price = parseFloat(r.querySelector('.b-main-price').value) || 0;
-            if (name) inserts.push({ project_id: currentProject.id, item_order: orderStart++, item_name: name, qty: qty, unit: unit, unit_price: price });
-        });
-        if (inserts.length === 0) return alert('กรุณากรอกข้อมูลอย่างน้อย 1 รายการ');
-        await supabaseClient.from('project_main_items').insert(inserts);
-        closeModal('modalBatchMain');
-        await loadFullProjectData();
-    }
-
-    function openBatchBomModal(mainItemId) {
-        currentBatchMainItemId = mainItemId;
-        const item = mainItems.find(m => m.id === mainItemId);
-        document.getElementById('batch-bom-title').innerText = `⚡ เพิ่มอุปกรณ์ย่อยหลายรายการ: ${item ? item.item_name : ''}`;
-        const tbody = document.getElementById('tbl-batch-bom-body');
-        tbody.innerHTML = '';
-        for (let i = 0; i < 5; i++) addBatchBomRow();
-        document.getElementById('modalBatchBom').style.display = 'flex';
-    }
-
-    function addBatchBomRow() {
-        const tbody = document.getElementById('tbl-batch-bom-body');
-        const idx = tbody.children.length + 1;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="t-center">${idx}</td>
-            <td><input type="text" class="clean-input b-bom-name" placeholder="ชื่ออุปกรณ์..."></td>
-            <td><input type="number" class="clean-input t-center b-bom-qty" value="1" oninput="calcBatchBomRow(this)"></td>
-            <td><input type="number" class="clean-input t-right b-bom-cost" value="0" oninput="calcBatchBomRow(this)"></td>
-            <td class="t-right font-bold text-amber b-bom-total" style="vertical-align:middle; padding-right:12px;">0.00</td>
-            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-bom-body');">🗑️</button></td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    function calcBatchBomRow(input) {
-        const tr = input.closest('tr');
-        const qty = parseFloat(tr.querySelector('.b-bom-qty').value) || 0;
-        const cost = parseFloat(tr.querySelector('.b-bom-cost').value) || 0;
-        tr.querySelector('.b-bom-total').innerText = (qty * cost).toLocaleString('en-US', { minimumFractionDigits: 2 });
-    }
-
-    async function submitBatchBom() {
-        const rows = document.querySelectorAll('#tbl-batch-bom-body tr');
-        const inserts = [];
-        rows.forEach(r => {
-            const name = r.querySelector('.b-bom-name').value.trim();
-            const qty = parseFloat(r.querySelector('.b-bom-qty').value) || 1;
-            const cost = parseFloat(r.querySelector('.b-bom-cost').value) || 0;
-            if (name) inserts.push({ main_item_id: currentBatchMainItemId, item_name: name, qty: qty, unit_cost: cost, is_paid: false });
-        });
-        if (inserts.length === 0) return alert('กรุณากรอกข้อมูลอย่างน้อย 1 รายการ');
-        await supabaseClient.from('project_bom_items').insert(inserts);
-        closeModal('modalBatchBom');
-        await loadFullProjectData();
-    }
-
-    function openBatchExpenseModal(catKey) {
-        currentBatchExpenseCategory = catKey;
-        const allExpenseCats = getProjectExpenseCategories();
-        const catInfo = allExpenseCats.find(c => c.key === catKey) || { name: catKey, defaultUnit: 'รายการ' };
-        document.getElementById('batch-exp-title').innerText = `⚡ เพิ่มค่าใช้จ่ายหลายรายการ: ${catInfo.name}`;
-        const tbody = document.getElementById('tbl-batch-exp-body');
-        tbody.innerHTML = '';
-        for (let i = 0; i < 5; i++) addBatchExpenseRow(catInfo.defaultUnit);
-        document.getElementById('modalBatchExpense').style.display = 'flex';
-    }
-
-    function addBatchExpenseRow(defaultUnit = 'รายการ') {
-        const today = new Date().toISOString().split('T')[0];
-        const tbody = document.getElementById('tbl-batch-exp-body');
-        const idx = tbody.children.length + 1;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="t-center">${idx}</td>
-            <td><input type="text" class="clean-input b-exp-name" placeholder="รายการ..."></td>
-            <td><input type="number" class="clean-input t-center b-exp-qty" value="1" oninput="calcBatchExpRow(this)"></td>
-            <td><input type="text" class="clean-input t-center b-exp-unit" value="${defaultUnit}"></td>
-            <td><input type="number" class="clean-input t-right b-exp-price" value="0" oninput="calcBatchExpRow(this)"></td>
-            <td class="t-right font-bold text-rose b-exp-total" style="vertical-align:middle; padding-right:10px;">0.00</td>
-            <td><input type="date" class="clean-input t-center b-exp-date" value="${today}"></td>
-            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-exp-body');">🗑️</button></td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    function calcBatchExpRow(input) {
-        const tr = input.closest('tr');
-        const qty = parseFloat(tr.querySelector('.b-exp-qty').value) || 0;
-        const price = parseFloat(tr.querySelector('.b-exp-price').value) || 0;
-        tr.querySelector('.b-exp-total').innerText = (qty * price).toLocaleString('en-US', { minimumFractionDigits: 2 });
-    }
-
-    async function submitBatchExpense() {
-        if (!currentProject) return;
-        const rows = document.querySelectorAll('#tbl-batch-exp-body tr');
-        const inserts = [];
-        rows.forEach(r => {
-            const name = r.querySelector('.b-exp-name').value.trim();
-            const qty = parseFloat(r.querySelector('.b-exp-qty').value) || 1;
-            const unit = r.querySelector('.b-exp-unit').value.trim() || 'ชิ้น';
-            const price = parseFloat(r.querySelector('.b-exp-price').value) || 0;
-            const totalAmt = qty * price;
-            const date = r.querySelector('.b-exp-date').value;
-            if (name && totalAmt > 0) {
-                inserts.push({ project_id: currentProject.id, category: currentBatchExpenseCategory, item_name: name, qty: qty, unit: unit, unit_price: price, amount: totalAmt, expense_date: date, is_paid: false });
-            }
-        });
-        if (inserts.length === 0) return alert('กรุณากรอกข้อมูลอย่างน้อย 1 รายการ');
-        await supabaseClient.from('project_expenses').insert(inserts);
-        closeModal('modalBatchExpense');
-        await loadFullProjectData();
-    }
-
-    function openBatchFundingModal() {
-        const tbody = document.getElementById('tbl-batch-fund-body');
-        tbody.innerHTML = '';
-        for (let i = 0; i < 4; i++) addBatchFundingRow();
-        document.getElementById('modalBatchFunding').style.display = 'flex';
-    }
-
-    function addBatchFundingRow() {
-        const today = new Date().toISOString().split('T')[0];
-        const tbody = document.getElementById('tbl-batch-fund-body');
-        const idx = tbody.children.length + 1;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="t-center">${idx}</td>
-            <td><input type="date" class="clean-input t-center b-fund-date" value="${today}"></td>
-            <td><input type="text" class="clean-input b-fund-source" placeholder="แหล่งที่มา..."></td>
-            <td><input type="text" class="clean-input b-fund-desc" placeholder="หมายเหตุ..."></td>
-            <td><input type="number" class="clean-input t-right font-bold text-purple b-fund-amt" value="0"></td>
-            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-fund-body');">🗑️</button></td>
-        `;
-        tbody.appendChild(tr);
-    }
-
-    async function submitBatchFunding() {
-        if (!currentProject) return;
-        const rows = document.querySelectorAll('#tbl-batch-fund-body tr');
-        const inserts = [];
-        rows.forEach(r => {
-            const date = r.querySelector('.b-fund-date').value;
-            const source = r.querySelector('.b-fund-source').value.trim();
-            const desc = r.querySelector('.b-fund-desc').value.trim();
-            const amt = parseFloat(r.querySelector('.b-fund-amt').value) || 0;
-            if (source && amt > 0) {
-                inserts.push({ project_id: currentProject.id, flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'in' });
-            }
-        });
-        if (inserts.length === 0) return alert('กรุณากรอกข้อมูลอย่างน้อย 1 รายการ');
-        await supabaseClient.from('project_cashflow').insert(inserts);
-        closeModal('modalBatchFunding');
-        await loadFullProjectData();
-    }
-
-    async function addExpenseRow(catKey) {
-        const name = document.getElementById('add-exp-name').value.trim();
-        const qty = parseFloat(document.getElementById('add-exp-qty').value) || 1;
-        const unit = document.getElementById('add-exp-unit').value.trim() || 'ชิ้น';
-        const unitPrice = parseFloat(document.getElementById('add-exp-price').value) || 0;
-        const totalAmt = qty * unitPrice;
-        const date = document.getElementById('add-exp-date').value;
-
-        if (!name || totalAmt <= 0) return alert('กรุณากรอกข้อมูลให้ถูกต้อง');
-        await supabaseClient.from('project_expenses').insert([{ project_id: currentProject.id, category: catKey, item_name: name, qty: qty, unit: unit, unit_price: unitPrice, amount: totalAmt, expense_date: date, is_paid: false }]);
-        await loadFullProjectData();
-    }
-
-    function openEditExpenseModal(id) {
-        const e = expenses.find(x => x.id === id);
-        if (!e) return;
-        const qty = Number(e.qty || 1);
-        const unitPrice = e.unit_price !== undefined && e.unit_price !== null ? Number(e.unit_price) : (Number(e.amount || 0) / qty);
-        document.getElementById('edit-exp-id').value = e.id;
-        document.getElementById('edit-exp-name').value = e.item_name || '';
-        document.getElementById('edit-exp-qty').value = qty;
-        document.getElementById('edit-exp-unit').value = e.unit || 'ชิ้น';
-        document.getElementById('edit-exp-unit-price').value = unitPrice;
-        document.getElementById('edit-exp-amt').value = Number(e.amount || 0);
-        document.getElementById('edit-exp-date').value = e.expense_date || '';
-        document.getElementById('modalEditExpense').style.display = 'flex';
-    }
-
-    function calcModalExpTotal() {
-        const qty = parseFloat(document.getElementById('edit-exp-qty').value) || 0;
-        const price = parseFloat(document.getElementById('edit-exp-unit-price').value) || 0;
-        document.getElementById('edit-exp-amt').value = qty * price;
-    }
-
-    async function submitEditExpense() {
-        const id = document.getElementById('edit-exp-id').value;
-        const name = document.getElementById('edit-exp-name').value.trim();
-        const qty = parseFloat(document.getElementById('edit-exp-qty').value) || 1;
-        const unit = document.getElementById('edit-exp-unit').value.trim() || 'ชิ้น';
-        const unitPrice = parseFloat(document.getElementById('edit-exp-unit-price').value) || 0;
-        const amt = qty * unitPrice;
-        const date = document.getElementById('edit-exp-date').value;
-
-        if (!name || amt <= 0) return alert('กรุณากรอกข้อมูลให้ถูกต้อง');
-        await supabaseClient.from('project_expenses').update({ item_name: name, qty: qty, unit: unit, unit_price: unitPrice, amount: amt, expense_date: date }).eq('id', id);
-        closeModal('modalEditExpense');
-        await loadFullProjectData();
-    }
-
-    async function deleteExpenseRow(id) {
-        if (!confirm('ยืนยันลบรายการนี้?')) return;
-        await supabaseClient.from('project_expenses').delete().eq('id', id);
-        await loadFullProjectData();
-    }
-
-    function openFundingModal(id = null) {
-        if (id) {
-            const f = fundings.find(x => x.id === id);
-            if (!f) return;
-            document.getElementById('modal-fund-title').innerText = '✏️ แก้ไขแหล่งเงินทุน';
-            document.getElementById('fund-edit-id').value = f.id;
-            document.getElementById('fund-date').value = f.funding_date || '';
-            document.getElementById('fund-source').value = f.source_owner || '';
-            document.getElementById('fund-desc').value = f.description || '';
-            document.getElementById('fund-amt').value = f.amount || 0;
-        } else {
-            document.getElementById('modal-fund-title').innerText = '➕ บันทึกแหล่งเงินทุน';
-            document.getElementById('fund-edit-id').value = '';
-            document.getElementById('fund-date').valueAsDate = new Date();
-            document.getElementById('fund-source').value = '';
-            document.getElementById('fund-desc').value = '';
-            document.getElementById('fund-amt').value = '0';
-        }
-        document.getElementById('modalFunding').style.display = 'flex';
-    }
-
-    async function submitFunding() {
-        const id = document.getElementById('fund-edit-id').value;
-        const date = document.getElementById('fund-date').value;
-        const source = document.getElementById('fund-source').value.trim();
-        const desc = document.getElementById('fund-desc').value.trim();
-        const amt = parseFloat(document.getElementById('fund-amt').value) || 0;
-
-        if (!source || amt <= 0) return alert('กรุณาระบุข้อมูลให้ถูกต้อง');
-        if (id) {
-            await supabaseClient.from('project_cashflow').update({ flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'in' }).eq('id', id);
-        } else {
-            await supabaseClient.from('project_cashflow').insert([{ project_id: currentProject.id, flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'in' }]);
-        }
-        closeModal('modalFunding');
-        await loadFullProjectData();
-    }
-
-    async function deleteFunding(id) {
-        if (!confirm('ยืนยันลบรายการนี้?')) return;
-        await supabaseClient.from('project_cashflow').delete().eq('id', id);
-        await loadFullProjectData();
-    }
-
-    function openAddMainTabModal() {
-        document.getElementById('add-main-name').value = '';
-        document.getElementById('add-main-qty').value = '1';
-        document.getElementById('add-main-unit').value = 'ชุด';
-        document.getElementById('add-main-price').value = '0';
-        document.getElementById('modalAddMainTab').style.display = 'flex';
-    }
-
-    async function submitAddMainTab() {
-        if (!currentProject) return;
-        const name = document.getElementById('add-main-name').value.trim();
-        const qty = parseFloat(document.getElementById('add-main-qty').value) || 1;
-        const unit = document.getElementById('add-main-unit').value.trim() || 'ชุด';
-        const price = parseFloat(document.getElementById('add-main-price').value) || 0;
-        if (!name) return alert('กรุณากรอกชื่อหมวดงาน');
-
-        const { data, error } = await supabaseClient.from('project_main_items').insert([{ project_id: currentProject.id, item_order: mainItems.length + 1, item_name: name, qty: qty, unit: unit, unit_price: price }]).select().single();
-        if (error) return alert('เกิดข้อผิดพลาด: ' + error.message);
-        closeModal('modalAddMainTab');
-        activeSheetKey = 'bom-' + data.id;
-        await loadFullProjectData();
-    }
-
-    function openEditMainTabModal(id) {
-        const item = mainItems.find(m => m.id === id);
-        if (!item) return;
-        document.getElementById('edit-main-id').value = item.id;
-        document.getElementById('edit-main-name').value = item.item_name;
-        document.getElementById('edit-main-qty').value = item.qty;
-        document.getElementById('edit-main-unit').value = item.unit || 'ชุด';
-        document.getElementById('edit-main-price').value = item.unit_price;
-        document.getElementById('modalEditMainTab').style.display = 'flex';
-    }
-
-    async function submitEditMainTab() {
-        const id = document.getElementById('edit-main-id').value;
-        const name = document.getElementById('edit-main-name').value.trim();
-        const qty = parseFloat(document.getElementById('edit-main-qty').value) || 1;
-        const unit = document.getElementById('edit-main-unit').value.trim() || 'ชุด';
-        const price = parseFloat(document.getElementById('edit-main-price').value) || 0;
-        if (!name) return alert('กรุณากรอกชื่อหมวดงาน');
-
-        await supabaseClient.from('project_main_items').update({ item_name: name, qty: qty, unit: unit, unit_price: price }).eq('id', id);
-        closeModal('modalEditMainTab');
-        await loadFullProjectData();
-    }
-
-    async function deleteMainItem(id) {
-        if (!confirm('ยืนยันลบหมวดงานนี้?')) return;
-        await supabaseClient.from('project_main_items').delete().eq('id', id);
-        activeSheetKey = 'main-summary';
-        await loadFullProjectData();
-    }
-
-    async function addBomRow(mainItemId) {
-        const name = document.getElementById('add-sub-name').value.trim();
-        const qty = parseFloat(document.getElementById('add-sub-qty').value) || 1;
-        const cost = parseFloat(document.getElementById('add-sub-cost').value) || 0;
-        if (!name) return alert('กรุณาระบุชื่อรายการ');
-        await supabaseClient.from('project_bom_items').insert([{ main_item_id: mainItemId, item_name: name, qty: qty, unit_cost: cost, is_paid: false }]);
-        await loadFullProjectData();
-    }
-
-    function openEditBomModal(id) {
-        const s = bomItems.find(b => b.id === id);
-        if (!s) return;
-        document.getElementById('edit-bom-id').value = s.id;
-        document.getElementById('edit-bom-name').value = s.item_name;
-        document.getElementById('edit-bom-qty').value = s.qty;
-        document.getElementById('edit-bom-cost').value = s.unit_cost;
-        document.getElementById('modalEditBomItem').style.display = 'flex';
-    }
-
-    async function submitEditBomItem() {
-        const id = document.getElementById('edit-bom-id').value;
-        const name = document.getElementById('edit-bom-name').value.trim();
-        const qty = parseFloat(document.getElementById('edit-bom-qty').value) || 1;
-        const cost = parseFloat(document.getElementById('edit-bom-cost').value) || 0;
-        if (!name) return alert('กรุณากรอกข้อมูลให้ถูกต้อง');
-        await supabaseClient.from('project_bom_items').update({ item_name: name, qty: qty, unit_cost: cost }).eq('id', id);
-        closeModal('modalEditBomItem');
-        await loadFullProjectData();
-    }
-
-    async function deleteBomRow(id) {
-        if (!confirm('ยืนยันลบรายการนี้?')) return;
-        await supabaseClient.from('project_bom_items').delete().eq('id', id);
-        await loadFullProjectData();
-    }
-
-    function openNewProjectModal() { document.getElementById('modalNewProject').style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     async function loadQuotesForModal() {
         const { data } = await supabaseClient.from('documents').select('*').order('created_at', { ascending: false });
@@ -2016,18 +1593,17 @@
         }
     }
 
-    function toggleCreateType() {
-        const type = document.getElementById('sel-create-type').value;
-        document.getElementById('row-quote-select').style.display = type === 'quote' ? 'block' : 'none';
-    }
-
     async function submitCreateProject() {
         const type = document.getElementById('sel-create-type').value;
         const name = document.getElementById('inp-proj-name').value.trim();
         const cust = document.getElementById('inp-proj-cust').value.trim();
         const amt = parseFloat(document.getElementById('inp-proj-amt').value) || 0;
         const quoteId = type === 'quote' ? document.getElementById('sel-quote-doc').value : null;
-        if (!name) return alert('กรุณากรอกชื่อโครงการ');
+
+        if (!name) return alert('⚠️ กรุณากรอกชื่อโครงการ');
+        if (amt < 0) return alert('⚠️ ยอดสัญญารวมต้องไม่ติดลบ');
+
+        setBtnLoading('btn-submit-create-proj', true);
 
         try {
             const { data: newProj, error: pErr } = await supabaseClient.from('projects').insert([{ project_name: name, customer_name: cust, contract_amount: amt, document_id: quoteId }]).select().single();
@@ -2066,18 +1642,452 @@
                     }
                 }
             }
-            closeModal('modalNewProject');
+            closeModalSafe('modalNewProject');
+            closeModalSafe('modalLauncher');
             currentProject = newProj;
-            await loadProjectList();
-        } catch (err) { alert('เกิดข้อผิดพลาด: ' + err.message); }
+            document.getElementById('lbl-current-project-name').innerText = currentProject.project_name;
+            await loadProjectLauncherList();
+            await loadFullProjectData();
+        } catch (err) { 
+            alert('❌ เกิดข้อผิดพลาด: ' + err.message); 
+        } finally {
+            setBtnLoading('btn-submit-create-proj', false);
+        }
     }
 
+    // 2. Delete Project (High Safety: Must confirm with project name)
     async function deleteCurrentProject() {
         if (!currentProject) return;
-        if (!confirm(`ยืนยันลบโครงการ "${currentProject.project_name}"?`)) return;
-        await supabaseClient.from('projects').delete().eq('id', currentProject.id);
-        currentProject = null;
-        await loadProjectList();
+        const confirmName = prompt(`⚠️ คำเตือนระดับสูงสุด!\nหากลบโครงการนี้ ข้อมูลอุปกรณ์ (BOM), ค่าใช้จ่ายหน้างาน, และเงินทุนทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้\n\nพิมพ์ชื่อโครงการ "${currentProject.project_name}" เพื่อยืนยันการลบ:`);
+        if (confirmName !== currentProject.project_name) {
+            if (confirmName !== null) alert('❌ ชื่อโครงการไม่ตรงกัน ยกเลิกการลบ');
+            return;
+        }
+
+        try {
+            await supabaseClient.from('projects').delete().eq('id', currentProject.id);
+            alert('🗑️ ลบโครงการเรียบร้อยแล้ว');
+            currentProject = null;
+            document.getElementById('lbl-current-project-name').innerText = '- ยังไม่ได้เลือก -';
+            await loadProjectLauncherList();
+        } catch (err) {
+            alert('❌ เกิดข้อผิดพลาดในการลบ: ' + err.message);
+        }
+    }
+
+    // 3. Main Item CRUD
+    function openAddMainTabModal() {
+        document.getElementById('add-main-name').value = '';
+        document.getElementById('add-main-qty').value = '1';
+        document.getElementById('add-main-unit').value = 'ชุด';
+        document.getElementById('add-main-price').value = '0';
+        document.getElementById('modalAddMainTab').style.display = 'flex';
+    }
+
+    async function submitAddMainTab() {
+        if (!currentProject) return;
+        const name = document.getElementById('add-main-name').value.trim();
+        const qty = parseFloat(document.getElementById('add-main-qty').value) || 1;
+        const unit = document.getElementById('add-main-unit').value.trim() || 'ชุด';
+        const price = parseFloat(document.getElementById('add-main-price').value) || 0;
+
+        if (!name) return alert('⚠️ กรุณากรอกชื่อหมวดงาน');
+        if (qty <= 0) return alert('⚠️ จำนวนต้องมากกว่า 0');
+        if (price < 0) return alert('⚠️ ราคาขายต้องไม่ติดลบ');
+
+        const { data, error } = await supabaseClient.from('project_main_items').insert([{ project_id: currentProject.id, item_order: mainItems.length + 1, item_name: name, qty: qty, unit: unit, unit_price: price }]).select().single();
+        if (error) return alert('❌ เกิดข้อผิดพลาด: ' + error.message);
+        closeModalSafe('modalAddMainTab');
+        activeSheetKey = 'bom-' + data.id;
+        await loadFullProjectData();
+    }
+
+    function openEditMainTabModal(id) {
+        const item = mainItems.find(m => m.id === id);
+        if (!item) return;
+        document.getElementById('edit-main-id').value = item.id;
+        document.getElementById('edit-main-name').value = item.item_name;
+        document.getElementById('edit-main-qty').value = item.qty;
+        document.getElementById('edit-main-unit').value = item.unit || 'ชุด';
+        document.getElementById('edit-main-price').value = item.unit_price;
+        document.getElementById('modalEditMainTab').style.display = 'flex';
+    }
+
+    async function submitEditMainTab() {
+        const id = document.getElementById('edit-main-id').value;
+        const name = document.getElementById('edit-main-name').value.trim();
+        const qty = parseFloat(document.getElementById('edit-main-qty').value) || 1;
+        const unit = document.getElementById('edit-main-unit').value.trim() || 'ชุด';
+        const price = parseFloat(document.getElementById('edit-main-price').value) || 0;
+
+        if (!name) return alert('⚠️ กรุณากรอกชื่อหมวดงาน');
+        if (qty <= 0) return alert('⚠️ จำนวนต้องมากกว่า 0');
+        if (price < 0) return alert('⚠️ ราคาขายต้องไม่ติดลบ');
+
+        await supabaseClient.from('project_main_items').update({ item_name: name, qty: qty, unit: unit, unit_price: price }).eq('id', id);
+        closeModalSafe('modalEditMainTab');
+        await loadFullProjectData();
+    }
+
+    async function deleteMainItem(id, itemName = '') {
+        if (!confirm(`⚠️ ยืนยันลบหมวดงาน "${itemName}"?\nอุปกรณ์ย่อย (BOM) ทั้งหมดในหมวดนี้จะถูกลบไปด้วย!`)) return;
+        await supabaseClient.from('project_main_items').delete().eq('id', id);
+        activeSheetKey = 'main-summary';
+        await loadFullProjectData();
+    }
+
+    // 4. BOM CRUD
+    async function addBomRow(mainItemId) {
+        const name = document.getElementById('add-sub-name').value.trim();
+        const qty = parseFloat(document.getElementById('add-sub-qty').value) || 1;
+        const cost = parseFloat(document.getElementById('add-sub-cost').value) || 0;
+
+        if (!name) return alert('⚠️ กรุณาระบุชื่ออุปกรณ์ย่อย');
+        if (qty <= 0) return alert('⚠️ จำนวนต้องมากกว่า 0');
+        if (cost < 0) return alert('⚠️ ราคาทุนต้องไม่ติดลบ');
+
+        await supabaseClient.from('project_bom_items').insert([{ main_item_id: mainItemId, item_name: name, qty: qty, unit_cost: cost, is_paid: false }]);
+        await loadFullProjectData();
+    }
+
+    function openEditBomModal(id) {
+        const s = bomItems.find(b => b.id === id);
+        if (!s) return;
+        document.getElementById('edit-bom-id').value = s.id;
+        document.getElementById('edit-bom-name').value = s.item_name;
+        document.getElementById('edit-bom-qty').value = s.qty;
+        document.getElementById('edit-bom-cost').value = s.unit_cost;
+        document.getElementById('modalEditBomItem').style.display = 'flex';
+    }
+
+    async function submitEditBomItem() {
+        const id = document.getElementById('edit-bom-id').value;
+        const name = document.getElementById('edit-bom-name').value.trim();
+        const qty = parseFloat(document.getElementById('edit-bom-qty').value) || 1;
+        const cost = parseFloat(document.getElementById('edit-bom-cost').value) || 0;
+
+        if (!name) return alert('⚠️ กรุณากรอกชื่ออุปกรณ์');
+        if (qty <= 0) return alert('⚠️ จำนวนต้องมากกว่า 0');
+        if (cost < 0) return alert('⚠️ ราคาทุนต้องไม่ติดลบ');
+
+        await supabaseClient.from('project_bom_items').update({ item_name: name, qty: qty, unit_cost: cost }).eq('id', id);
+        closeModalSafe('modalEditBomItem');
+        await loadFullProjectData();
+    }
+
+    async function deleteBomRow(id, name = '') {
+        if (!confirm(`ยืนยันลบอุปกรณ์ "${name}"?`)) return;
+        await supabaseClient.from('project_bom_items').delete().eq('id', id);
+        await loadFullProjectData();
+    }
+
+    // 5. Batch Handlers (Main, BOM, Expenses, Funding, Deposits)
+    function openBatchMainTabModal() {
+        const tbody = document.getElementById('tbl-batch-main-body');
+        tbody.innerHTML = '';
+        for (let i = 0; i < 4; i++) addBatchMainRow();
+        document.getElementById('modalBatchMain').style.display = 'flex';
+    }
+
+    function addBatchMainRow() {
+        const tbody = document.getElementById('tbl-batch-main-body');
+        const idx = tbody.children.length + 1;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="t-center">${idx}</td>
+            <td><input type="text" class="clean-input b-main-name" placeholder="ชื่อหมวดงาน..."></td>
+            <td><input type="number" class="clean-input t-center b-main-qty" min="1" value="1"></td>
+            <td><input type="text" class="clean-input t-center b-main-unit" value="ชุด"></td>
+            <td><input type="number" class="clean-input t-right b-main-price" min="0" value="0"></td>
+            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-main-body');">🗑️</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    async function submitBatchMain() {
+        if (!currentProject) return;
+        const rows = document.querySelectorAll('#tbl-batch-main-body tr');
+        const inserts = [];
+        let orderStart = mainItems.length + 1;
+        rows.forEach(r => {
+            const name = r.querySelector('.b-main-name').value.trim();
+            const qty = parseFloat(r.querySelector('.b-main-qty').value) || 1;
+            const unit = r.querySelector('.b-main-unit').value.trim() || 'ชุด';
+            const price = parseFloat(r.querySelector('.b-main-price').value) || 0;
+            if (name && qty > 0 && price >= 0) {
+                inserts.push({ project_id: currentProject.id, item_order: orderStart++, item_name: name, qty: qty, unit: unit, unit_price: price });
+            }
+        });
+        if (inserts.length === 0) return alert('⚠️ กรุณากรอกข้อมูลหมวดงานอย่างน้อย 1 รายการ');
+        setBtnLoading('btn-submit-batch-main', true);
+        await supabaseClient.from('project_main_items').insert(inserts);
+        setBtnLoading('btn-submit-batch-main', false);
+        closeModalSafe('modalBatchMain');
+        await loadFullProjectData();
+    }
+
+    function openBatchBomModal(mainItemId) {
+        currentBatchMainItemId = mainItemId;
+        const item = mainItems.find(m => m.id === mainItemId);
+        document.getElementById('batch-bom-title').innerText = `⚡ เพิ่มอุปกรณ์ย่อยหลายรายการ: ${item ? item.item_name : ''}`;
+        const tbody = document.getElementById('tbl-batch-bom-body');
+        tbody.innerHTML = '';
+        for (let i = 0; i < 5; i++) addBatchBomRow();
+        document.getElementById('modalBatchBom').style.display = 'flex';
+    }
+
+    function addBatchBomRow() {
+        const tbody = document.getElementById('tbl-batch-bom-body');
+        const idx = tbody.children.length + 1;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="t-center">${idx}</td>
+            <td><input type="text" class="clean-input b-bom-name" placeholder="ชื่ออุปกรณ์..."></td>
+            <td><input type="number" class="clean-input t-center b-bom-qty" min="1" value="1" oninput="calcBatchBomRow(this)"></td>
+            <td><input type="number" class="clean-input t-right b-bom-cost" min="0" value="0" oninput="calcBatchBomRow(this)"></td>
+            <td class="t-right font-bold text-amber b-bom-total" style="vertical-align:middle; padding-right:12px;">0.00</td>
+            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-bom-body');">🗑️</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function calcBatchBomRow(input) {
+        const tr = input.closest('tr');
+        const qty = parseFloat(tr.querySelector('.b-bom-qty').value) || 0;
+        const cost = parseFloat(tr.querySelector('.b-bom-cost').value) || 0;
+        tr.querySelector('.b-bom-total').innerText = (qty * cost).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
+
+    async function submitBatchBom() {
+        const rows = document.querySelectorAll('#tbl-batch-bom-body tr');
+        const inserts = [];
+        rows.forEach(r => {
+            const name = r.querySelector('.b-bom-name').value.trim();
+            const qty = parseFloat(r.querySelector('.b-bom-qty').value) || 1;
+            const cost = parseFloat(r.querySelector('.b-bom-cost').value) || 0;
+            if (name && qty > 0 && cost >= 0) {
+                inserts.push({ main_item_id: currentBatchMainItemId, item_name: name, qty: qty, unit_cost: cost, is_paid: false });
+            }
+        });
+        if (inserts.length === 0) return alert('⚠️ กรุณากรอกชื่ออุปกรณ์อย่างน้อย 1 รายการ');
+        setBtnLoading('btn-submit-batch-bom', true);
+        await supabaseClient.from('project_bom_items').insert(inserts);
+        setBtnLoading('btn-submit-batch-bom', false);
+        closeModalSafe('modalBatchBom');
+        await loadFullProjectData();
+    }
+
+    function openBatchExpenseModal(catKey) {
+        currentBatchExpenseCategory = catKey;
+        const allExpenseCats = getProjectExpenseCategories();
+        const catInfo = allExpenseCats.find(c => c.key === catKey) || { name: catKey, defaultUnit: 'รายการ' };
+        document.getElementById('batch-exp-title').innerText = `⚡ เพิ่มค่าใช้จ่ายหลายรายการ: ${catInfo.name}`;
+        const tbody = document.getElementById('tbl-batch-exp-body');
+        tbody.innerHTML = '';
+        for (let i = 0; i < 5; i++) addBatchExpenseRow(catInfo.defaultUnit);
+        document.getElementById('modalBatchExpense').style.display = 'flex';
+    }
+
+    function addBatchExpenseRow(defaultUnit = 'รายการ') {
+        const today = new Date().toISOString().split('T')[0];
+        const tbody = document.getElementById('tbl-batch-exp-body');
+        const idx = tbody.children.length + 1;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="t-center">${idx}</td>
+            <td><input type="text" class="clean-input b-exp-name" placeholder="รายการ..."></td>
+            <td><input type="number" class="clean-input t-center b-exp-qty" min="1" value="1" oninput="calcBatchExpRow(this)"></td>
+            <td><input type="text" class="clean-input t-center b-exp-unit" value="${defaultUnit}"></td>
+            <td><input type="number" class="clean-input t-right b-exp-price" min="0" value="0" oninput="calcBatchExpRow(this)"></td>
+            <td class="t-right font-bold text-rose b-exp-total" style="vertical-align:middle; padding-right:10px;">0.00</td>
+            <td><input type="date" class="clean-input t-center b-exp-date" value="${today}"></td>
+            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-exp-body');">🗑️</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function calcBatchExpRow(input) {
+        const tr = input.closest('tr');
+        const qty = parseFloat(tr.querySelector('.b-exp-qty').value) || 0;
+        const price = parseFloat(tr.querySelector('.b-exp-price').value) || 0;
+        tr.querySelector('.b-exp-total').innerText = (qty * price).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
+
+    async function submitBatchExpense() {
+        if (!currentProject) return;
+        const rows = document.querySelectorAll('#tbl-batch-exp-body tr');
+        const inserts = [];
+        rows.forEach(r => {
+            const name = r.querySelector('.b-exp-name').value.trim();
+            const qty = parseFloat(r.querySelector('.b-exp-qty').value) || 1;
+            const unit = r.querySelector('.b-exp-unit').value.trim() || 'ชิ้น';
+            const price = parseFloat(r.querySelector('.b-exp-price').value) || 0;
+            const totalAmt = qty * price;
+            const date = r.querySelector('.b-exp-date').value;
+            if (name && totalAmt > 0) {
+                inserts.push({ project_id: currentProject.id, category: currentBatchExpenseCategory, item_name: name, qty: qty, unit: unit, unit_price: price, amount: totalAmt, expense_date: date, is_paid: false });
+            }
+        });
+        if (inserts.length === 0) return alert('⚠️ กรุณากรอกรายการและจำนวนเงินอย่างน้อย 1 รายการ');
+        setBtnLoading('btn-submit-batch-exp', true);
+        await supabaseClient.from('project_expenses').insert(inserts);
+        setBtnLoading('btn-submit-batch-exp', false);
+        closeModalSafe('modalBatchExpense');
+        await loadFullProjectData();
+    }
+
+    async function addExpenseRow(catKey) {
+        const name = document.getElementById('add-exp-name').value.trim();
+        const qty = parseFloat(document.getElementById('add-exp-qty').value) || 1;
+        const unit = document.getElementById('add-exp-unit').value.trim() || 'ชิ้น';
+        const unitPrice = parseFloat(document.getElementById('add-exp-price').value) || 0;
+        const totalAmt = qty * unitPrice;
+        const date = document.getElementById('add-exp-date').value;
+
+        if (!name) return alert('⚠️ กรุณาระบุชื่อรายการ');
+        if (totalAmt <= 0) return alert('⚠️ จำนวนเงินรวมต้องมากกว่า 0');
+
+        await supabaseClient.from('project_expenses').insert([{ project_id: currentProject.id, category: catKey, item_name: name, qty: qty, unit: unit, unit_price: unitPrice, amount: totalAmt, expense_date: date, is_paid: false }]);
+        await loadFullProjectData();
+    }
+
+    function openEditExpenseModal(id) {
+        const e = expenses.find(x => x.id === id);
+        if (!e) return;
+        const qty = Number(e.qty || 1);
+        const unitPrice = e.unit_price !== undefined && e.unit_price !== null ? Number(e.unit_price) : (Number(e.amount || 0) / qty);
+        document.getElementById('edit-exp-id').value = e.id;
+        document.getElementById('edit-exp-name').value = e.item_name || '';
+        document.getElementById('edit-exp-qty').value = qty;
+        document.getElementById('edit-exp-unit').value = e.unit || 'ชิ้น';
+        document.getElementById('edit-exp-unit-price').value = unitPrice;
+        document.getElementById('edit-exp-amt').value = Number(e.amount || 0);
+        document.getElementById('edit-exp-date').value = e.expense_date || '';
+        document.getElementById('modalEditExpense').style.display = 'flex';
+    }
+
+    function calcModalExpTotal() {
+        const qty = parseFloat(document.getElementById('edit-exp-qty').value) || 0;
+        const price = parseFloat(document.getElementById('edit-exp-unit-price').value) || 0;
+        document.getElementById('edit-exp-amt').value = qty * price;
+    }
+
+    async function submitEditExpense() {
+        const id = document.getElementById('edit-exp-id').value;
+        const name = document.getElementById('edit-exp-name').value.trim();
+        const qty = parseFloat(document.getElementById('edit-exp-qty').value) || 1;
+        const unit = document.getElementById('edit-exp-unit').value.trim() || 'ชิ้น';
+        const unitPrice = parseFloat(document.getElementById('edit-exp-unit-price').value) || 0;
+        const amt = qty * unitPrice;
+        const date = document.getElementById('edit-exp-date').value;
+
+        if (!name) return alert('⚠️ กรุณาระบุชื่อรายการ');
+        if (amt <= 0) return alert('⚠️ จำนวนเงินรวมต้องมากกว่า 0');
+
+        await supabaseClient.from('project_expenses').update({ item_name: name, qty: qty, unit: unit, unit_price: unitPrice, amount: amt, expense_date: date }).eq('id', id);
+        closeModalSafe('modalEditExpense');
+        await loadFullProjectData();
+    }
+
+    async function deleteExpenseRow(id, name = '') {
+        if (!confirm(`ยืนยันลบค่าใช้จ่าย "${name}"?`)) return;
+        await supabaseClient.from('project_expenses').delete().eq('id', id);
+        await loadFullProjectData();
+    }
+
+    function openFundingModal(id = null) {
+        if (id) {
+            const f = fundings.find(x => x.id === id);
+            if (!f) return;
+            document.getElementById('modal-fund-title').innerText = '✏️ แก้ไขแหล่งเงินทุน';
+            document.getElementById('fund-edit-id').value = f.id;
+            document.getElementById('fund-date').value = f.funding_date || '';
+            document.getElementById('fund-source').value = f.source_owner || '';
+            document.getElementById('fund-desc').value = f.description || '';
+            document.getElementById('fund-amt').value = f.amount || 0;
+        } else {
+            document.getElementById('modal-fund-title').innerText = '➕ บันทึกแหล่งเงินทุน';
+            document.getElementById('fund-edit-id').value = '';
+            document.getElementById('fund-date').valueAsDate = new Date();
+            document.getElementById('fund-source').value = '';
+            document.getElementById('fund-desc').value = '';
+            document.getElementById('fund-amt').value = '0';
+        }
+        document.getElementById('modalFunding').style.display = 'flex';
+    }
+
+    async function submitFunding() {
+        const id = document.getElementById('fund-edit-id').value;
+        const date = document.getElementById('fund-date').value;
+        const source = document.getElementById('fund-source').value.trim();
+        const desc = document.getElementById('fund-desc').value.trim();
+        const amt = parseFloat(document.getElementById('fund-amt').value) || 0;
+
+        if (!source || amt <= 0) return alert('⚠️ กรุณาระบุแหล่งที่มาและจำนวนเงินให้ถูกต้อง');
+
+        setBtnLoading('btn-submit-fund', true);
+        if (id) {
+            await supabaseClient.from('project_cashflow').update({ flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'in' }).eq('id', id);
+        } else {
+            await supabaseClient.from('project_cashflow').insert([{ project_id: currentProject.id, flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'in' }]);
+        }
+        setBtnLoading('btn-submit-fund', false);
+        closeModalSafe('modalFunding');
+        await loadFullProjectData();
+    }
+
+    async function deleteFunding(id, source = '') {
+        if (!confirm(`ยืนยันลบแหล่งเงินทุน "${source}"?`)) return;
+        await supabaseClient.from('project_cashflow').delete().eq('id', id);
+        await loadFullProjectData();
+    }
+
+    function openBatchFundingModal() {
+        const tbody = document.getElementById('tbl-batch-fund-body');
+        tbody.innerHTML = '';
+        for (let i = 0; i < 4; i++) addBatchFundingRow();
+        document.getElementById('modalBatchFunding').style.display = 'flex';
+    }
+
+    function addBatchFundingRow() {
+        const today = new Date().toISOString().split('T')[0];
+        const tbody = document.getElementById('tbl-batch-fund-body');
+        const idx = tbody.children.length + 1;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="t-center">${idx}</td>
+            <td><input type="date" class="clean-input t-center b-fund-date" value="${today}"></td>
+            <td><input type="text" class="clean-input b-fund-source" placeholder="แหล่งที่มา..."></td>
+            <td><input type="text" class="clean-input b-fund-desc" placeholder="หมายเหตุ..."></td>
+            <td><input type="number" class="clean-input t-right font-bold text-purple b-fund-amt" min="0" value="0"></td>
+            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-fund-body');">🗑️</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    async function submitBatchFunding() {
+        if (!currentProject) return;
+        const rows = document.querySelectorAll('#tbl-batch-fund-body tr');
+        const inserts = [];
+        rows.forEach(r => {
+            const date = r.querySelector('.b-fund-date').value;
+            const source = r.querySelector('.b-fund-source').value.trim();
+            const desc = r.querySelector('.b-fund-desc').value.trim();
+            const amt = parseFloat(r.querySelector('.b-fund-amt').value) || 0;
+            if (source && amt > 0) {
+                inserts.push({ project_id: currentProject.id, flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'in' });
+            }
+        });
+        if (inserts.length === 0) return alert('⚠️ กรุณากรอกข้อมูลแหล่งเงินทุนอย่างน้อย 1 รายการ');
+        setBtnLoading('btn-submit-batch-fund', true);
+        await supabaseClient.from('project_cashflow').insert(inserts);
+        setBtnLoading('btn-submit-batch-fund', false);
+        closeModalSafe('modalBatchFunding');
+        await loadFullProjectData();
+    }
+
+    function renumberRows(tbodyId) {
+        Array.from(document.getElementById(tbodyId).children).forEach((tr, idx) => { tr.children[0].innerText = idx + 1; });
     }
 </script>
 </body>
