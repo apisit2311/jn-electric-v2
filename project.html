@@ -707,7 +707,7 @@
             card.onclick = () => selectProjectFromLauncher(p.id);
             card.innerHTML = `
                 <div>
-                    <div class="launcher-title">${p.status === 'active' ? '🟢' : '📁'} ${p.project_name}</div>
+                    <div class="launcher-title">${p.status === 'active' ? '' : '📁'} ${p.project_name}</div>
                     <div class="launcher-meta">ผู้ว่าจ้าง: <strong>${p.customer_name || 'ลูกค้าทั่วไป'}</strong> • ยอด: <strong class="text-primary">${Number(p.contract_amount || 0).toLocaleString()} ฿</strong></div>
                 </div>
                 <button class="btn btn-primary btn-sm">📂 เปิด</button>
