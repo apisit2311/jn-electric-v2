@@ -136,10 +136,10 @@
 
         <!-- Cashflow Metrics -->
         <div class="metrics-grid">
-            <!-- 🌟 การ์ดเงินสดคงเหลือจริง (เพิ่มข้อมูลมัดจำสินค้า) -->
+            <!-- 🌟 การ์ดเงินทุนคงเหลือจริง (เพิ่มข้อมูลมัดจำสินค้า) -->
             <div class="m-tile tile-purple">
                 <div class="m-tile-head">
-                    <span class="m-tile-lbl">เงินสดคงเหลือจริง</span>
+                    <span class="m-tile-lbl">เงินทุนคงเหลือจริง</span>
                     <span>💳</span>
                 </div>
                 <div class="m-tile-val" id="kpi-cash-balance">0.00</div>
@@ -148,7 +148,7 @@
 
             <div class="m-tile tile-amber" id="card-need-fund">
                 <div class="m-tile-head">
-                    <span class="m-tile-lbl">ต้องเพิ่มเงินสด</span>
+                    <span class="m-tile-lbl">ต้องเพิ่มเงินทุน</span>
                     <span>🪙</span>
                 </div>
                 <div class="m-tile-val" id="kpi-need-fund">0.00</div>
@@ -352,7 +352,7 @@
         const netPendingToPay = Math.max(0, unpaidPendingTotal - totalDeposits);
         const neededFund = Math.max(0, netPendingToPay - cashBalance);
 
-        // 🌟 อัปเดตข้อมูลการ์ดเงินสดคงเหลือจริง พร้อมแสดงเงินมัดจำ
+        // 🌟 อัปเดตข้อมูลการ์ดเงินทุนคงเหลือจริง พร้อมแสดงเงินมัดจำ
         document.getElementById('kpi-cash-balance').innerText = `${cashBalance.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
         document.getElementById('kpi-cash-sub').innerText = `จ่ายจริง ${actualPaidTotal.toLocaleString()} | มัดจำ ${totalDeposits.toLocaleString()}`;
 
@@ -404,7 +404,7 @@
 📄 ยอดรวมสัญญา: ${selling}
 💸 งบต้นทุนรวม: ${cost}
 💰 กำไรสุทธิ: ${profit} (${margin})
-💳 เงินสดในมือจริง: ${cash}
+💳 เงินทุนในมือจริง: ${cash}
 🪙 เงินที่ต้องเติมเพิ่ม: ${need}
 -----------------------------
 🔗 ลิงก์รายงาน: ${window.location.href}`;
