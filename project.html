@@ -2090,8 +2090,13 @@
         Array.from(document.getElementById(tbodyId).children).forEach((tr, idx) => { tr.children[0].innerText = idx + 1; });
     }
     function openChecklistForCurrentProject() {
-    if (!currentProject) return alert('กรุณาเลือกโครงการก่อนเปิดเช็คลิสต์');
-    window.location.href = `checklist.html?id=${currentProject.id}`;
+    if (!currentProject || !currentProject.id) {
+        alert('⚠️ กรุณาคลิกเลือกโครงการก่อนเปิดหน้าเช็คลิสต์ครับ');
+        openProjectLauncherModal(); // เด้งหน้าต่างให้เลือกโครงการทันที
+        return;
+    }
+    // ส่ง ID ของโครงการปัจจุบันไปแน่นอน 100%
+    window.location.href = `checklist.html?id=${encodeURIComponent(currentProject.id)}`;
 }
 </script>
 </body>
