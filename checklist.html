@@ -425,14 +425,13 @@
         renderChecklistView();
     }
 
-    // 🌟 ฟังก์ชันอัปเดตสถานะขึ้น Supabase ทันที
     async function toggleCheck(itemName) {
         const target = checklist.find(c => c.item_name === itemName);
         if (!target) return;
         
         const newStatus = !target.is_checked;
         target.is_checked = newStatus;
-        renderChecklistView(); // Render ทันทีเพื่อให้หน้าจอไวขึ้น
+        renderChecklistView();
 
         try {
             const bomIds = target.raw_ids.filter(r => r.table === 'project_bom_items').map(r => r.id);
@@ -531,6 +530,11 @@
         }
 
         displayList.forEach(item => {
+            // 🌟 ปรับข้อความย่อยให้สะอาดตา ไม่ซ้ำซ้อน
+            const subText = item.sources.length > 1 
+                ? `<span style="color:var(--primary-accent); font-weight:500;">รวมจาก ${item.sources.length} หมวด:</span> ${item.sources.join(' + ')}`
+                : `${item.category}`;
+
             const card = document.createElement('div');
             card.className = `check-card ${item.is_checked ? 'checked' : ''}`;
             card.onclick = () => toggleCheck(item.item_name);
@@ -538,7 +542,7 @@
                 <div class="check-box-ui">${item.is_checked ? '✓' : ''}</div>
                 <div class="check-info">
                     <div class="check-item-name">${item.item_name}</div>
-                    <div class="check-item-sub">${item.category} • จาก: ${item.sources.join(', ')}</div>
+                    <div class="check-item-sub">${subText}</div>
                 </div>
                 <div class="check-qty-badge">${item.total_qty} ${item.unit}</div>
             `;
