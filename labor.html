@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบจัดการช่างและเบิกจ่ายค่าแรง - JN Electric</title>
+    <title>ระบบจัดการคนงานและเบิกจ่ายค่าแรง - JN Electric</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -108,7 +108,7 @@
         <div class="header-title">
             <div class="header-logo-icon">👷</div>
             <div>
-                <h1>ระบบจัดการค่าแรงช่าง</h1>
+                <h1>ระบบจัดการค่าแรงคนงาน</h1>
                 <p>JN Electric & Technology</p>
             </div>
         </div>
@@ -121,7 +121,7 @@
     <!-- Mini KPIs -->
     <div class="kpi-grid">
         <div class="kpi-card amber">
-            <div class="kpi-title">ยอดค้างจ่ายช่าง</div>
+            <div class="kpi-title">ยอดค้างจ่ายคนงาน</div>
             <div class="kpi-val" style="color: var(--amber);" id="kpi-pending-labor">0.00 ฿</div>
             <div class="kpi-sub" id="kpi-pending-count">0 รายการรอโอน</div>
         </div>
@@ -138,7 +138,7 @@
             🕒 รายการเบิกค่าแรง (<span id="cnt-logs">0</span>)
         </button>
         <button class="tab-btn" id="tab-btn-techs" onclick="switchLaborTab('techs')">
-            👷 ทะเบียนรายชื่อช่าง (<span id="cnt-techs">0</span>)
+            👷 ทะเบียนรายชื่อคนงาน (<span id="cnt-techs">0</span>)
         </button>
     </div>
 
@@ -158,11 +158,11 @@
     <!-- PANE 2: Technicians Roster (ซ่อนอยู่ในแท็บนี้) -->
     <div id="pane-techs" style="display: none;">
         <div class="filter-row">
-            <div style="font-size:12.5px; font-weight:600; color:var(--text-sub);">รายชื่อช่างทั้งหมดในระบบ:</div>
-            <button class="btn btn-purple btn-sm" onclick="openNewTechModal()">➕ เพิ่มช่างใหม่</button>
+            <div style="font-size:12.5px; font-weight:600; color:var(--text-sub);">รายชื่อคนงานทั้งหมดในระบบ:</div>
+            <button class="btn btn-purple btn-sm" onclick="openNewTechModal()">➕ เพิ่มคนงานใหม่</button>
         </div>
         <div class="card-list" id="tech-list-container">
-            <div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">กำลังโหลดรายชื่อช่าง...</div>
+            <div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">กำลังโหลดรายชื่อคนงาน...</div>
         </div>
     </div>
 </div>
@@ -170,7 +170,7 @@
 <!-- Floating Action Bar -->
 <div class="bottom-bar">
     <div class="bottom-bar-inner">
-        <button class="btn-main-action" onclick="openNewJobLogModal()">⚡ ลงบันทึกค่าแรงช่างเข้าโครงการ</button>
+        <button class="btn-main-action" onclick="openNewJobLogModal()">⚡ ลงบันทึกค่าแรงคนงานเข้าโครงการ</button>
     </div>
 </div>
 
@@ -178,11 +178,11 @@
 <div class="modal-overlay" id="modalTech">
     <div class="modal-box">
         <div class="modal-head">
-            <h3 id="modal-tech-title">➕ ข้อมูลช่าง</h3>
+            <h3 id="modal-tech-title">➕ ข้อมูลคนงาน</h3>
             <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalTech')">&times;</span>
         </div>
         <input type="hidden" id="inp-tech-id">
-        <div class="form-item"><label>ชื่อช่าง / ชื่อเล่น:</label><input type="text" id="inp-tech-name" class="clean-input" placeholder="เช่น ช่างเอก (ตู้คอนโทรล)"></div>
+        <div class="form-item"><label>ชื่อคนงาน / ชื่อเล่น:</label><input type="text" id="inp-tech-name" class="clean-input" placeholder="เช่น คนงานเอก (ตู้คอนโทรล)"></div>
         <div class="form-item"><label>เบอร์โทรศัพท์:</label><input type="text" id="inp-tech-phone" class="clean-input" placeholder="08x-xxx-xxxx"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <div class="form-item"><label>ธนาคาร:</label><input type="text" id="inp-tech-bank" class="clean-input" placeholder="กสิกรไทย"></div>
@@ -192,7 +192,7 @@
         <div class="form-item"><label>ความชำนาญ / หมายเหตุ:</label><input type="text" id="inp-tech-skills" class="clean-input" placeholder="เช่น เดินท่อ, ดึงสาย"></div>
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
             <button class="btn btn-white" onclick="closeModal('modalTech')">ยกเลิก</button>
-            <button class="btn btn-purple font-bold" onclick="submitTechnician()">💾 บันทึกช่าง</button>
+            <button class="btn btn-purple font-bold" onclick="submitTechnician()">💾 บันทึกคนงาน</button>
         </div>
     </div>
 </div>
@@ -201,11 +201,11 @@
 <div class="modal-overlay" id="modalJobLog">
     <div class="modal-box">
         <div class="modal-head">
-            <h3>⚡ ลงบันทึกค่าแรงช่าง</h3>
+            <h3>⚡ ลงบันทึกค่าแรงคนงาน</h3>
             <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalJobLog')">&times;</span>
         </div>
         <div class="form-item"><label>เลือกโครงการ:</label><select id="inp-log-proj" class="clean-input"></select></div>
-        <div class="form-item"><label>เลือกช่าง:</label><select id="inp-log-tech" class="clean-input" onchange="onTechSelectChanged()"></select></div>
+        <div class="form-item"><label>เลือกคนงาน:</label><select id="inp-log-tech" class="clean-input" onchange="onTechSelectChanged()"></select></div>
         <div class="form-item"><label>วันที่ทำงาน:</label><input type="date" id="inp-log-date" class="clean-input"></div>
         <div class="form-item">
             <label>รูปแบบค่าแรง:</label>
@@ -288,12 +288,12 @@
         const container = document.getElementById('tech-list-container');
         const selLogTech = document.getElementById('inp-log-tech');
         container.innerHTML = '';
-        selLogTech.innerHTML = '<option value="">-- เลือกช่าง --</option>';
+        selLogTech.innerHTML = '<option value="">-- เลือกคนงาน --</option>';
 
         document.getElementById('cnt-techs').innerText = technicians.length;
 
         if (technicians.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">ยังไม่มีช่างในระบบ กดปุ่ม "➕ เพิ่มช่างใหม่" ด้านบน</div>`;
+            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">ยังไม่มีคนงานในระบบ กดปุ่ม "➕ เพิ่มคนงานใหม่" ด้านบน</div>`;
             return;
         }
 
@@ -312,7 +312,7 @@
                 </div>
                 <div class="item-card-body">
                     <span>เรทเริ่มต้น: <strong style="color:var(--primary-accent);">${Number(t.default_daily_rate || 500).toLocaleString()} ฿/วัน</strong></span>
-                    <span>${t.skills || 'ช่างทั่วไป'}</span>
+                    <span>${t.skills || 'คนงานทั่วไป'}</span>
                 </div>
             `;
             container.appendChild(card);
@@ -360,7 +360,7 @@
             card.innerHTML = `
                 <div class="item-card-top">
                     <div>
-                        <div class="item-card-title">${l.technicians?.tech_name || 'ช่าง'}</div>
+                        <div class="item-card-title">${l.technicians?.tech_name || 'คนงาน'}</div>
                         <div style="font-size:12px; color:var(--primary-accent); font-weight:600; margin-top:2px;">
                             📁 ${l.projects?.project_name || '-'}
                         </div>
@@ -422,10 +422,10 @@
         const details = document.getElementById('inp-log-details').value.trim();
         const total = (units * rate) + ot;
 
-        if (!projId || !techId || total <= 0) return alert('⚠️ กรุณาเลือกโครงการ ช่าง และระบุค่าแรงให้ถูกต้อง');
+        if (!projId || !techId || total <= 0) return alert('⚠️ กรุณาเลือกโครงการ คนงาน และระบุค่าแรงให้ถูกต้อง');
 
         const tech = technicians.find(t => t.id === techId);
-        const expItemName = `ค่าแรง: ${tech?.tech_name || 'ช่าง'} (${details || (type === 'daily' ? `${units} วัน` : `${units} จุด`)})`;
+        const expItemName = `ค่าแรง: ${tech?.tech_name || 'คนงาน'} (${details || (type === 'daily' ? `${units} วัน` : `${units} จุด`)})`;
 
         // 1. Sync เข้า project_expenses (หมวด labor)
         const { data: expData, error: expErr } = await supabaseClient.from('project_expenses').insert([{
@@ -480,7 +480,7 @@
     }
 
     function openNewTechModal() {
-        document.getElementById('modal-tech-title').innerText = '➕ เพิ่มทะเบียนช่างใหม่';
+        document.getElementById('modal-tech-title').innerText = '➕ เพิ่มทะเบียนคนงานใหม่';
         document.getElementById('inp-tech-id').value = '';
         document.getElementById('inp-tech-name').value = '';
         document.getElementById('inp-tech-phone').value = '';
@@ -494,7 +494,7 @@
     function openEditTechModal(id) {
         const t = technicians.find(x => x.id === id);
         if (!t) return;
-        document.getElementById('modal-tech-title').innerText = '✏️ แก้ไขข้อมูลช่าง';
+        document.getElementById('modal-tech-title').innerText = '✏️ แก้ไขข้อมูลคนงาน';
         document.getElementById('inp-tech-id').value = t.id;
         document.getElementById('inp-tech-name').value = t.tech_name;
         document.getElementById('inp-tech-phone').value = t.phone || '';
@@ -514,7 +514,7 @@
         const rate = parseFloat(document.getElementById('inp-tech-rate').value) || 500;
         const skills = document.getElementById('inp-tech-skills').value.trim();
 
-        if (!name) return alert('⚠️ กรุณากรอกชื่อช่าง');
+        if (!name) return alert('⚠️ กรุณากรอกชื่อคนงาน');
         const payload = { tech_name: name, phone: phone, bank_name: bank, bank_account: acc, default_daily_rate: rate, skills: skills };
 
         if (id) {
@@ -538,7 +538,7 @@
     function copyLaborPayToLine(logId) {
         const l = laborLogs.find(x => x.id === logId);
         if (!l) return;
-        const text = `💸 สลิปเบิกค่าแรง: ${l.technicians?.tech_name || 'ช่าง'}
+        const text = `💸 สลิปเบิกค่าแรง: ${l.technicians?.tech_name || 'คนงาน'}
 📁 โครงการ: ${l.projects?.project_name || '-'}
 🗓️ วันที่: ${l.work_date || '-'}
 📝 งาน: ${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : `${l.units} จุด`)}
