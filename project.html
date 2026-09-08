@@ -920,6 +920,7 @@
             `;
         }
 
+        // 🌟 ตารางส่วนที่ 2: เพิ่มคอลัมน์ "จ่ายแล้ว" + สรุปยอดจ่ายจริง
         const containerExp = document.getElementById('container-expense-categories');
         const allExpenseCats = getProjectExpenseCategories();
         let totalSiteExpenses = 0;
@@ -928,14 +929,13 @@
         const calculatedExpenseCats = allExpenseCats.map((cat, idx) => {
             const catList = expenses.filter(e => e.category === cat.key);
             const catTotal = catList.reduce((s, e) => s + Number(e.amount || 0), 0);
+            const catPaid = catList.filter(e => e.is_paid).reduce((s, e) => s + Number(e.amount || 0), 0);
+            
             totalSiteExpenses += catTotal;
-
-            catList.forEach(e => {
-                if (e.is_paid) paidSiteExpenses += Number(e.amount || 0);
-            });
+            paidSiteExpenses += catPaid;
 
             const isCustom = !DEFAULT_EXPENSE_CATEGORIES.some(d => d.key === cat.key);
-            return { cat, idx, catList, catTotal, isCustom };
+            return { cat, idx, catList, catTotal, catPaid, isCustom };
         });
 
         const totalProjectCost = sumBomCost + totalSiteExpenses;
@@ -944,18 +944,19 @@
 
         if (currentViewMode === 'table') {
             containerExp.innerHTML = `
-                <div class="table-wrap" style="max-width: 780px;">
+                <div class="table-wrap" style="max-width: 880px;">
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 8%;" class="t-center">ลำดับ</th>
-                                <th style="width: 58%;">หมวดหมู่ค่าใช้จ่าย</th>
-                                <th style="width: 26%;" class="t-right">จำนวนเงิน (บาท)</th>
+                                <th style="width: 6%;" class="t-center">ลำดับ</th>
+                                <th style="width: 44%;">หมวดหมู่ค่าใช้จ่าย</th>
+                                <th style="width: 22%;" class="t-right">จำนวนเงินงบประมาณ</th>
+                                <th style="width: 20%;" class="t-right text-emerald">จ่ายจริงแล้ว</th>
                                 <th style="width: 8%;" class="t-center no-print">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${calculatedExpenseCats.map(({ cat, idx, catTotal, isCustom }) => `
+                            ${calculatedExpenseCats.map(({ cat, idx, catTotal, catPaid, isCustom }) => `
                                 <tr>
                                     <td class="t-center">${idx + 1}</td>
                                     <td>
@@ -964,21 +965,23 @@
                                         </a>
                                     </td>
                                     <td class="t-right font-bold text-slate-800">${catTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                    <td class="t-right font-bold text-emerald">${catPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                     <td class="t-center no-print">
-                                        ${isCustom ? `<button class="btn-icon del" onclick="deleteCustomExpenseCategory('${cat.key}')" title="ลบ">🗑️</button>` : ''}
+                                        ${isCustom ? `<button class="btn-icon del" onclick="deleteCustomExpenseCategory('${cat.key}')" title="ลบหมวดนี้">🗑️</button>` : '<span title="หมวดหมู่มาตรฐานของระบบ" style="color:#94a3b8; font-size:12px;">🔒</span>'}
                                     </td>
                                 </tr>
                             `).join('')}
                         </tbody>
                         <tfoot>
                             <tr class="row-total-master">
-                                <td colspan="2" class="t-center font-bold">รวมค่าใช้จ่ายหน้างาน (ส่วนที่ 2)</td>
+                                <td colspan="2" class="t-center font-bold">รวมค่าใช้จ่ายหน้างานทั้งหมด (ส่วนที่ 2)</td>
                                 <td class="t-right font-bold text-rose">${totalSiteExpenses.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                <td class="t-right font-bold text-emerald">${paidSiteExpenses.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td class="no-print"></td>
                             </tr>
                             <tr class="profit-final-row">
-                                <td colspan="2" class="t-center font-bold">💰 กำไรสุทธิคงเหลือจริง (Net Profit)</td>
-                                <td class="t-right font-bold">${netProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                <td colspan="2" class="t-center font-bold">💰 กำไรสุทธิคงเหลือจริงทั้งโครงการ (Net Profit)</td>
+                                <td class="t-right font-bold" colspan="2">${netProfit.toLocaleString('en-US', {minimumFractionDigits: 2})} บาท (กำไร ${marginPct}%)</td>
                                 <td class="no-print"></td>
                             </tr>
                         </tfoot>
@@ -988,7 +991,7 @@
         } else {
             containerExp.innerHTML = `
                 <div class="mobile-card-list" style="max-width: 600px;">
-                    ${calculatedExpenseCats.map(({ cat, idx, catList, catTotal, isCustom }) => `
+                    ${calculatedExpenseCats.map(({ cat, idx, catList, catTotal, catPaid, isCustom }) => `
                         <div class="m-item-card">
                             <div class="m-card-head">
                                 <div class="m-card-title">
@@ -999,9 +1002,9 @@
                                 <div class="m-card-val text-rose">${catTotal.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</div>
                             </div>
                             <div class="m-card-body">
-                                <span>${catList.length} รายการ</span>
+                                <span>${catList.length} รายการ • <strong class="text-emerald">จ่ายแล้ว: ${catPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</strong></span>
                                 <div class="m-card-actions">
-                                    ${isCustom ? `<button class="btn-icon del" onclick="deleteCustomExpenseCategory('${cat.key}')">🗑️</button>` : ''}
+                                    ${isCustom ? `<button class="btn-icon del" onclick="deleteCustomExpenseCategory('${cat.key}')">🗑️</button>` : '<span style="color:#94a3b8; font-size:11px;">🔒 ระบบ</span>'}
                                 </div>
                             </div>
                         </div>
@@ -1673,7 +1676,7 @@
         }
     }
 
-    // 3. Main Item CRUD (ลบอุปกรณ์ย่อยก่อนเสมอเพื่อป้องกัน Foreign Key Error)
+    // 3. Main Item CRUD
     function openAddMainTabModal() {
         document.getElementById('add-main-name').value = '';
         document.getElementById('add-main-qty').value = '1';
@@ -1727,13 +1730,10 @@
         await loadFullProjectData();
     }
 
-    // 🌟 แก้ไข: สั่งลบ BOM ย่อยก่อนลบหมวดงานหลัก
     async function deleteMainItem(id, itemName = '') {
         if (!confirm(`⚠️ ยืนยันลบหมวดงาน "${itemName}"?\nอุปกรณ์ย่อย (BOM) ทั้งหมดในหมวดนี้จะถูกลบไปด้วย!`)) return;
         try {
-            // 1. ลบอุปกรณ์ย่อยใน BOM ก่อน
             await supabaseClient.from('project_bom_items').delete().eq('main_item_id', id);
-            // 2. ลบหมวดงานหลัก
             const { error } = await supabaseClient.from('project_main_items').delete().eq('id', id);
             if (error) throw error;
             activeSheetKey = 'main-summary';
