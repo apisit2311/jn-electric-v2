@@ -38,6 +38,8 @@
         /* Header Card */
         .header-card { background: var(--surface); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-subtle); margin-bottom: 12px; }
         .badge-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 2px 8px; background: #e0f2fe; color: #0369a1; border-radius: 20px; margin-bottom: 6px; }
+        .badge-live-sync { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 2px 8px; background: #ecfdf5; color: #059669; border-radius: 20px; }
+        .badge-live-sync::before { content: ''; width: 6px; height: 6px; background: #10b981; border-radius: 50%; }
         .proj-name { font-size: 17px; font-weight: 700; color: var(--primary); margin: 0; line-height: 1.3; }
         .proj-meta { font-size: 12.5px; color: var(--text-sub); margin-top: 4px; }
 
@@ -117,7 +119,7 @@
 <div class="wrapper">
     <div id="loading-view">
         <div class="spinner"></div>
-        <div style="font-size: 13px; color: var(--text-sub);">กำลังรวบรวมรายการอุปกรณ์และ BOM...</div>
+        <div style="font-size: 13px; color: var(--text-sub);">กำลังรวบรวมรายการอุปกรณ์จากฐานข้อมูล...</div>
     </div>
 
     <div id="error-view" style="display: none;">
@@ -133,7 +135,10 @@
         <!-- Header -->
         <div class="header-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div class="badge-tag">🛒 BOM Project Checklist</div>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <div class="badge-tag">🛒 BOM Project Checklist</div>
+                    <div class="badge-live-sync">Cloud Sync</div>
+                </div>
                 <button onclick="openProjectChooserModal()" class="no-print" style="border:none; background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:11.5px; font-family:'Prompt'; color:var(--primary-accent); cursor:pointer; font-weight:600;">สลับโครงการ 🔁</button>
             </div>
             <h1 class="proj-name" id="lbl-proj-name">-</h1>
@@ -330,14 +335,17 @@
                     const existing = mapItems.get(key);
                     existing.total_qty += totalQty;
                     existing.sources.push(`${parentTitle} (${totalQty})`);
+                    existing.raw_ids.push({ table: 'project_bom_items', id: b.id });
+                    if (!b.is_checked) existing.is_checked = false;
                 } else {
                     mapItems.set(key, {
-                        id: 'bom_' + b.id,
                         item_name: b.item_name.trim(),
                         total_qty: totalQty,
                         unit: 'ชิ้น',
                         category: parentTitle,
-                        sources: [`${parentTitle} (${totalQty})`]
+                        sources: [`${parentTitle} (${totalQty})`],
+                        raw_ids: [{ table: 'project_bom_items', id: b.id }],
+                        is_checked: !!b.is_checked
                     });
                 }
             });
@@ -352,24 +360,22 @@
                     const existing = mapItems.get(key);
                     existing.total_qty += qty;
                     existing.sources.push(`${catTitle} (${qty})`);
+                    existing.raw_ids.push({ table: 'project_expenses', id: e.id });
+                    if (!e.is_checked) existing.is_checked = false;
                 } else {
                     mapItems.set(key, {
-                        id: 'exp_' + e.id,
                         item_name: e.item_name.trim(),
                         total_qty: qty,
                         unit: e.unit || 'ชิ้น',
                         category: catTitle,
-                        sources: [`${catTitle} (${qty})`]
+                        sources: [`${catTitle} (${qty})`],
+                        raw_ids: [{ table: 'project_expenses', id: e.id }],
+                        is_checked: !!e.is_checked
                     });
                 }
             });
 
-            const savedChecks = JSON.parse(localStorage.getItem(`checklist_status_${projectId}`) || '{}');
-
-            checklist = Array.from(mapItems.values()).map(item => ({
-                ...item,
-                is_checked: !!savedChecks[item.item_name]
-            }));
+            checklist = Array.from(mapItems.values());
 
             renderCategoryTabs();
             renderChecklistView();
@@ -419,18 +425,34 @@
         renderChecklistView();
     }
 
-    function toggleCheck(itemName) {
+    // 🌟 ฟังก์ชันอัปเดตสถานะขึ้น Supabase ทันที
+    async function toggleCheck(itemName) {
         const target = checklist.find(c => c.item_name === itemName);
         if (!target) return;
-        target.is_checked = !target.is_checked;
+        
+        const newStatus = !target.is_checked;
+        target.is_checked = newStatus;
+        renderChecklistView(); // Render ทันทีเพื่อให้หน้าจอไวขึ้น
 
-        saveChecklistToStorage();
-        renderChecklistView();
+        try {
+            const bomIds = target.raw_ids.filter(r => r.table === 'project_bom_items').map(r => r.id);
+            const expIds = target.raw_ids.filter(r => r.table === 'project_expenses').map(r => r.id);
+
+            if (bomIds.length > 0) {
+                await supabaseClient.from('project_bom_items').update({ is_checked: newStatus }).in('id', bomIds);
+            }
+            if (expIds.length > 0) {
+                await supabaseClient.from('project_expenses').update({ is_checked: newStatus }).in('id', expIds);
+            }
+        } catch (e) {
+            console.error("Supabase sync error:", e);
+        }
     }
 
-    function bulkToggleCurrentView(status) {
+    async function bulkToggleCurrentView(status) {
         const searchKw = (document.getElementById('inp-search-item')?.value || '').trim().toLowerCase();
         
+        const targetItems = [];
         checklist.forEach(item => {
             const matchStatus = (currentFilter === 'all') || 
                                (currentFilter === 'pending' && !item.is_checked) || 
@@ -440,19 +462,25 @@
 
             if (matchStatus && matchCategory && matchSearch) {
                 item.is_checked = status;
+                targetItems.push(item);
             }
         });
 
-        saveChecklistToStorage();
         renderChecklistView();
-    }
 
-    function saveChecklistToStorage() {
-        const savedChecks = {};
-        checklist.forEach(item => {
-            if (item.is_checked) savedChecks[item.item_name] = true;
-        });
-        localStorage.setItem(`checklist_status_${projectId}`, JSON.stringify(savedChecks));
+        try {
+            const allBomIds = targetItems.flatMap(i => i.raw_ids.filter(r => r.table === 'project_bom_items').map(r => r.id));
+            const allExpIds = targetItems.flatMap(i => i.raw_ids.filter(r => r.table === 'project_expenses').map(r => r.id));
+
+            if (allBomIds.length > 0) {
+                await supabaseClient.from('project_bom_items').update({ is_checked: status }).in('id', allBomIds);
+            }
+            if (allExpIds.length > 0) {
+                await supabaseClient.from('project_expenses').update({ is_checked: status }).in('id', allExpIds);
+            }
+        } catch (e) {
+            console.error("Bulk sync error:", e);
+        }
     }
 
     function setFilter(flt) {
