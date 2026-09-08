@@ -294,7 +294,7 @@
         });
 
         // Site Expenses Calculations
-        const catMap = { 'materials': 'วัสดุสิ้นเปลืองอื่นๆ', 'ops': 'ค่าใช้จ่ายดำเนินงาน / น้ำมัน', 'labor': 'ยอดเบิกจ่ายค่าแรงช่าง' };
+        const catMap = { 'materials': 'วัสดุสิ้นเปลืองอื่นๆ', 'ops': 'ค่าใช้จ่ายดำเนินงาน / น้ำมัน', 'labor': 'ยอดเบิกจ่ายค่าแรง' };
         const categories = [...new Set(expenses.map(e => e.category || 'materials'))];
         const listExp = document.getElementById('list-expenses');
         listExp.innerHTML = '';
