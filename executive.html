@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>สรุปโครงการ - Executive Overview</title>
+    <title>สรุปภาพรวมโครงการ - Executive Overview</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -136,14 +136,16 @@
 
         <!-- Cashflow Metrics -->
         <div class="metrics-grid">
+            <!-- 🌟 การ์ดเงินสดคงเหลือจริง (เพิ่มข้อมูลมัดจำสินค้า) -->
             <div class="m-tile tile-purple">
                 <div class="m-tile-head">
                     <span class="m-tile-lbl">เงินสดคงเหลือจริง</span>
                     <span>💳</span>
                 </div>
                 <div class="m-tile-val" id="kpi-cash-balance">0.00</div>
-                <div class="m-tile-foot" style="color: var(--text-sub);" id="kpi-cash-sub">หักจ่ายจริง & มัดจำแล้ว</div>
+                <div class="m-tile-foot" style="color: var(--text-sub);" id="kpi-cash-sub">จ่ายแล้ว 0.00 | มัดจำ 0.00</div>
             </div>
+
             <div class="m-tile tile-amber" id="card-need-fund">
                 <div class="m-tile-head">
                     <span class="m-tile-lbl">ต้องเพิ่มเงินสด</span>
@@ -349,8 +351,9 @@
         const netPendingToPay = Math.max(0, unpaidPendingTotal - totalDeposits);
         const neededFund = Math.max(0, netPendingToPay - cashBalance);
 
+        // 🌟 อัปเดตข้อมูลการ์ดเงินสดคงเหลือจริง พร้อมแสดงเงินมัดจำ
         document.getElementById('kpi-cash-balance').innerText = `${cashBalance.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
-        document.getElementById('kpi-cash-sub').innerText = `รับเข้า ${totalFundIn.toLocaleString()} | จ่ายแล้ว ${actualPaidTotal.toLocaleString()}`;
+        document.getElementById('kpi-cash-sub').innerText = `จ่ายจริง ${actualPaidTotal.toLocaleString()} | มัดจำ ${totalDeposits.toLocaleString()}`;
 
         const cardNeed = document.getElementById('card-need-fund');
         const valNeed = document.getElementById('kpi-need-fund');
