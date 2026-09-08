@@ -654,7 +654,7 @@
     async function selectProjectFromLauncher(projectId) {
         currentProject = projects.find(p => p.id === projectId);
         if (!currentProject) return;
-        activeSheetKey = 'main-summary'; // 🌟 รีเซ็ตแท็บกลับมาหน้าหลักเสมอเมื่อเปิดโครงการ
+        activeSheetKey = 'main-summary';
         document.getElementById('lbl-current-project-name').innerText = currentProject.project_name;
         document.getElementById('modalLauncher').style.display = 'none';
         await loadFullProjectData();
@@ -685,17 +685,6 @@
         if (!currentProject) return;
 
         document.getElementById('lbl-customer').innerText = currentProject.customer_name || 'ทั่วไป';
-
-        try {
-            let customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]');
-            for (const c of customCats) {
-                if (c.key && c.key.startsWith('custom_') && c.name) {
-                    await supabaseClient.from('project_expenses').update({ category: c.name }).eq('project_id', currentProject.id).eq('category', c.key);
-                    c.key = c.name;
-                }
-            }
-            localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
-        } catch (err) {}
 
         const resMain = await supabaseClient.from('project_main_items').select('*').eq('project_id', currentProject.id).order('item_order');
         mainItems = resMain.data || [];
@@ -774,7 +763,6 @@
     }
 
     function renderActiveSheet() {
-        // 🌟 ซ่อนหน้าทั้งหมดก่อนเปิดหน้าที่เลือก
         document.querySelectorAll('.sheet-pane').forEach(p => p.classList.remove('active'));
         const dynContainer = document.getElementById('dynamic-panes-container');
         dynContainer.innerHTML = '';
@@ -1226,7 +1214,7 @@
                     <div class="btn-group no-print">
                         <button class="btn btn-emerald btn-sm" onclick="openBatchBomModal('${item.id}')">⚡ เพิ่มหลายรายการ</button>
                         <button class="btn btn-white btn-sm" onclick="openEditMainTabModal('${item.id}')">✏️ แก้ไขหมวด</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteMainItem('${item.id}', '${item.item_name}')">🗑️ ลบแท็บ</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMainItem('${item.id}', '${item.item_name}')">🗑️ ลบหมวดนี้</button>
                         <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
                     </div>
                 </div>
@@ -1245,6 +1233,7 @@
             placeholder: 'พิมพ์รายการ...' 
         };
 
+        const isCustom = !DEFAULT_EXPENSE_CATEGORIES.some(d => d.key === catKey);
         const list = expenses.filter(e => e.category === catKey);
         const total = list.reduce((s, e) => s + Number(e.amount || 0), 0);
         const container = document.getElementById('dynamic-panes-container');
@@ -1368,6 +1357,7 @@
                     </div>
                     <div class="btn-group no-print">
                         <button class="btn btn-emerald btn-sm" onclick="openBatchExpenseModal('${catKey}')">⚡ เพิ่มหลายรายการ</button>
+                        ${isCustom ? `<button class="btn btn-danger btn-sm" onclick="deleteCustomExpenseCategory('${catKey}')">🗑️ ลบหมวดนี้</button>` : ''}
                         <button class="btn btn-white btn-sm" onclick="switchSheet('main-summary')">⬅️ กลับหน้าหลัก</button>
                     </div>
                 </div>
@@ -1683,7 +1673,7 @@
         }
     }
 
-    // 3. Main Item CRUD
+    // 3. Main Item CRUD (ลบอุปกรณ์ย่อยก่อนเสมอเพื่อป้องกัน Foreign Key Error)
     function openAddMainTabModal() {
         document.getElementById('add-main-name').value = '';
         document.getElementById('add-main-qty').value = '1';
@@ -1737,14 +1727,43 @@
         await loadFullProjectData();
     }
 
+    // 🌟 แก้ไข: สั่งลบ BOM ย่อยก่อนลบหมวดงานหลัก
     async function deleteMainItem(id, itemName = '') {
         if (!confirm(`⚠️ ยืนยันลบหมวดงาน "${itemName}"?\nอุปกรณ์ย่อย (BOM) ทั้งหมดในหมวดนี้จะถูกลบไปด้วย!`)) return;
-        await supabaseClient.from('project_main_items').delete().eq('id', id);
-        activeSheetKey = 'main-summary';
-        await loadFullProjectData();
+        try {
+            // 1. ลบอุปกรณ์ย่อยใน BOM ก่อน
+            await supabaseClient.from('project_bom_items').delete().eq('main_item_id', id);
+            // 2. ลบหมวดงานหลัก
+            const { error } = await supabaseClient.from('project_main_items').delete().eq('id', id);
+            if (error) throw error;
+            activeSheetKey = 'main-summary';
+            await loadFullProjectData();
+        } catch (err) {
+            alert('❌ ไม่สามารถลบหมวดงานนี้ได้: ' + err.message);
+        }
     }
 
-    // 4. BOM CRUD
+    // 4. Custom Expense Category Delete
+    async function deleteCustomExpenseCategory(catKey) {
+        const hasExpenses = expenses.some(e => e.category === catKey);
+        if (!confirm(hasExpenses ? `หมวด "${catKey}" มีรายการค่าใช้จ่ายอยู่ ยืนยันลบทั้งหมวดและรายการทั้งหมด?` : `ยืนยันลบหมวดหมู่ "${catKey}"?`)) return;
+        try {
+            if (hasExpenses) {
+                const { error: delErr } = await supabaseClient.from('project_expenses').delete().eq('project_id', currentProject.id).eq('category', catKey);
+                if (delErr) throw delErr;
+            }
+            let customCats = [];
+            try { customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]'); } catch(e) {}
+            customCats = customCats.filter(c => c.key !== catKey && c.name !== catKey);
+            localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
+            activeSheetKey = 'main-summary';
+            await loadFullProjectData();
+        } catch (err) {
+            alert('❌ ไม่สามารถลบหมวดค่าใช้จ่ายได้: ' + err.message);
+        }
+    }
+
+    // 5. BOM Items CRUD
     async function addBomRow(mainItemId) {
         const name = document.getElementById('add-sub-name').value.trim();
         const qty = parseFloat(document.getElementById('add-sub-qty').value) || 1;
@@ -1789,7 +1808,7 @@
         await loadFullProjectData();
     }
 
-    // 5. Batch Handlers
+    // 6. Expense & Funding CRUD
     function openBatchMainTabModal() {
         const tbody = document.getElementById('tbl-batch-main-body');
         tbody.innerHTML = '';
@@ -1883,6 +1902,30 @@
         setBtnLoading('btn-submit-batch-bom', false);
         closeModalSafe('modalBatchBom');
         await loadFullProjectData();
+    }
+
+    function openAddExpenseCategoryModal() {
+        document.getElementById('add-cat-name').value = '';
+        document.getElementById('add-cat-unit').value = 'รายการ';
+        document.getElementById('modalAddExpenseCategory').style.display = 'flex';
+    }
+
+    function submitAddExpenseCategory() {
+        if (!currentProject) return;
+        const name = document.getElementById('add-cat-name').value.trim();
+        const unit = document.getElementById('add-cat-unit').value.trim() || 'รายการ';
+        if (!name) return alert('⚠️ กรุณากรอกชื่อหมวดหมู่');
+
+        const key = name;
+        let customCats = [];
+        try { customCats = JSON.parse(localStorage.getItem(`exp_cats_${currentProject.id}`) || '[]'); } catch(e) {}
+
+        if (!customCats.some(c => c.key === key)) {
+            customCats.push({ key: key, name: name, tabLabel: '📋 ' + name, defaultUnit: unit, placeholder: 'พิมพ์รายการ...' });
+            localStorage.setItem(`exp_cats_${currentProject.id}`, JSON.stringify(customCats));
+        }
+        closeModalSafe('modalAddExpenseCategory');
+        switchSheet('exp-' + key);
     }
 
     function openBatchExpenseModal(catKey) {
@@ -2091,6 +2134,94 @@
         await supabaseClient.from('project_cashflow').insert(inserts);
         setBtnLoading('btn-submit-batch-fund', false);
         closeModalSafe('modalBatchFunding');
+        await loadFullProjectData();
+    }
+
+    // 7. Deposit Handlers
+    function openDepositModal(id = null) {
+        if (id) {
+            const d = deposits.find(x => x.id === id);
+            if (!d) return;
+            document.getElementById('modal-deposit-title').innerText = '✏️ แก้ไขเงินมัดจำสินค้า';
+            document.getElementById('deposit-edit-id').value = d.id;
+            document.getElementById('deposit-date').value = d.deposit_date || '';
+            document.getElementById('deposit-source').value = d.supplier_name || '';
+            document.getElementById('deposit-desc').value = d.description || '';
+            document.getElementById('deposit-amt').value = d.amount || 0;
+        } else {
+            document.getElementById('modal-deposit-title').innerText = '📦 บันทึกเงินมัดจำสินค้าชั่วคราว';
+            document.getElementById('deposit-edit-id').value = '';
+            document.getElementById('deposit-date').valueAsDate = new Date();
+            document.getElementById('deposit-source').value = '';
+            document.getElementById('deposit-desc').value = '';
+            document.getElementById('deposit-amt').value = '0';
+        }
+        document.getElementById('modalDeposit').style.display = 'flex';
+    }
+
+    async function submitDeposit() {
+        const id = document.getElementById('deposit-edit-id').value;
+        const date = document.getElementById('deposit-date').value;
+        const source = document.getElementById('deposit-source').value.trim();
+        const desc = document.getElementById('deposit-desc').value.trim();
+        const amt = parseFloat(document.getElementById('deposit-amt').value) || 0;
+
+        if (!source || amt <= 0) return alert('⚠️ กรุณาระบุรายการ/ร้านค้า และจำนวนเงินมัดจำ');
+
+        if (id) {
+            await supabaseClient.from('project_cashflow').update({ flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'deposit' }).eq('id', id);
+        } else {
+            await supabaseClient.from('project_cashflow').insert([{ project_id: currentProject.id, flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'deposit' }]);
+        }
+        closeModalSafe('modalDeposit');
+        await loadFullProjectData();
+    }
+
+    async function deleteDeposit(id, name = '') {
+        if (!confirm(`ยืนยันลบรายการมัดจำ "${name}"?`)) return;
+        await supabaseClient.from('project_cashflow').delete().eq('id', id);
+        await loadFullProjectData();
+    }
+
+    function openBatchDepositModal() {
+        const tbody = document.getElementById('tbl-batch-deposit-body');
+        tbody.innerHTML = '';
+        for (let i = 0; i < 4; i++) addBatchDepositRow();
+        document.getElementById('modalBatchDeposit').style.display = 'flex';
+    }
+
+    function addBatchDepositRow() {
+        const today = new Date().toISOString().split('T')[0];
+        const tbody = document.getElementById('tbl-batch-deposit-body');
+        const idx = tbody.children.length + 1;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="t-center">${idx}</td>
+            <td><input type="date" class="clean-input t-center b-dep-date" value="${today}"></td>
+            <td><input type="text" class="clean-input b-dep-source" placeholder="เช่น มัดจำตู้..."></td>
+            <td><input type="text" class="clean-input b-dep-desc" placeholder="เช่น 30%"></td>
+            <td><input type="number" class="clean-input t-right font-bold text-amber b-dep-amt" value="0"></td>
+            <td class="t-center"><button class="btn-icon del" onclick="this.closest('tr').remove(); renumberRows('tbl-batch-deposit-body');">🗑️</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    async function submitBatchDeposit() {
+        if (!currentProject) return;
+        const rows = document.querySelectorAll('#tbl-batch-deposit-body tr');
+        const inserts = [];
+        rows.forEach(r => {
+            const date = r.querySelector('.b-dep-date').value;
+            const source = r.querySelector('.b-dep-source').value.trim();
+            const desc = r.querySelector('.b-dep-desc').value.trim();
+            const amt = parseFloat(r.querySelector('.b-dep-amt').value) || 0;
+            if (source && amt > 0) {
+                inserts.push({ project_id: currentProject.id, flow_date: date, item_name: source, notes: desc, amount: amt, flow_type: 'deposit' });
+            }
+        });
+        if (inserts.length === 0) return alert('⚠️ กรุณาระบุข้อมูลอย่างน้อย 1 รายการ');
+        await supabaseClient.from('project_cashflow').insert(inserts);
+        closeModalSafe('modalBatchDeposit');
         await loadFullProjectData();
     }
 
