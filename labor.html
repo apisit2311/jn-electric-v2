@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ระบบจัดการช่างและเบิกจ่ายค่าแรง - JN Electric</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-accent: #2563eb;
+            --surface: #ffffff;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --emerald: #059669;
+            --emerald-bg: #ecfdf5;
+            --emerald-border: #bbf7d0;
+            --amber: #d97706;
+            --amber-bg: #fffbeb;
+            --amber-border: #fde68a;
+            --rose: #e11d48;
+            --rose-bg: #fff1f2;
+            --purple: #7c3aed;
+            --purple-bg: #faf5ff;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --card-shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Prompt', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 16px; line-height: 1.4; }
+        .wrapper { max-width: 1200px; margin: 0 auto; }
+
+        /* Header */
+        .app-header { background: var(--surface); padding: 16px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .header-title { display: flex; align-items: center; gap: 12px; }
+        .header-logo-icon { width: 44px; height: 44px; background: #e0f2fe; color: #0284c7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; }
+        .header-title h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--primary); }
+        .header-title p { margin: 2px 0 0 0; font-size: 12px; color: var(--text-sub); }
+        .btn-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .btn { padding: 8px 14px; border-radius: 9px; font-family: 'Prompt'; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; transition: all 0.15s ease; }
+        .btn-primary { background: var(--primary-accent); color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-white { background: #fff; border-color: var(--border); color: var(--text-main); }
+        .btn-white:hover { background: var(--bg); }
+        .btn-emerald { background: var(--emerald); color: #fff; }
+        .btn-emerald:hover { background: #047857; }
+        .btn-purple { background: var(--purple); color: #fff; }
+        .btn-danger { background: var(--rose-bg); color: var(--rose); border-color: #fecdd3; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 7px; }
+
+        /* KPI Dashboard */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .kpi-card { background: var(--surface); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--card-shadow); position: relative; overflow: hidden; }
+        .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+        .kpi-card.amber::before { background: var(--amber); }
+        .kpi-card.emerald::before { background: var(--emerald); }
+        .kpi-card.purple::before { background: var(--purple); }
+        .kpi-title { font-size: 11.5px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; }
+        .kpi-val { font-size: 22px; font-weight: 700; }
+        .kpi-sub { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
+
+        /* Main Workspace */
+        .layout-grid { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+        @media (max-width: 900px) { .layout-grid { grid-template-columns: 1fr; } }
+
+        .panel-box { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 18px; box-shadow: var(--card-shadow); }
+        .panel-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px; }
+        .panel-head h2 { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary); }
+
+        /* Technician List */
+        .tech-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.15s; }
+        .tech-card:hover, .tech-card.active { border-color: var(--primary-accent); background: #eff6ff; }
+        .tech-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .tech-sub { font-size: 11.5px; color: var(--text-sub); }
+
+        /* Table & Cards */
+        .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+        th { background: #f8fafc; color: var(--text-sub); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background-color: #f8fafc; }
+        .t-center { text-align: center; }
+        .t-right { text-align: right; }
+        .font-bold { font-weight: 700; }
+        .pay-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--emerald); }
+
+        /* Forms & Inputs */
+        .clean-input { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 13px; outline: none; transition: 0.15s; }
+        .clean-input:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .form-item { margin-bottom: 12px; }
+        .form-item label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-main); }
+
+        /* Modals */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; }
+        .modal-box { background: #fff; width: 500px; max-width: 92%; border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--card-shadow-lg); max-height: 90vh; overflow-y: auto; }
+        .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 14px; }
+        .modal-head h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Header -->
+    <div class="app-header">
+        <div class="header-title">
+            <div class="header-logo-icon">👷</div>
+            <div>
+                <h1>Labor & Subcontractor Hub</h1>
+                <p>ระบบจัดการสมุดทะเบียนช่าง บันทึกชั่วโมงงาน และควบคุมยอดเบิกจ่ายค่าแรง</p>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-emerald" onclick="openNewJobLogModal()">⚡ ลงบันทึกค่าแรงใหม่</button>
+            <button class="btn btn-purple" onclick="openNewTechModal()">➕ เพิ่มช่างใหม่</button>
+            <a href="project.html" class="btn btn-white">📁 หน้าโครงการ</a>
+            <a href="index.html" class="btn btn-white">⬅️ ออกบิล</a>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+        <div class="kpi-card amber">
+            <div class="kpi-title">ยอดค่าแรงรอเบิกจ่าย (Pending)</div>
+            <div class="kpi-val" style="color: var(--amber);" id="kpi-pending-labor">0.00 ฿</div>
+            <div class="kpi-sub" id="kpi-pending-count">0 รายการที่ยังไม่จ่าย</div>
+        </div>
+        <div class="kpi-card emerald">
+            <div class="kpi-title">ยอดค่าแรงที่จ่ายแล้วทั้งหมด</div>
+            <div class="kpi-val" style="color: var(--emerald);" id="kpi-paid-labor">0.00 ฿</div>
+            <div class="kpi-sub" id="kpi-paid-count">0 รายการที่โอนแล้ว</div>
+        </div>
+        <div class="kpi-card purple">
+            <div class="kpi-title">จำนวนช่างในระบบ</div>
+            <div class="kpi-val" style="color: var(--purple);" id="kpi-tech-count">0 คน</div>
+            <div class="kpi-sub">พร้อมรับงานติดตั้ง</div>
+        </div>
+    </div>
+
+    <!-- Layout -->
+    <div class="layout-grid">
+        <!-- Left: Technician Roster -->
+        <div class="panel-box">
+            <div class="panel-head">
+                <h2>📋 ทะเบียนรายชื่อช่าง</h2>
+                <button class="btn btn-purple btn-sm" onclick="openNewTechModal()">➕ เพิ่ม</button>
+            </div>
+            <div id="tech-list-container" style="max-height: 520px; overflow-y: auto;">
+                <div style="text-align: center; color: var(--text-sub); padding: 20px;">กำลังโหลดรายชื่อช่าง...</div>
+            </div>
+        </div>
+
+        <!-- Right: Labor Logs Table -->
+        <div class="panel-box">
+            <div class="panel-head">
+                <h2>🕒 ประวัติการทำงานและเบิกค่าแรง</h2>
+                <div style="display:flex; gap:6px;">
+                    <select id="sel-filter-proj" class="clean-input" style="padding:4px 8px; font-size:12px;" onchange="loadLaborLogs()">
+                        <option value="">-- ทุกโครงการ --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;" class="t-center">#</th>
+                            <th style="width: 12%;" class="t-center">วันที่</th>
+                            <th style="width: 18%;">ชื่อช่าง</th>
+                            <th style="width: 22%;">โครงการ</th>
+                            <th style="width: 18%;">รายละเอียดงาน</th>
+                            <th style="width: 13%;" class="t-right">รวมเงิน (บาท)</th>
+                            <th style="width: 6%;" class="t-center">จ่ายแล้ว</th>
+                            <th style="width: 6%;" class="t-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="labor-logs-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: New Technician -->
+<div class="modal-overlay" id="modalTech">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3 id="modal-tech-title">➕ เพิ่มทะเบียนช่างใหม่</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalTech')">&times;</span>
+        </div>
+        <input type="hidden" id="inp-tech-id">
+        <div class="form-item"><label>ชื่อ-นามสกุล / ชื่อเล่น:</label><input type="text" id="inp-tech-name" class="clean-input" placeholder="เช่น ช่างเอก (งานตู้คอนโทรล)"></div>
+        <div class="form-item"><label>เบอร์โทรศัพท์:</label><input type="text" id="inp-tech-phone" class="clean-input" placeholder="08x-xxx-xxxx"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item"><label>ธนาคาร:</label><input type="text" id="inp-tech-bank" class="clean-input" placeholder="เช่น กสิกรไทย, กรุงเทพ"></div>
+            <div class="form-item"><label>เลขที่บัญชี:</label><input type="text" id="inp-tech-acc" class="clean-input" placeholder="xxx-x-xxxxx-x"></div>
+        </div>
+        <div class="form-item"><label>ค่าแรงเริ่มต้นต่อวัน (บาท):</label><input type="number" id="inp-tech-rate" class="clean-input" value="500"></div>
+        <div class="form-item"><label>ความชำนาญ / หมายเหตุ:</label><input type="text" id="inp-tech-skills" class="clean-input" placeholder="เช่น ช่างเดินท่อ, เข้าหัวสาย"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModal('modalTech')">ยกเลิก</button>
+            <button class="btn btn-purple font-bold" onclick="submitTechnician()">💾 บันทึกข้อมูลช่าง</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Record Labor Log (Sync to project_expenses) -->
+<div class="modal-overlay" id="modalJobLog">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3>⚡ ลงบันทึกค่าแรงช่างเข้าโครงการ</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalJobLog')">&times;</span>
+        </div>
+        <div class="form-item"><label>เลือกโครงการ:</label><select id="inp-log-proj" class="clean-input"></select></div>
+        <div class="form-item"><label>เลือกช่าง:</label><select id="inp-log-tech" class="clean-input" onchange="onTechSelectChanged()"></select></div>
+        <div class="form-item"><label>วันที่ทำงาน:</label><input type="date" id="inp-log-date" class="clean-input"></div>
+        <div class="form-item">
+            <label>รูปแบบการคิดค่าแรง:</label>
+            <select id="inp-log-type" class="clean-input" onchange="calcJobLogTotal()">
+                <option value="daily">คิดเป็นรายวัน (จำนวนวัน × ค่าแรง/วัน)</option>
+                <option value="task">คิดเหมางาน / รายจุด (จำนวนจุด × ราคา/จุด)</option>
+            </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item"><label id="lbl-unit-qty">จำนวนวัน:</label><input type="number" id="inp-log-units" class="clean-input" min="0.5" step="0.5" value="1" oninput="calcJobLogTotal()"></div>
+            <div class="form-item"><label id="lbl-unit-rate">ค่าแรง/หน่วย (บาท):</label><input type="number" id="inp-log-rate" class="clean-input" min="0" value="500" oninput="calcJobLogTotal()"></div>
+        </div>
+        <div class="form-item"><label>ค่าล่วงเวลา / เบี้ยเลี้ยงพิเศษ (OT):</label><input type="number" id="inp-log-ot" class="clean-input" min="0" value="0" oninput="calcJobLogTotal()"></div>
+        <div class="form-item"><label>รายละเอียดงานที่ทำ:</label><input type="text" id="inp-log-details" class="clean-input" placeholder="เช่น ติดตั้งตู้ควบคุม 2 ชุด"></div>
+        <div style="background: var(--amber-bg); border: 1px solid var(--amber-border); padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600; color: var(--amber); font-size: 13px;">ยอดรวมค่าแรงงวดนี้:</span>
+            <strong style="font-size: 18px; color: var(--amber);" id="lbl-log-total">0.00 ฿</strong>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+            <button class="btn btn-white" onclick="closeModal('modalJobLog')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" id="btn-submit-log" onclick="submitLaborLog()">💾 บันทึกและเชื่อมเข้าโครงการ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let technicians = [];
+    let projects = [];
+    let laborLogs = [];
+
+    window.onload = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) { window.location.href = "index.html"; return; }
+        await loadProjects();
+        await loadTechnicians();
+        await loadLaborLogs();
+    };
+
+    async function loadProjects() {
+        const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
+        projects = data || [];
+        const selFilter = document.getElementById('sel-filter-proj');
+        const selLogProj = document.getElementById('inp-log-proj');
+        
+        selFilter.innerHTML = '<option value="">-- ทุกโครงการ --</option>';
+        selLogProj.innerHTML = '<option value="">-- เลือกโครงการ --</option>';
+        
+        projects.forEach(p => {
+            const opt1 = document.createElement('option');
+            opt1.value = p.id;
+            opt1.textContent = p.project_name;
+            selFilter.appendChild(opt1);
+
+            const opt2 = document.createElement('option');
+            opt2.value = p.id;
+            opt2.textContent = p.project_name;
+            selLogProj.appendChild(opt2);
+        });
+    }
+
+    async function loadTechnicians() {
+        const { data } = await supabaseClient.from('technicians').select('*').order('tech_name');
+        technicians = data || [];
+        
+        const container = document.getElementById('tech-list-container');
+        const selLogTech = document.getElementById('inp-log-tech');
+        container.innerHTML = '';
+        selLogTech.innerHTML = '<option value="">-- เลือกช่าง --</option>';
+
+        document.getElementById('kpi-tech-count').innerText = `${technicians.length} คน`;
+
+        if (technicians.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub); font-size:12px;">ยังไม่มีช่างในระบบ กดปุ่ม "➕ เพิ่ม" ด้านบน</div>`;
+            return;
+        }
+
+        technicians.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'tech-card';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <div class="tech-name">${t.tech_name}</div>
+                        <div class="tech-sub">📞 ${t.phone || '-'} • 🏦 ${t.bank_name || ''} ${t.bank_account || ''}</div>
+                    </div>
+                    <button class="btn-icon edit" onclick="openEditTechModal('${t.id}')">✏️</button>
+                </div>
+            `;
+            container.appendChild(card);
+
+            const opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = t.tech_name;
+            selLogTech.appendChild(opt);
+        });
+    }
+
+    async function loadLaborLogs() {
+        const filterProj = document.getElementById('sel-filter-proj').value;
+        let query = supabaseClient.from('project_labor_logs').select('*, projects(project_name), technicians(tech_name, phone, bank_name, bank_account)').order('work_date', { ascending: false });
+        
+        if (filterProj) query = query.eq('project_id', filterProj);
+        const { data } = await query;
+        laborLogs = data || [];
+
+        let sumPending = 0;
+        let cntPending = 0;
+        let sumPaid = 0;
+        let cntPaid = 0;
+
+        const tbody = document.getElementById('labor-logs-body');
+        tbody.innerHTML = '';
+
+        laborLogs.forEach((l, idx) => {
+            const amt = Number(l.total_amount || 0);
+            if (l.is_paid) {
+                sumPaid += amt;
+                cntPaid++;
+            } else {
+                sumPending += amt;
+                cntPending++;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="t-center">${idx + 1}</td>
+                <td class="t-center">${l.work_date || '-'}</td>
+                <td class="font-bold">${l.technicians?.tech_name || 'ช่าง'}</td>
+                <td>${l.projects?.project_name || '-'}</td>
+                <td>${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : `${l.units} จุด`)}</td>
+                <td class="t-right font-bold" style="color: ${l.is_paid ? 'var(--emerald)' : 'var(--amber)'};">${amt.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                <td class="t-center">
+                    <input type="checkbox" class="pay-checkbox" ${l.is_paid ? 'checked' : ''} onchange="toggleLaborPaid('${l.id}', '${l.expense_id}', ${l.is_paid})">
+                </td>
+                <td class="t-center">
+                    <button class="btn-icon del" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('kpi-pending-labor').innerText = `${sumPending.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการที่ยังไม่จ่าย`;
+        document.getElementById('kpi-paid-labor').innerText = `${sumPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการที่โอนแล้ว`;
+    }
+
+    function onTechSelectChanged() {
+        const tId = document.getElementById('inp-log-tech').value;
+        const tech = technicians.find(t => t.id === tId);
+        if (tech && tech.default_daily_rate) {
+            document.getElementById('inp-log-rate').value = tech.default_daily_rate;
+            calcJobLogTotal();
+        }
+    }
+
+    function calcJobLogTotal() {
+        const units = parseFloat(document.getElementById('inp-log-units').value) || 0;
+        const rate = parseFloat(document.getElementById('inp-log-rate').value) || 0;
+        const ot = parseFloat(document.getElementById('inp-log-ot').value) || 0;
+        const total = (units * rate) + ot;
+        document.getElementById('lbl-log-total').innerText = `${total.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+    }
+
+    async function submitLaborLog() {
+        const projId = document.getElementById('inp-log-proj').value;
+        const techId = document.getElementById('inp-log-tech').value;
+        const date = document.getElementById('inp-log-date').value;
+        const type = document.getElementById('inp-log-type').value;
+        const units = parseFloat(document.getElementById('inp-log-units').value) || 1;
+        const rate = parseFloat(document.getElementById('inp-log-rate').value) || 0;
+        const ot = parseFloat(document.getElementById('inp-log-ot').value) || 0;
+        const details = document.getElementById('inp-log-details').value.trim();
+        const total = (units * rate) + ot;
+
+        if (!projId || !techId || total <= 0) return alert('⚠️ กรุณาเลือกโครงการ ช่าง และระบุค่าแรงให้ถูกต้อง');
+
+        const tech = technicians.find(t => t.id === techId);
+        const expItemName = `ค่าแรง: ${tech?.tech_name || 'ช่าง'} (${details || (type === 'daily' ? `${units} วัน` : `${units} จุด`)})`;
+
+        // 1. สร้างรายการลง project_expenses ในหมวด labor ทันที
+        const { data: expData, error: expErr } = await supabaseClient.from('project_expenses').insert([{
+            project_id: projId,
+            category: 'labor',
+            item_name: expItemName,
+            qty: units,
+            unit: type === 'daily' ? 'วัน' : 'จุด',
+            unit_price: rate,
+            amount: total,
+            expense_date: date,
+            is_paid: false
+        }]).select().single();
+
+        if (expErr) return alert('❌ ไม่สามารถสร้างรายการค่าใช้จ่ายได้: ' + expErr.message);
+
+        // 2. สร้างประวัติลง project_labor_logs พร้อมผูก expense_id
+        await supabaseClient.from('project_labor_logs').insert([{
+            project_id: projId,
+            technician_id: techId,
+            expense_id: expData.id,
+            work_date: date,
+            work_type: type,
+            units: units,
+            unit_rate: rate,
+            ot_amount: ot,
+            total_amount: total,
+            work_details: details,
+            is_paid: false
+        }]);
+
+        closeModal('modalJobLog');
+        await loadLaborLogs();
+    }
+
+    // 2-Way Status Sync: ติ๊กจ่ายแล้ว อัปเดตทั้งใน project_labor_logs และ project_expenses
+    async function toggleLaborPaid(logId, expenseId, currentStatus) {
+        const newStatus = !currentStatus;
+        await supabaseClient.from('project_labor_logs').update({ is_paid: newStatus }).eq('id', logId);
+        if (expenseId) {
+            await supabaseClient.from('project_expenses').update({ is_paid: newStatus }).eq('id', expenseId);
+        }
+        await loadLaborLogs();
+    }
+
+    async function deleteLaborLog(logId, expenseId) {
+        if (!confirm('ยืนยันลบรายการค่าแรงนี้? (ข้อมูลในหน้าโครงการจะถูกลบด้วย)')) return;
+        await supabaseClient.from('project_labor_logs').delete().eq('id', logId);
+        if (expenseId) {
+            await supabaseClient.from('project_expenses').delete().eq('id', expenseId);
+        }
+        await loadLaborLogs();
+    }
+
+    // Technician Modal Handlers
+    function openNewTechModal() {
+        document.getElementById('modal-tech-title').innerText = '➕ เพิ่มทะเบียนช่างใหม่';
+        document.getElementById('inp-tech-id').value = '';
+        document.getElementById('inp-tech-name').value = '';
+        document.getElementById('inp-tech-phone').value = '';
+        document.getElementById('inp-tech-bank').value = '';
+        document.getElementById('inp-tech-acc').value = '';
+        document.getElementById('inp-tech-rate').value = '500';
+        document.getElementById('inp-tech-skills').value = '';
+        document.getElementById('modalTech').style.display = 'flex';
+    }
+
+    function openEditTechModal(id) {
+        const t = technicians.find(x => x.id === id);
+        if (!t) return;
+        document.getElementById('modal-tech-title').innerText = '✏️ แก้ไขข้อมูลช่าง';
+        document.getElementById('inp-tech-id').value = t.id;
+        document.getElementById('inp-tech-name').value = t.tech_name;
+        document.getElementById('inp-tech-phone').value = t.phone || '';
+        document.getElementById('inp-tech-bank').value = t.bank_name || '';
+        document.getElementById('inp-tech-acc').value = t.bank_account || '';
+        document.getElementById('inp-tech-rate').value = t.default_daily_rate || 500;
+        document.getElementById('inp-tech-skills').value = t.skills || '';
+        document.getElementById('modalTech').style.display = 'flex';
+    }
+
+    async function submitTechnician() {
+        const id = document.getElementById('inp-tech-id').value;
+        const name = document.getElementById('inp-tech-name').value.trim();
+        const phone = document.getElementById('inp-tech-phone').value.trim();
+        const bank = document.getElementById('inp-tech-bank').value.trim();
+        const acc = document.getElementById('inp-tech-acc').value.trim();
+        const rate = parseFloat(document.getElementById('inp-tech-rate').value) || 500;
+        const skills = document.getElementById('inp-tech-skills').value.trim();
+
+        if (!name) return alert('⚠️ กรุณากรอกชื่อช่าง');
+
+        const payload = { tech_name: name, phone: phone, bank_name: bank, bank_account: acc, default_daily_rate: rate, skills: skills };
+
+        if (id) {
+            await supabaseClient.from('technicians').update(payload).eq('id', id);
+        } else {
+            await supabaseClient.from('technicians').insert([payload]);
+        }
+        closeModal('modalTech');
+        await loadTechnicians();
+    }
+
+    function openNewJobLogModal() {
+        document.getElementById('inp-log-date').valueAsDate = new Date();
+        document.getElementById('inp-log-details').value = '';
+        document.getElementById('inp-log-units').value = '1';
+        document.getElementById('inp-log-ot').value = '0';
+        calcJobLogTotal();
+        document.getElementById('modalJobLog').style.display = 'flex';
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+</script>
+</body>
+</html>
