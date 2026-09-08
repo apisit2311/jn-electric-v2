@@ -68,8 +68,12 @@
         .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 700; }
 
         /* Filter Row */
-        .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
-        .custom-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; outline: none; background: #fff; flex: 1; max-width: 240px; }
+        .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
+        .custom-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; outline: none; background: #fff; flex: 1; min-width: 200px; }
+
+        .status-pill-group { display: flex; gap: 4px; background: #e2e8f0; padding: 3px; border-radius: 8px; }
+        .status-pill { padding: 4px 8px; border: none; background: transparent; font-family: 'Prompt'; font-size: 11.5px; font-weight: 600; color: var(--text-sub); border-radius: 6px; cursor: pointer; }
+        .status-pill.active { background: #fff; color: var(--primary); font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
         /* Minimal Cards */
         .card-list { display: flex; flex-direction: column; gap: 8px; }
@@ -148,6 +152,11 @@
             <select id="sel-filter-proj" class="custom-select" onchange="loadLaborLogs()">
                 <option value="">-- กรองทุกโครงการ --</option>
             </select>
+            <div class="status-pill-group">
+                <button class="status-pill active" id="st-all" onclick="setStatusFilter('all')">ทั้งหมด</button>
+                <button class="status-pill" id="st-pending" onclick="setStatusFilter('pending')">รอโอน</button>
+                <button class="status-pill" id="st-paid" onclick="setStatusFilter('paid')">โอนแล้ว</button>
+            </div>
             <button class="btn btn-emerald btn-sm" onclick="openNewJobLogModal()">⚡ ลงค่าแรงด่วน</button>
         </div>
         <div class="card-list" id="labor-logs-list">
@@ -155,7 +164,7 @@
         </div>
     </div>
 
-    <!-- PANE 2: Technicians Roster (ซ่อนอยู่ในแท็บนี้) -->
+    <!-- PANE 2: Technicians Roster -->
     <div id="pane-techs" style="display: none;">
         <div class="filter-row">
             <div style="font-size:12.5px; font-weight:600; color:var(--text-sub);">รายชื่อคนงานทั้งหมดในระบบ:</div>
@@ -242,6 +251,7 @@
     let projects = [];
     let laborLogs = [];
     let activeTab = 'logs';
+    let statusFilter = 'all';
 
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -259,33 +269,43 @@
         document.getElementById('pane-techs').style.display = tab === 'techs' ? 'block' : 'none';
     }
 
-   async function loadProjects() {
-    // ดึงเฉพาะโครงการที่กำลังดำเนินงาน (Active) เรียงจากล่าสุด
-    const { data } = await supabaseClient
-        .from('projects')
-        .select('*')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false });
-        
-    projects = data || [];
-    const selFilter = document.getElementById('sel-filter-proj');
-    const selLogProj = document.getElementById('inp-log-proj');
-    
-    selFilter.innerHTML = '<option value="">-- กรองเฉพาะโครงการ Active --</option>';
-    selLogProj.innerHTML = '<option value="">-- เลือกโครงการที่กำลังดำเนินงาน --</option>';
-    
-    projects.forEach(p => {
-        const opt1 = document.createElement('option');
-        opt1.value = p.id;
-        opt1.textContent = `🟢 ${p.project_name}`;
-        selFilter.appendChild(opt1);
+    function setStatusFilter(st) {
+        statusFilter = st;
+        document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
+        document.getElementById(`st-${st}`).classList.add('active');
+        renderLaborLogsView();
+    }
 
-        const opt2 = document.createElement('option');
-        opt2.value = p.id;
-        opt2.textContent = `🟢 ${p.project_name}`;
-        selLogProj.appendChild(opt2);
-    });
-}
+    async function loadProjects() {
+        const { data } = await supabaseClient
+            .from('projects')
+            .select('*')
+            .eq('status', 'active')
+            .order('created_at', { ascending: false });
+            
+        projects = data || [];
+        const selFilter = document.getElementById('sel-filter-proj');
+        const selLogProj = document.getElementById('inp-log-proj');
+        
+        selFilter.innerHTML = '<option value="">-- กรองทุกโครงการ Active --</option>';
+        selLogProj.innerHTML = '<option value="">-- เลือกโครงการที่กำลังดำเนินงาน --</option>';
+        
+        const lastSavedId = localStorage.getItem('erp_last_selected_project');
+
+        projects.forEach(p => {
+            const opt1 = document.createElement('option');
+            opt1.value = p.id;
+            opt1.textContent = `🟢 ${p.project_name}`;
+            if (lastSavedId && p.id === lastSavedId) opt1.selected = true;
+            selFilter.appendChild(opt1);
+
+            const opt2 = document.createElement('option');
+            opt2.value = p.id;
+            opt2.textContent = `🟢 ${p.project_name}`;
+            if (lastSavedId && p.id === lastSavedId) opt2.selected = true;
+            selLogProj.appendChild(opt2);
+        });
+    }
 
     async function loadTechnicians() {
         const { data } = await supabaseClient.from('technicians').select('*').order('tech_name');
@@ -314,7 +334,10 @@
                             📞 ${t.phone || '-'} • 🏦 ${t.bank_name || ''} <strong>${t.bank_account || ''}</strong>
                         </div>
                     </div>
-                    <button class="btn-icon" onclick="openEditTechModal('${t.id}')">✏️</button>
+                    <div>
+                        <button class="btn-icon" onclick="openEditTechModal('${t.id}')">✏️</button>
+                        <button class="btn-icon" onclick="deleteTechnician('${t.id}', '${t.tech_name}')">🗑️</button>
+                    </div>
                 </div>
                 <div class="item-card-body">
                     <span>เรทเริ่มต้น: <strong style="color:var(--primary-accent);">${Number(t.default_daily_rate || 500).toLocaleString()} ฿/วัน</strong></span>
@@ -338,18 +361,14 @@
         const { data } = await query;
         laborLogs = data || [];
 
+        renderLaborLogsView();
+    }
+
+    function renderLaborLogsView() {
         let sumPending = 0;
         let cntPending = 0;
         let sumPaid = 0;
         let cntPaid = 0;
-
-        const container = document.getElementById('labor-logs-list');
-        container.innerHTML = '';
-        document.getElementById('cnt-logs').innerText = laborLogs.length;
-
-        if (laborLogs.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">ยังไม่มีการบันทึกค่าแรง</div>`;
-        }
 
         laborLogs.forEach(l => {
             const amt = Number(l.total_amount || 0);
@@ -360,7 +379,29 @@
                 sumPending += amt;
                 cntPending++;
             }
+        });
 
+        document.getElementById('kpi-pending-labor').innerText = `${sumPending.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอโอน`;
+        document.getElementById('kpi-paid-labor').innerText = `${sumPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการโอนแล้ว`;
+
+        document.getElementById('cnt-logs').innerText = laborLogs.length;
+
+        let displayList = laborLogs;
+        if (statusFilter === 'pending') displayList = laborLogs.filter(l => !l.is_paid);
+        if (statusFilter === 'paid') displayList = laborLogs.filter(l => l.is_paid);
+
+        const container = document.getElementById('labor-logs-list');
+        container.innerHTML = '';
+
+        if (displayList.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">ไม่มีรายการในเงื่อนไขนี้</div>`;
+            return;
+        }
+
+        displayList.forEach(l => {
+            const amt = Number(l.total_amount || 0);
             const card = document.createElement('div');
             card.className = `item-card ${l.is_paid ? 'paid' : ''}`;
             card.innerHTML = `
@@ -393,11 +434,6 @@
             `;
             container.appendChild(card);
         });
-
-        document.getElementById('kpi-pending-labor').innerText = `${sumPending.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
-        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอโอนเงิน`;
-        document.getElementById('kpi-paid-labor').innerText = `${sumPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
-        document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการโอนแล้ว`;
     }
 
     function onTechSelectChanged() {
@@ -529,6 +565,12 @@
             await supabaseClient.from('technicians').insert([payload]);
         }
         closeModal('modalTech');
+        await loadTechnicians();
+    }
+
+    async function deleteTechnician(id, name) {
+        if (!confirm(`ยืนยันลบคนงาน "${name}" ออกจากระบบ?`)) return;
+        await supabaseClient.from('technicians').delete().eq('id', id);
         await loadTechnicians();
     }
 
