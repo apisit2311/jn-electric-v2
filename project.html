@@ -186,20 +186,21 @@
         </div>
         <div class="btn-group no-print">
             <button class="btn btn-mode-toggle" id="btn-view-mode" onclick="toggleViewMode()">📱 โหมดการ์ดมือถือ</button>
-            <button class="btn btn-purple" onclick="shareExecutiveLink()">🔗 ลิงก์ผู้บริหาร</button>
-            <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์</button>
-            <button class="btn btn-white" onclick="openChecklistForCurrentProject()">🛒 เช็คของ</button>
             <a href="labor.html" class="btn btn-purple">👷 จัดการค่าแรง</a>
+            <button class="btn btn-white" onclick="openChecklistForCurrentProject()">🛒 เช็คของ</button>
+            <button class="btn btn-white" onclick="shareExecutiveLink()">🔗 ลิงก์ผู้บริหาร</button>
+            <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์</button>
             <a href="index.html" class="btn btn-primary">⬅️ ออกบิล</a>
         </div>
     </div>
 
     <!-- Project Switcher Bar -->
     <div class="project-bar no-print">
-        <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 260px;">
-            <span style="font-size: 13px; font-weight: 600; color: var(--slate-700);">📁 โครงการปัจจุบัน:</span>
+        <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 260px; flex-wrap: wrap;">
+            <span style="font-size: 13px; font-weight: 600; color: var(--slate-700);">📁 โครงการ:</span>
             <div class="current-proj-pill" id="lbl-current-project-name">⚡ กำลังโหลด...</div>
             <button class="btn btn-white btn-sm" onclick="openProjectLauncherModal()">📂 สลับโครงการ</button>
+            <button class="btn btn-sm" id="btn-toggle-status" style="background:#f1f5f9; border:1px solid var(--slate-300);" onclick="toggleCurrentProjectStatus()">📁 ปิดโครงการนี้</button>
         </div>
         <div class="btn-group">
             <button class="btn btn-emerald" onclick="openNewProjectModal()">➕ สร้างโครงการใหม่</button>
@@ -306,18 +307,24 @@
     </div>
 </div>
 
-<!-- ==================== MODAL: PROJECT LAUNCHER ==================== -->
-<div class="modal-overlay" id="modalLauncher" style="display: flex;">
-    <div class="modal-box" style="width: 580px;">
+<!-- ==================== MODAL: PROJECT LAUNCHER (Active/Archived Tabs) ==================== -->
+<div class="modal-overlay" id="modalLauncher">
+    <div class="modal-box" style="width: 600px;">
         <div class="modal-head">
             <h3>⚡ เลือกโครงการที่ต้องการจัดการ</h3>
             <span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalLauncher')">&times;</span>
         </div>
-        <div style="font-size: 12.5px; color: var(--slate-600); margin-bottom: 12px;">กรุณาคลิกเลือกโครงการเพื่อเริ่มต้นตรวจสอบต้นทุนและกระแสเงินสด:</div>
         
-        <div id="launcher-project-list" style="max-height: 380px; overflow-y: auto; margin-bottom: 14px;">
-            <div style="text-align: center; padding: 20px; color: var(--slate-600);">กำลังโหลดรายการโครงการ...</div>
+        <!-- Search & Status Filter Tabs -->
+        <div style="margin-bottom: 12px;">
+            <input type="text" id="inp-search-proj" class="clean-input" placeholder="🔍 ค้นหาตามชื่อโครงการ หรือชื่อลูกค้า..." oninput="filterLauncherProjects()" style="margin-bottom: 8px;">
+            <div style="display: flex; gap: 6px; background: #f1f5f9; padding: 4px; border-radius: 10px;">
+                <button id="btn-flt-active" class="btn btn-sm btn-white" style="flex:1; border:none; font-weight:600; box-shadow:0 1px 2px rgba(0,0,0,0.05);" onclick="setLauncherFilter('active')">🟢 กำลังดำเนินการ (<span id="cnt-flt-active">0</span>)</button>
+                <button id="btn-flt-archived" class="btn btn-sm" style="flex:1; border:none; background:transparent; color:var(--slate-600);" onclick="setLauncherFilter('archived')">📁 ประวัติ/ปิดแล้ว (<span id="cnt-flt-archived">0</span>)</button>
+            </div>
         </div>
+        
+        <div id="launcher-project-list" style="max-height: 360px; overflow-y: auto; margin-bottom: 14px;"></div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--slate-200); padding-top: 12px;">
             <a href="index.html" class="btn btn-white">⬅️ กลับหน้าออกบิล</a>
@@ -326,7 +333,7 @@
     </div>
 </div>
 
-<!-- ==================== MODALS ==================== -->
+<!-- ==================== OTHER MODALS ==================== -->
 
 <div class="modal-overlay" id="modalDeposit">
     <div class="modal-box">
@@ -579,6 +586,7 @@
     let deposits = [];
     let quotes = [];
     let activeSheetKey = 'main-summary';
+    let launcherFilter = 'active';
 
     let currentViewMode = localStorage.getItem('erp_view_mode') || (window.innerWidth < 768 ? 'card' : 'table');
 
@@ -613,52 +621,143 @@
         }
     }
 
-    // ==================== PROJECT LAUNCHER HUB ====================
+    // ==================== SMART AUTO-LOAD & LAUNCHER HUB ====================
     async function loadProjectLauncherList() {
         const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
-        projects = data || [];
+        projects = (data || []).map(p => ({ ...p, status: p.status || 'active' }));
+
+        const activeProjects = projects.filter(p => p.status === 'active');
+        const lastSavedId = localStorage.getItem('erp_last_selected_project');
+
+        // 🌟 SMART AUTO-LOAD LOGIC:
+        if (activeProjects.length === 1) {
+            // กรณีมี 1 โครงการที่ Active -> โหลดเลยทันที
+            await selectProjectFromLauncher(activeProjects[0].id);
+            return;
+        } else if (lastSavedId && activeProjects.some(p => p.id === lastSavedId)) {
+            // กรณีเคยเปิดโครงการ Active ไว้ล่าสุด -> โหลดโครงการล่าสุดเลย
+            await selectProjectFromLauncher(lastSavedId);
+            return;
+        }
+
+        // หากมีหลายโครงการและยังไม่มีตัวเลือก ให้เปิด Launcher ทันที
+        renderLauncherList();
+        document.getElementById('modalLauncher').style.display = 'flex';
+    }
+
+    function openProjectLauncherModal() {
+        launcherFilter = 'active';
+        setLauncherFilter('active');
+        document.getElementById('modalLauncher').style.display = 'flex';
+    }
+
+    function setLauncherFilter(flt) {
+        launcherFilter = flt;
+        const btnAct = document.getElementById('btn-flt-active');
+        const btnArc = document.getElementById('btn-flt-archived');
+        if (flt === 'active') {
+            btnAct.className = 'btn btn-sm btn-white';
+            btnAct.style.background = '#fff';
+            btnAct.style.fontWeight = '700';
+            btnArc.className = 'btn btn-sm';
+            btnArc.style.background = 'transparent';
+        } else {
+            btnArc.className = 'btn btn-sm btn-white';
+            btnArc.style.background = '#fff';
+            btnArc.style.fontWeight = '700';
+            btnAct.className = 'btn btn-sm';
+            btnAct.style.background = 'transparent';
+        }
+        renderLauncherList();
+    }
+
+    function filterLauncherProjects() {
+        renderLauncherList();
+    }
+
+    function renderLauncherList() {
         const container = document.getElementById('launcher-project-list');
+        const searchKw = (document.getElementById('inp-search-proj')?.value || '').trim().toLowerCase();
+
+        const activeCount = projects.filter(p => p.status === 'active').length;
+        const archivedCount = projects.filter(p => p.status !== 'active').length;
+
+        document.getElementById('cnt-flt-active').innerText = activeCount;
+        document.getElementById('cnt-flt-archived').innerText = archivedCount;
+
+        let displayList = projects.filter(p => {
+            const matchesFilter = (launcherFilter === 'active') ? (p.status === 'active') : (p.status !== 'active');
+            const matchesSearch = !searchKw || (p.project_name || '').toLowerCase().includes(searchKw) || (p.customer_name || '').toLowerCase().includes(searchKw);
+            return matchesFilter && matchesSearch;
+        });
+
         container.innerHTML = '';
 
-        if (projects.length === 0) {
+        if (displayList.length === 0) {
             container.innerHTML = `
                 <div style="text-align: center; padding: 30px; background: #f8fafc; border-radius: 12px; border: 1px dashed var(--slate-300);">
-                    <div style="font-size: 28px; margin-bottom: 6px;">📂</div>
-                    <div style="font-weight: 600; color: var(--slate-700);">ยังไม่มีโครงการในระบบ</div>
-                    <div style="font-size: 12px; color: var(--slate-600); margin-top: 4px;">กดปุ่มด้านล่างเพื่อเริ่มสร้างโครงการแรกของคุณ</div>
+                    <div style="font-size: 24px; margin-bottom: 4px;">📂</div>
+                    <div style="font-weight: 600; color: var(--slate-700); font-size: 13px;">ไม่มีโครงการในหมวดนี้</div>
                 </div>
             `;
             return;
         }
 
-        projects.forEach(p => {
+        displayList.forEach(p => {
             const card = document.createElement('div');
             card.className = 'launcher-card';
             card.onclick = () => selectProjectFromLauncher(p.id);
             card.innerHTML = `
                 <div>
-                    <div class="launcher-title">${p.project_name}</div>
-                    <div class="launcher-meta">ผู้ว่าจ้าง: <strong>${p.customer_name || 'ลูกค้าทั่วไป'}</strong> • ยอดสัญญา: <strong class="text-primary">${Number(p.contract_amount || 0).toLocaleString()} ฿</strong></div>
+                    <div class="launcher-title">${p.status === 'active' ? '🟢' : '📁'} ${p.project_name}</div>
+                    <div class="launcher-meta">ผู้ว่าจ้าง: <strong>${p.customer_name || 'ลูกค้าทั่วไป'}</strong> • ยอด: <strong class="text-primary">${Number(p.contract_amount || 0).toLocaleString()} ฿</strong></div>
                 </div>
                 <button class="btn btn-primary btn-sm">📂 เปิด</button>
             `;
             container.appendChild(card);
         });
-
-        document.getElementById('modalLauncher').style.display = 'flex';
-    }
-
-    function openProjectLauncherModal() {
-        document.getElementById('modalLauncher').style.display = 'flex';
     }
 
     async function selectProjectFromLauncher(projectId) {
         currentProject = projects.find(p => p.id === projectId);
         if (!currentProject) return;
+        localStorage.setItem('erp_last_selected_project', currentProject.id);
         activeSheetKey = 'main-summary';
-        document.getElementById('lbl-current-project-name').innerText = currentProject.project_name;
+
+        document.getElementById('lbl-current-project-name').innerText = `${currentProject.status === 'active' ? '🟢' : '📁'} ${currentProject.project_name}`;
+        
+        const btnToggleStatus = document.getElementById('btn-toggle-status');
+        if (currentProject.status === 'active') {
+            btnToggleStatus.innerText = '📁 ย้ายเข้าคลังประวัติ';
+            btnToggleStatus.title = 'ปิดและซ่อนโครงการนี้ออกจากหน้าหลัก';
+        } else {
+            btnToggleStatus.innerText = '🟢 กู้คืนเป็นโครงการหลัก';
+            btnToggleStatus.title = 'เปิดกลับมาเป็นโครงการที่กำลังทำอยู่';
+        }
+
         document.getElementById('modalLauncher').style.display = 'none';
         await loadFullProjectData();
+    }
+
+    async function toggleCurrentProjectStatus() {
+        if (!currentProject) return;
+        const newStatus = currentProject.status === 'active' ? 'archived' : 'active';
+        const msg = newStatus === 'archived' ? `ยืนยันปิดและย้ายโครงการ "${currentProject.project_name}" เข้าคลังประวัติ?` : `ยืนยันกู้คืนโครงการ "${currentProject.project_name}" กลับมาเป็นโครงการปัจจุบัน?`;
+        
+        if (!confirm(msg)) return;
+
+        await supabaseClient.from('projects').update({ status: newStatus }).eq('id', currentProject.id);
+        currentProject.status = newStatus;
+        
+        // อัปเดตลิสต์ในหน่วยความจำ
+        const pObj = projects.find(p => p.id === currentProject.id);
+        if (pObj) pObj.status = newStatus;
+
+        if (newStatus === 'archived') {
+            localStorage.removeItem('erp_last_selected_project');
+        }
+
+        await selectProjectFromLauncher(currentProject.id);
     }
 
     function getProjectExpenseCategories() {
@@ -921,7 +1020,6 @@
             `;
         }
 
-        // 🌟 ตารางส่วนที่ 2: เพิ่มคอลัมน์ "จ่ายแล้ว" + สรุปยอดจ่ายจริง
         const containerExp = document.getElementById('container-expense-categories');
         const allExpenseCats = getProjectExpenseCategories();
         let totalSiteExpenses = 0;
@@ -1606,7 +1704,7 @@
         setBtnLoading('btn-submit-create-proj', true);
 
         try {
-            const { data: newProj, error: pErr } = await supabaseClient.from('projects').insert([{ project_name: name, customer_name: cust, contract_amount: amt, document_id: quoteId }]).select().single();
+            const { data: newProj, error: pErr } = await supabaseClient.from('projects').insert([{ project_name: name, customer_name: cust, contract_amount: amt, document_id: quoteId, status: 'active' }]).select().single();
             if (pErr) throw pErr;
 
             if (quoteId) {
@@ -1646,9 +1744,8 @@
             closeModalSafe('modalLauncher');
             currentProject = newProj;
             activeSheetKey = 'main-summary';
-            document.getElementById('lbl-current-project-name').innerText = currentProject.project_name;
             await loadProjectLauncherList();
-            await loadFullProjectData();
+            await selectProjectFromLauncher(newProj.id);
         } catch (err) { 
             alert('❌ เกิดข้อผิดพลาด: ' + err.message); 
         } finally {
@@ -1669,6 +1766,7 @@
             await supabaseClient.from('projects').delete().eq('id', currentProject.id);
             alert('🗑️ ลบโครงการเรียบร้อยแล้ว');
             currentProject = null;
+            localStorage.removeItem('erp_last_selected_project');
             activeSheetKey = 'main-summary';
             document.getElementById('lbl-current-project-name').innerText = '- ยังไม่ได้เลือก -';
             await loadProjectLauncherList();
