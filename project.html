@@ -345,7 +345,7 @@
     </div>
 </div>
 
-<!-- ==================== MODAL: PROJECT LAUNCHER ==================== -->
+<!-- ==================== MODAL: PROJECT LAUNCHER (อัปเดตเพิ่มที่อยู่และเลขผู้เสียภาษี) ==================== -->
 <div class="modal-overlay" id="modalLauncher">
     <div class="modal-box" style="width: 600px;">
         <div class="modal-head">
@@ -371,6 +371,35 @@
 </div>
 
 <!-- ==================== OTHER MODALS ==================== -->
+<div class="modal-overlay" id="modalNewProject">
+    <div class="modal-box">
+        <div class="modal-head"><h3>➕ สร้างโครงการใหม่</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalNewProject')">&times;</span></div>
+        <div class="form-item">
+            <label>รูปแบบ:</label>
+            <select id="sel-create-type" class="clean-input" onchange="toggleCreateType()">
+                <option value="quote">ดึงข้อมูลจากใบเสนอราคา</option>
+                <option value="manual">สร้างโครงการอิสระ</option>
+            </select>
+        </div>
+        <div class="form-item" id="row-quote-select"><label>เลือกใบเสนอราคา:</label><select id="sel-quote-doc" class="clean-input"></select></div>
+        
+        <div style="background: var(--slate-50); padding: 12px; border-radius: 8px; border: 1px dashed var(--slate-300); margin-bottom: 12px;">
+            <div class="form-item"><label>ชื่อโครงการ:</label><input type="text" id="inp-proj-name" class="clean-input" placeholder="เช่น โครงการติดตั้งตู้คอนโทรล..."></div>
+            <div class="form-item"><label>ชื่อลูกค้า / ผู้ว่าจ้าง:</label><input type="text" id="inp-proj-cust" class="clean-input"></div>
+            <!-- 🌟 ช่องที่เพิ่มมาใหม่ -->
+            <div class="form-item"><label>ที่อยู่ลูกค้า:</label><textarea id="inp-proj-cust-addr" class="clean-input" rows="2" placeholder="บ้านเลขที่, ตำบล, อำเภอ, จังหวัด..."></textarea></div>
+            <div class="form-item"><label>เลขประจำตัวผู้เสียภาษี / สาขา:</label><input type="text" id="inp-proj-cust-tax" class="clean-input" placeholder="เช่น 01055xxxxxxxx (สำนักงานใหญ่)"></div>
+            <!-- ================= -->
+            <div class="form-item" style="margin-bottom:0;"><label>ยอดสัญญารวม:</label><input type="number" id="inp-proj-amt" class="clean-input" min="0" value="0"></div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalNewProject')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" id="btn-submit-create-proj" onclick="submitCreateProject()">สร้างโครงการ</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="modalDeposit">
     <div class="modal-box">
         <div class="modal-head">
@@ -517,6 +546,76 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="modalAddMainTab">
+    <div class="modal-box">
+        <div class="modal-head"><h3>➕ เพิ่มหมวดงาน</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalAddMainTab')">&times;</span></div>
+        <div class="form-item"><label>ชื่อหมวดงาน:</label><input type="text" id="add-main-name" class="clean-input"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item"><label>จำนวน:</label><input type="number" id="add-main-qty" class="clean-input" min="1" value="1"></div>
+            <div class="form-item"><label>หน่วย:</label><input type="text" id="add-main-unit" class="clean-input" value="ชุด"></div>
+        </div>
+        <div class="form-item"><label>ราคาขายต่อหน่วย:</label><input type="number" id="add-main-price" class="clean-input" min="0" value="0"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalAddMainTab')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" onclick="submitAddMainTab()">บันทึกหมวดงาน</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditMainTab">
+    <div class="modal-box">
+        <div class="modal-head"><h3>✏️ แก้ไขข้อมูลหมวดงาน</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalEditMainTab')">&times;</span></div>
+        <input type="hidden" id="edit-main-id">
+        <div class="form-item"><label>ชื่อหมวดงาน:</label><input type="text" id="edit-main-name" class="clean-input"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item"><label>จำนวน:</label><input type="number" id="edit-main-qty" class="clean-input" min="1"></div>
+            <div class="form-item"><label>หน่วย:</label><input type="text" id="edit-main-unit" class="clean-input"></div>
+        </div>
+        <div class="form-item"><label>ราคาขายต่อหน่วย:</label><input type="number" id="edit-main-price" class="clean-input" min="0"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalEditMainTab')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" onclick="submitEditMainTab()">บันทึกการแก้ไข</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditBomItem">
+    <div class="modal-box">
+        <div class="modal-head"><h3>✏️ แก้ไขอุปกรณ์ย่อย</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalEditBomItem')">&times;</span></div>
+        <input type="hidden" id="edit-bom-id">
+        <div class="form-item"><label>ชื่ออุปกรณ์:</label><input type="text" id="edit-bom-name" class="clean-input"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item"><label>จำนวน/จุด:</label><input type="number" id="edit-bom-qty" class="clean-input" min="1"></div>
+            <div class="form-item"><label>ราคาทุน/หน่วย:</label><input type="number" id="edit-bom-cost" class="clean-input" min="0"></div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalEditBomItem')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" onclick="submitEditBomItem()">บันทึกการแก้ไข</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalEditExpense">
+    <div class="modal-box">
+        <div class="modal-head"><h3>✏️ แก้ไขค่าใช้จ่าย</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalEditExpense')">&times;</span></div>
+        <input type="hidden" id="edit-exp-id">
+        <div class="form-item"><label>รายการ:</label><input type="text" id="edit-exp-name" class="clean-input"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item"><label>จำนวน:</label><input type="number" id="edit-exp-qty" class="clean-input" min="1" oninput="calcModalExpTotal()"></div>
+            <div class="form-item"><label>หน่วย:</label><input type="text" id="edit-exp-unit" class="clean-input"></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-item"><label>ราคา/หน่วย:</label><input type="number" id="edit-exp-unit-price" class="clean-input" min="0" oninput="calcModalExpTotal()"></div>
+            <div class="form-item"><label>รวมเงิน:</label><input type="number" id="edit-exp-amt" class="clean-input font-bold" readonly></div>
+        </div>
+        <div class="form-item"><label>วันที่:</label><input type="date" id="edit-exp-date" class="clean-input"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+            <button class="btn btn-white" onclick="closeModalSafe('modalEditExpense')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" onclick="submitEditExpense()">บันทึกการแก้ไข</button>
+        </div>
+    </div>
+</div>
+
 <script>
     const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
@@ -552,6 +651,8 @@
         if (!session) { window.location.href = "index.html"; return; }
         updateModeButtonText();
         await loadProjectLauncherList();
+        
+        // 🌟 ดึงข้อมูลลูกค้าจาก documents มาเก็บไว้ใช้ตอนเลือกจาก List
         await loadQuotesForModal();
     };
 
@@ -762,7 +863,7 @@
             amount: f.amount || 0
         }));
 
-        // 🌟 โหลดแฟ้มเอกสารที่ผูกกับโครงการนี้ทั้งหมด (รองรับทั้งแบบ project_id ตรงๆ หรือใบเก่าที่อิง document_id)
+        // 🌟 โหลดแฟ้มเอกสารที่ผูกกับโครงการนี้ทั้งหมด 
         projectDocs = [];
         let queryStr = `project_id.eq.${currentProject.id}`;
         if (currentProject.document_id) {
@@ -804,11 +905,11 @@
         tbody.innerHTML = '';
 
         projectDocs.forEach(doc => {
-            let badgeColor = '#64748b'; // default slate
+            let badgeColor = '#64748b'; 
             let typeStr = doc.doc_type || 'เอกสาร';
-            if (typeStr.includes('เสนอราคา')) badgeColor = '#2563eb'; // blue
-            else if (typeStr.includes('แจ้งหนี้') || typeStr.includes('ส่งสินค้า')) badgeColor = '#059669'; // emerald
-            else if (typeStr.includes('เสร็จ')) badgeColor = '#9333ea'; // purple
+            if (typeStr.includes('เสนอราคา')) badgeColor = '#2563eb'; 
+            else if (typeStr.includes('แจ้งหนี้') || typeStr.includes('ส่งสินค้า')) badgeColor = '#059669'; 
+            else if (typeStr.includes('เสร็จ')) badgeColor = '#9333ea'; 
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -833,6 +934,12 @@
         const { data: custData } = await supabaseClient.from('customers').select('*').eq('id', targetDoc.customer_id).single();
         const { data: itmData } = await supabaseClient.from('document_items').select('*').eq('document_id', docId).order('id');
         
+        // 🌟 ดึงข้อมูลที่อยู่และผู้เสียภาษีไปด้วย
+        const custAddress = custData?.address || currentProject.customer_address || '';
+        const custExtra = currentProject.customer_tax 
+                        ? `เลขประจำตัวผู้เสียภาษี: ${currentProject.customer_tax}\nโครงการ: ${currentProject.project_name}`
+                        : `โครงการ: ${currentProject.project_name}`;
+
         const payload = {
             docId: targetDoc.id,
             docType: targetDoc.doc_type || 'ใบเสนอราคา',
@@ -840,8 +947,8 @@
             docDate: targetDoc.doc_date,
             dueDate: targetDoc.due_date,
             customerName: custData?.customer_name || currentProject.customer_name || '',
-            customerAddress: custData?.address || '',
-            customerExtra: `โครงการ: ${currentProject.project_name}`,
+            customerAddress: custAddress,
+            customerExtra: custExtra,
             discount: targetDoc.discount || 0,
             hasDiscount: Number(targetDoc.discount || 0) > 0,
             items: (itmData || []).map(i => ({
@@ -851,7 +958,7 @@
                 unit: i.unit || 'ชุด',
                 price: i.price || 0
             })),
-            projectId: currentProject.id // 🌟 ส่งต่อให้ index.html รู้ว่าเอกสารนี้ผูกกับโปรเจกต์ไหน
+            projectId: currentProject.id 
         };
 
         localStorage.setItem("jn_selected_cloud_doc", JSON.stringify(payload));
@@ -865,7 +972,6 @@
 
         if (!confirm(`ยืนยันการนำ "หมวดงานหลัก (ส่วนที่ 1)" ไปสร้างเป็นเอกสารตั้งต้นใบใหม่?`)) return;
 
-        // ถ้าอยู่ใน Modal Tray ให้ปุ่มนั้นโหลด ถ้าอยู่นอกให้ใช้ปุ่มหัวเรื่อง
         let btn = document.getElementById('btn-create-doc-tray');
         if(!btn || btn.offsetParent === null) btn = document.getElementById('btn-quote-action');
         
@@ -903,12 +1009,12 @@
             let customerId = null;
             const { data: custData, error: custErr } = await supabaseClient
                 .from('customers')
-                .insert([{ customer_name: currentProject.customer_name || 'ลูกค้าทั่วไป', address: '' }])
+                .insert([{ customer_name: currentProject.customer_name || 'ลูกค้าทั่วไป', address: currentProject.customer_address || '' }])
                 .select();
             if (custErr) throw custErr;
             customerId = custData[0].id;
 
-            // 🌟 Insert พร้อมผูก project_id เพื่อเก็บลงแฟ้มโครงการทันที
+            // 🌟 Insert พร้อมผูก project_id
             const { data: docData, error: docErr } = await supabaseClient
                 .from('documents')
                 .insert([{
@@ -920,7 +1026,7 @@
                     subtotal: subtotal,
                     discount: 0,
                     grand_total: subtotal,
-                    project_id: currentProject.id // <-- ผูกเข้ากับโครงการ
+                    project_id: currentProject.id 
                 }])
                 .select();
             if (docErr) throw docErr;
@@ -937,11 +1043,15 @@
             }));
             await supabaseClient.from('document_items').insert(itemsToInsert);
 
-            // สำหรับโปรเจกต์ที่ยังไม่มี document_id ตัวแรก ให้ผูกไว้ด้วยเพื่อ backward compatibility
             if (!currentProject.document_id) {
                 await supabaseClient.from('projects').update({ document_id: newDocId }).eq('id', currentProject.id);
                 currentProject.document_id = newDocId;
             }
+
+            // 🌟 ส่งข้อมูลที่อยู่และรหัสผู้เสียภาษีไปด้วย
+            const custExtra = currentProject.customer_tax 
+                            ? `เลขประจำตัวผู้เสียภาษี: ${currentProject.customer_tax}\nโครงการ: ${currentProject.project_name}`
+                            : `โครงการ: ${currentProject.project_name}`;
 
             const forwardPayload = {
                 docId: newDocId,
@@ -950,12 +1060,12 @@
                 docDate: docDate,
                 dueDate: '',
                 customerName: currentProject.customer_name || 'ลูกค้าทั่วไป',
-                customerAddress: '',
-                customerExtra: `โครงการ: ${currentProject.project_name}`,
+                customerAddress: currentProject.customer_address || '',
+                customerExtra: custExtra,
                 discount: 0,
                 hasDiscount: false,
                 items: docItemsPayload,
-                projectId: currentProject.id // ส่งต่อให้ index.html
+                projectId: currentProject.id 
             };
 
             localStorage.setItem("jn_selected_cloud_doc", JSON.stringify(forwardPayload));
