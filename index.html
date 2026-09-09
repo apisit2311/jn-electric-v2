@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JN electric&Technology (V2 สมบูรณ์แบบ)</title>
+    <title>JN electric&Technology V2 )</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -108,7 +108,7 @@
 
         .drag-handle { cursor: grab; color: #cbd5e1; font-size: 18px; padding-top: 12px !important; user-select: none; }
         .drag-handle:active { cursor: grabbing; color: var(--primary-color); }
-        tr.dragging { opacity: 0.6; background-color: #eff6ff; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .tr.dragging { opacity: 0.6; background-color: #eff6ff; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
 
         .discount-toggle-btn { background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 4px; padding: 2px 8px; font-size: 12px; cursor: pointer; font-family: 'Sarabun'; font-weight: 600; margin-bottom: 5px; float: right; }
         .discount-toggle-btn:hover { background: #eff6ff; }
@@ -316,6 +316,7 @@
     let isDirty = false;
     let globalProducts = [];
     let currentDocId = null; 
+    let currentProjectId = null; // 🌟 เก็บค่าโปรเจกต์ไอดี (ถ้ามี)
 
     const unitDropdownHTML = `
         <select class="unit-select text-center" onchange="markDirty(); checkCustomUnit(this)">
@@ -496,6 +497,7 @@
     function createNewDocument() {
         if(isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการล้างหน้าจอหรือไม่?")) return;
         currentDocId = null; 
+        currentProjectId = null; // รีเซ็ตโปรเจกต์ไอดี
         
         document.getElementById('customer-name').value = "";
         document.getElementById('customer-address').value = "";
@@ -526,6 +528,7 @@
         }
         
         currentDocId = null; 
+        // 🌟 ยังคงรักษา currentProjectId เอาไว้เผื่อบิลใหม่นี้ยังเป็นของโปรเจกต์เดิม
         document.getElementById('doc-date').value = getTodayThai(); 
         
         alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
@@ -544,7 +547,6 @@
             const dueDate = document.getElementById('due-date').value;
             const customerName = document.getElementById('customer-name').value;
             const customerAddress = document.getElementById('customer-address').value;
-            // *หมายเหตุ: customer-extra จะมีผลแค่ใน Excel และ JSON ยังไม่ถูกบันทึกลง Supabase หากยังไม่มีคอลัมน์รองรับ
             
             const subtotal = parseFloat(document.getElementById('subtotal').innerText.replace(/,/g, '')) || 0;
             const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
@@ -592,9 +594,11 @@
                 const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
                 const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
 
+                // 🌟 อัปเดตข้อมูลเอกสาร รวมถึง project_id 
                 const { error: updateErr } = await supabaseClient.from('documents').update({
                     doc_type: docType, doc_date: docDate, due_date: dueDate,
-                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal 
+                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
+                    project_id: currentProjectId || null
                 }).eq('id', currentDocId);
                 if (updateErr) throw updateErr;
 
@@ -616,9 +620,11 @@
                 documentIdToUse = currentDocId; 
                 
             } else {
+                // 🌟 สร้างเอกสารใหม่ พร้อมแนบ project_id เข้าไปด้วย (ถ้ามี)
                 const { data: docData, error: docErr } = await supabaseClient.from('documents').insert([{ 
                     doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
-                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal 
+                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
+                    project_id: currentProjectId || null
                 }]).select();
                 
                 if (docErr) {
@@ -885,6 +891,7 @@
 
     function loadSelectedDoc(cloudData) {
         currentDocId = cloudData.docId || null; 
+        currentProjectId = cloudData.projectId || null; // 🌟 รับ project_id มาด้วย
         
         const selectEl = document.getElementById('docType');
         const targetType = cloudData.docType || "ใบเสนอราคา";
