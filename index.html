@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JN electric&Technology V2 )</title>
+    <title>JN electric&Technology (V2 สมบูรณ์แบบ)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -24,10 +24,8 @@
         input:hover, textarea:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
         input:focus, textarea:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
         
-        /* 🔥 คืนค่าให้หน้าจอปกติ: สามารถใช้เมาส์ดึงขยายช่องได้เหมือนเดิม */
         textarea { resize: vertical; overflow: hidden; }
 
-        /* 🔥 สไตล์สำหรับ Textarea ให้ขยายบรรทัดได้ (และดึงได้ด้วย) */
         textarea.item-desc {
             font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
             border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; 
@@ -36,7 +34,6 @@
         textarea.item-desc:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
         textarea.item-desc:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
 
-        /* 🔥 สไตล์สำหรับ Custom Autocomplete (กล่องค้นหาเด้งๆ) */
         .autocomplete-wrapper { position: relative; width: 100%; text-align: left; }
         .autocomplete-list { position: absolute; z-index: 100; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--accent-color); border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; display: none; }
         .autocomplete-list div { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 14px; font-family: 'Sarabun'; color: var(--text-main); line-height: 1.4; }
@@ -108,7 +105,7 @@
 
         .drag-handle { cursor: grab; color: #cbd5e1; font-size: 18px; padding-top: 12px !important; user-select: none; }
         .drag-handle:active { cursor: grabbing; color: var(--primary-color); }
-        .tr.dragging { opacity: 0.6; background-color: #eff6ff; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .item-row.dragging { opacity: 0.6; background-color: #eff6ff; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
 
         .discount-toggle-btn { background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 4px; padding: 2px 8px; font-size: 12px; cursor: pointer; font-family: 'Sarabun'; font-weight: 600; margin-bottom: 5px; float: right; }
         .discount-toggle-btn:hover { background: #eff6ff; }
@@ -135,7 +132,6 @@
             .document-container { width: 100%; height: auto; min-height: auto; box-shadow: none; padding: 0; margin: 0; }
             .no-print { display: none !important; }
             
-            /* 🔥 ตอนปริ้นท์ สั่งซ่อนขีดเฉียงๆ 100% (resize: none) */
             input, textarea, select, .doc-title-editable, .sn-input { 
                 border: none !important; 
                 background: transparent !important; 
@@ -149,14 +145,12 @@
             .summary-table tr.total td { background-color: transparent; }
             select::-ms-expand { display: none; } 
             
-            /* ปล่อยให้ขยายตามข้อความจริง ไม่โดนตัดขอบ */
             textarea { overflow: visible !important; white-space: pre-wrap !important; }
             
             tr { page-break-inside: avoid; }
             ::-webkit-input-placeholder, ::placeholder { color: transparent !important; }
             .sn-input:placeholder-shown { display: none !important; }
             
-            /* 🔥 ซ่อนช่องข้อมูลลูกค้าเพิ่มเติม ถ้าไม่ได้พิมพ์อะไรลงไป */
             #customer-extra:placeholder-shown { display: none !important; }
             
             #login-overlay, #scanner-modal { display: none !important; }
@@ -247,7 +241,6 @@
             <div class="section-label">ลูกค้า (BILL TO)</div>
             <input type="text" id="customer-name" value="บริษัท ลูกค้าองค์กร จำกัด" style="font-weight: 700; font-size: 18px; padding-left: 0;">
             <textarea id="customer-address" rows="5" style="padding-left: 0; margin-bottom: 0;">888 ถนนรัชดาภิเษก แขวงดินแดง&#10;เขตดินแดง กรุงเทพฯ 10400&#10;โทร: 02-888-9999</textarea>
-            <!-- 🔥 ช่องกรอกข้อมูลเพิ่มเติมใต้ที่อยู่ลูกค้า -->
             <textarea id="customer-extra" rows="2" placeholder="เลขประจำตัวผู้เสียภาษี / สาขา / โครงการ..." style="font-weight: 700; padding-left: 0; border-top: 1px dashed var(--border-color);"></textarea>
         </div>
     </div>
@@ -316,7 +309,7 @@
     let isDirty = false;
     let globalProducts = [];
     let currentDocId = null; 
-    let currentProjectId = null; // 🌟 เก็บค่าโปรเจกต์ไอดี (ถ้ามี)
+    let currentProjectId = null; 
 
     const unitDropdownHTML = `
         <select class="unit-select text-center" onchange="markDirty(); checkCustomUnit(this)">
@@ -366,7 +359,6 @@
         document.getElementById('customer-extra').addEventListener('input', markDirty);
     }
 
-    // โหลดรายชื่อสินค้ามาเก็บในตัวแปรอย่างเดียว
     async function fetchProducts() {
         const { data } = await supabaseClient.from('products').select('*');
         if (data) {
@@ -374,7 +366,6 @@
         }
     }
 
-    // 🔥 ระบบค้นหาอัจฉริยะ
     function handleCustomAutocomplete(textarea) {
         const wrapper = textarea.closest('.autocomplete-wrapper');
         const listEl = wrapper.querySelector('.autocomplete-list');
@@ -480,6 +471,7 @@
         window.location.href = "search.html"; 
     }
 
+    // 🌟 อัปเดตฟังก์ชันนี้ ให้สลับคำนำหน้าเมื่อมีรหัสเอกสารอยู่แล้ว
     function fetchNextDocNumber() {
         const docText = document.getElementById('docType').value;
         let prefix = "QUO"; 
@@ -489,15 +481,23 @@
         else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) prefix = "DLV";
         else prefix = "INV";
 
-        const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
-        const randomStr = Math.floor(100 + Math.random() * 900); 
-        document.getElementById('doc-num').value = `${prefix}-${dateStr}-${randomStr}`;
+        const currentNum = document.getElementById('doc-num').value;
+        
+        if (currentNum && currentNum.includes('-')) {
+            const parts = currentNum.split('-');
+            parts[0] = prefix;
+            document.getElementById('doc-num').value = parts.join('-');
+        } else {
+            const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+            const randomStr = Math.floor(100 + Math.random() * 900); 
+            document.getElementById('doc-num').value = `${prefix}-${dateStr}-${randomStr}`;
+        }
     }
 
     function createNewDocument() {
         if(isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการล้างหน้าจอหรือไม่?")) return;
         currentDocId = null; 
-        currentProjectId = null; // รีเซ็ตโปรเจกต์ไอดี
+        currentProjectId = null; 
         
         document.getElementById('customer-name').value = "";
         document.getElementById('customer-address').value = "";
@@ -514,6 +514,9 @@
         addRow();
         calculateTotal();
         isDirty = false;
+        
+        // ล้างเลขเก่าทิ้งเพื่อให้มันสุ่มเลขใหม่ทั้งหมด
+        document.getElementById('doc-num').value = "";
         fetchNextDocNumber();
     }
 
@@ -528,7 +531,6 @@
         }
         
         currentDocId = null; 
-        // 🌟 ยังคงรักษา currentProjectId เอาไว้เผื่อบิลใหม่นี้ยังเป็นของโปรเจกต์เดิม
         document.getElementById('doc-date').value = getTodayThai(); 
         
         alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
@@ -594,7 +596,6 @@
                 const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
                 const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
 
-                // 🌟 อัปเดตข้อมูลเอกสาร รวมถึง project_id 
                 const { error: updateErr } = await supabaseClient.from('documents').update({
                     doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
@@ -620,7 +621,6 @@
                 documentIdToUse = currentDocId; 
                 
             } else {
-                // 🌟 สร้างเอกสารใหม่ พร้อมแนบ project_id เข้าไปด้วย (ถ้ามี)
                 const { data: docData, error: docErr } = await supabaseClient.from('documents').insert([{ 
                     doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
@@ -684,11 +684,6 @@
         }
     }
 
-    function getTodayThai() {
-        const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const d = new Date(); return d.getDate() + ' ' + m[d.getMonth()] + ' ' + (d.getFullYear() + 543);
-    }
-
     function handleDocTypeChange() {
         markDirty();
         const selectEl = document.getElementById('docType');
@@ -708,6 +703,7 @@
         updateDocTypeSync(true);
     }
 
+    // 🌟 อัปเดตฟังก์ชันนี้ ให้ปรับเลขเมื่ออัปเดต Document Type
     function updateDocTypeSync(shouldFetchNum = true) {
         const docText = document.getElementById('docType').value;
         const subTitle = document.getElementById('docSubTitle');
@@ -719,7 +715,13 @@
         else if (docText.includes("รับเงิน") || docText.includes("เสร็จ")) { subTitle.value = "(RECEIPT)"; sigLeft.value = "ผู้ชำระเงิน"; sigRight.value = "ผู้รับเงิน"; }
         else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) { subTitle.value = "(INVOICE / DELIVERY ORDER)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ส่งสินค้า / ผู้ออกเอกสาร"; }
         else { subTitle.value = "(INVOICE)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ออกเอกสาร"; }
-        if(shouldFetchNum && !currentDocId) fetchNextDocNumber(); 
+        
+        if(shouldFetchNum) fetchNextDocNumber(); 
+    }
+
+    function getTodayThai() {
+        const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        const d = new Date(); return d.getDate() + ' ' + m[d.getMonth()] + ' ' + (d.getFullYear() + 543);
     }
 
     function toggleDate() {
@@ -771,12 +773,17 @@
         document.getElementById('grand-total').innerText = (subtotal - discount).toLocaleString('th-TH', {minimumFractionDigits: 2});
     }
 
+    // 🌟 อัปเดตฟังก์ชันนี้ ให้รองรับทั้งคำว่า desc และ description จาก object
     function addRow(data = null) {
         if(!data) markDirty();
         const tbody = document.getElementById('items-body');
         const tr = document.createElement('tr');
         tr.className = 'item-row';
-        const desc = data ? data.desc : ''; const qty = data ? data.qty : 1; const unit = data ? data.unit : 'ตัว'; const price = data ? data.price : 0; const sn = data ? (data.sn || '') : '';
+        const desc = data ? (data.desc || data.description || '') : ''; 
+        const qty = data ? data.qty : 1; 
+        const unit = data ? data.unit : 'ตัว'; 
+        const price = data ? data.price : 0; 
+        const sn = data ? (data.sn || '') : '';
         
         tr.innerHTML = `
             <td class="no-print text-center drag-handle" title="คลิกค้างเพื่อลาก">⋮⋮</td>
@@ -891,7 +898,7 @@
 
     function loadSelectedDoc(cloudData) {
         currentDocId = cloudData.docId || null; 
-        currentProjectId = cloudData.projectId || null; // 🌟 รับ project_id มาด้วย
+        currentProjectId = cloudData.projectId || null; 
         
         const selectEl = document.getElementById('docType');
         const targetType = cloudData.docType || "ใบเสนอราคา";
