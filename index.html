@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JN electric&Technology (V2 สมบูรณ์แบบ)</title>
+    <title>JN electric&Technology (V2 สมบูรณ์แบบ + Sync)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -471,7 +471,6 @@
         window.location.href = "search.html"; 
     }
 
-    // 🌟 อัปเดตฟังก์ชันนี้ ให้สลับคำนำหน้าเมื่อมีรหัสเอกสารอยู่แล้ว
     function fetchNextDocNumber() {
         const docText = document.getElementById('docType').value;
         let prefix = "QUO"; 
@@ -515,7 +514,6 @@
         calculateTotal();
         isDirty = false;
         
-        // ล้างเลขเก่าทิ้งเพื่อให้มันสุ่มเลขใหม่ทั้งหมด
         document.getElementById('doc-num').value = "";
         fetchNextDocNumber();
     }
@@ -536,6 +534,7 @@
         alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
     }
 
+    // 🌟 ฟังก์ชันหลัก: บันทึกข้อมูลและซิงค์กลับไปยัง Project
     async function saveToSupabase() {
         const btnSave = document.getElementById('btnSave');
         const docNum = document.getElementById('doc-num').value;
@@ -561,6 +560,7 @@
             const cutStockTypes = ['ใบส่งงาน', 'ใบแจ้งหนี้/ใบส่งสินค้า', 'ใบส่งสินค้า', 'ใบแจ้งหนี้', 'ใบเสร็จรับเงิน'];
             const shouldCutStock = cutStockTypes.includes(docType);
 
+            // เช็คสต็อก
             if (shouldCutStock) {
                 for (let row of rows) {
                     const textarea = row.querySelector('.item-desc');
@@ -585,6 +585,7 @@
                 }
             }
 
+            // บันทึกลูกค้า
             const { data: customerData, error: custErr } = await supabaseClient
                 .from('customers').insert([{ customer_name: customerName, address: customerAddress }]).select();
             if (custErr) throw custErr;
@@ -592,6 +593,7 @@
 
             let documentIdToUse = null;
 
+            // ===== 1. บันทึก / อัปเดต เอกสาร =====
             if (currentDocId) {
                 const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
                 const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
@@ -635,7 +637,10 @@
                 currentDocId = documentIdToUse; 
             }
 
+            // ===== 2. บันทึกรายการสินค้า (และเก็บ Payload ไว้ Sync โครงการ) =====
             const itemsToInsert = [];
+            const itemsPayloadForSync = []; // 🌟 เก็บลิสต์สำหรับอัปเดต Project
+
             for(let row of rows) {
                 const textarea = row.querySelector('.item-desc');
                 const fullDesc = textarea ? textarea.value.trim() : '';
@@ -654,6 +659,8 @@
                 if(fullDesc !== "") {
                     itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: fullDesc, sn: sn, qty: qty, unit: unit, price: price });
                     
+                    itemsPayloadForSync.push({ item_name: searchDesc, qty: qty, unit: unit, unit_price: price }); // 🌟 เก็บค่าเตรียม Sync
+
                     if(productId && qty > 0 && shouldCutStock) {
                         const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
                         if(currentStock) {
@@ -667,6 +674,61 @@
                 const { error: itemsErr } = await supabaseClient.from('document_items').insert(itemsToInsert);
                 if (itemsErr) throw itemsErr;
             }
+
+            // ===== 3. 🌟 ระบบ AUTO-SYNC ข้อมูลกลับไปยัง Project (ถ้าเอกสารนี้ผูกกับโปรเจกต์) =====
+            if (currentProjectId) {
+                // 3.1 อัปเดตยอดรวมสัญญา (Contract Amount) ให้โปรเจกต์
+                await supabaseClient.from('projects').update({ contract_amount: grandTotal }).eq('id', currentProjectId);
+
+                // 3.2 ดึงหมวดงานเดิมในโปรเจกต์มาเปรียบเทียบ
+                const { data: existingMainItems } = await supabaseClient.from('project_main_items').select('*').eq('project_id', currentProjectId).order('item_order');
+                const existingList = existingMainItems || [];
+
+                let orderCounter = 1;
+
+                // 3.3 วนลูปตามรายการในบิลล่าสุด
+                for (let i = 0; i < itemsPayloadForSync.length; i++) {
+                    const syncItem = itemsPayloadForSync[i];
+
+                    // หารายการเดิมในโปรเจกต์ที่ชื่อตรงกัน
+                    const matchedOldItem = existingList.find(old => old.item_name === syncItem.item_name);
+
+                    if (matchedOldItem) {
+                        // มีอยู่แล้ว -> อัปเดตข้อมูลให้ตรงกับในบิล
+                        await supabaseClient.from('project_main_items').update({
+                            qty: syncItem.qty,
+                            unit: syncItem.unit,
+                            unit_price: syncItem.unit_price,
+                            item_order: orderCounter
+                        }).eq('id', matchedOldItem.id);
+                    } else {
+                        // ยังไม่มีในโปรเจกต์ -> สร้างเป็นหมวดงานใหม่
+                        const { data: newMainItem } = await supabaseClient.from('project_main_items').insert([{
+                            project_id: currentProjectId,
+                            item_name: syncItem.item_name,
+                            qty: syncItem.qty,
+                            unit: syncItem.unit,
+                            unit_price: syncItem.unit_price,
+                            item_order: orderCounter
+                        }]).select().single();
+
+                        // แถม: สร้าง BOM เปล่าๆ ทิ้งไว้ให้ 1 แถว เผื่อให้ช่างไปถอดแบบต่อได้ง่ายๆ
+                        if (newMainItem) {
+                            await supabaseClient.from('project_bom_items').insert([{
+                                main_item_id: newMainItem.id,
+                                item_order: 1,
+                                item_name: syncItem.item_name, // ใช้ชื่อหมวดตั้งต้น
+                                qty: 1,
+                                unit_cost: 0,
+                                is_paid: false
+                            }]);
+                        }
+                    }
+                    orderCounter++;
+                }
+                // (หมายเหตุ: รายการที่เคยมีในโปรเจกต์ แต่โดนลบออกจากบิล จะยังคงอยู่ ไม่ลบทิ้ง เพื่อความปลอดภัยของ BOM เดิม)
+            }
+            // =================================================================
 
             if(shouldCutStock) {
                 alert(`✅ บันทึกข้อมูลและตัดสต็อกเรียบร้อยแล้ว!\n(เลขที่เอกสาร: ${docNum})`);
@@ -703,7 +765,6 @@
         updateDocTypeSync(true);
     }
 
-    // 🌟 อัปเดตฟังก์ชันนี้ ให้ปรับเลขเมื่ออัปเดต Document Type
     function updateDocTypeSync(shouldFetchNum = true) {
         const docText = document.getElementById('docType').value;
         const subTitle = document.getElementById('docSubTitle');
@@ -717,11 +778,6 @@
         else { subTitle.value = "(INVOICE)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ออกเอกสาร"; }
         
         if(shouldFetchNum) fetchNextDocNumber(); 
-    }
-
-    function getTodayThai() {
-        const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const d = new Date(); return d.getDate() + ' ' + m[d.getMonth()] + ' ' + (d.getFullYear() + 543);
     }
 
     function toggleDate() {
@@ -773,7 +829,6 @@
         document.getElementById('grand-total').innerText = (subtotal - discount).toLocaleString('th-TH', {minimumFractionDigits: 2});
     }
 
-    // 🌟 อัปเดตฟังก์ชันนี้ ให้รองรับทั้งคำว่า desc และ description จาก object
     function addRow(data = null) {
         if(!data) markDirty();
         const tbody = document.getElementById('items-body');
