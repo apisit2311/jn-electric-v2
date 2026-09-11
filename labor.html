@@ -20,10 +20,8 @@
             --text-sub: #64748b;
             --emerald: #059669;
             --emerald-bg: #ecfdf5;
-            --emerald-border: #bbf7d0;
             --amber: #d97706;
             --amber-bg: #fffbeb;
-            --amber-border: #fde68a;
             --rose: #e11d48;
             --rose-bg: #fff1f2;
             --purple: #7c3aed;
@@ -108,13 +106,6 @@
         .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px; }
         .modal-head h3 { margin: 0; font-size: 16.5px; font-weight: 700; color: var(--primary); }
 
-        /* Checkbox Grid for Techs */
-        .tech-checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 150px; overflow-y: auto; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
-        .tech-cb-label { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.2s; }
-        .tech-cb-label:hover { background: #e2e8f0; }
-        .tech-cb-input { width: 16px; height: 16px; accent-color: var(--primary-accent); }
-        
-        /* Payroll Table */
         .payroll-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12.5px; }
         .payroll-table th, .payroll-table td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
         .payroll-table th { background: var(--bg); font-weight: 600; color: var(--text-sub); }
@@ -196,7 +187,7 @@
     </div>
 </div>
 
-<!-- Floating Bottom Bar (แยกปุ่มทำงาน กับ เบิกเงิน ชัดเจน) -->
+<!-- Floating Bottom Bar -->
 <div class="bottom-bar">
     <div class="bottom-bar-inner">
         <button class="btn-bottom log" onclick="openWorkModal()">👷 ลงค่าแรง</button>
@@ -206,7 +197,7 @@
 
 <!-- ================= MODALS ================= -->
 
-<!-- 1. Modal: ลงค่าแรงทำงานปกติ (Work) -->
+<!-- 1. Modal: ลงค่าแรงทำงานปกติ (Work) - แก้ให้เรียบง่าย! -->
 <div class="modal-overlay" id="modalWork">
     <div class="modal-box">
         <div class="modal-head">
@@ -219,16 +210,14 @@
             <select id="work-proj" class="clean-input"></select>
         </div>
         <div class="form-item">
-            <label>เลือกช่าง (เลือกได้หลายคน):</label>
-            <div class="tech-checkbox-grid" id="work-tech-container">
-                <!-- Checkboxes injected here -->
-            </div>
-            <div style="font-size:11px; color:var(--text-sub); margin-top:4px;">* ถ้าระบุอัตราค่าแรงด้านล่างเป็น 0 ระบบจะดึงเรทพื้นฐานของช่างแต่ละคนมาให้เอง</div>
+            <label>เลือกช่าง:</label>
+            <!-- กลับมาใช้ Select เลือกทีละ 1 คน -->
+            <select id="work-tech" class="clean-input" onchange="onTechSelectChanged()"></select>
         </div>
         <div class="form-item">
-            <label>วันที่ (คั่นด้วยจุลภาคได้ถ้าต้องการลงหลายวันรวดเดียว):</label>
-            <input type="text" id="work-date" class="clean-input" placeholder="เช่น 2026-09-10, 2026-09-11">
-            <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">* ใช้ YYYY-MM-DD หรือ DD/MM/YYYY ก็ได้</div>
+            <label>วันที่ทำงาน:</label>
+            <!-- กลับมาใช้ Date Picker แบบมาตรฐาน เลือกทีละ 1 วัน -->
+            <input type="date" id="work-date" class="clean-input">
         </div>
         <div class="form-item">
             <label>รูปแบบการจ้าง:</label>
@@ -239,11 +228,12 @@
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <div class="form-item">
-                <label>จำนวน (วัน/จุด):</label>
+                <label>จำนวน (วัน/ชิ้น):</label>
                 <input type="number" id="work-units" class="clean-input" min="0.5" step="0.5" value="1" oninput="calcWorkTotal()">
             </div>
             <div class="form-item">
-                <label>อัตรา (0=ใช้เรทช่าง):</label>
+                <label>ค่าแรง/หน่วย (บาท):</label>
+                <!-- ช่องเรทค่าแรง ชัดเจน ไม่ต้องพิมพ์ 0 -->
                 <input type="number" id="work-rate" class="clean-input" min="0" value="0" oninput="calcWorkTotal()">
             </div>
         </div>
@@ -390,7 +380,7 @@
     let projects = [];
     let laborLogs = [];
     let activeTab = 'logs';
-    let statusFilter = 'pending'; // เปลี่ยน Default เป็นดูรายการที่ "รอโอน" ก่อน
+    let statusFilter = 'pending';
 
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
@@ -443,12 +433,14 @@
         technicians = data || [];
         
         const container = document.getElementById('tech-list-container');
-        const workCbContainer = document.getElementById('work-tech-container');
+        const workTech = document.getElementById('work-tech');
         const advTech = document.getElementById('adv-tech');
         
         container.innerHTML = '';
-        workCbContainer.innerHTML = '';
+        
+        // กลับมาใช้ Dropdown เลือก 1 คน ตามปกติ
         const reqOpts = '<option value="">-- เลือกช่าง --</option>';
+        workTech.innerHTML = reqOpts;
         advTech.innerHTML = reqOpts;
         
         document.getElementById('cnt-techs').innerText = technicians.length;
@@ -477,21 +469,16 @@
             `;
             container.appendChild(card);
 
-            // Populate Checkboxes for Work Modal
-            const lbl = document.createElement('label');
-            lbl.className = 'tech-cb-label';
-            lbl.innerHTML = `<input type="checkbox" class="tech-cb-input" value="${t.id}"> ${t.tech_name}`;
-            workCbContainer.appendChild(lbl);
-
-            // Populate Dropdown for Advance Modal
+            // Populate Dropdowns
             const opt = `<option value="${t.id}">${t.tech_name}</option>`;
+            workTech.insertAdjacentHTML('beforeend', opt);
             advTech.insertAdjacentHTML('beforeend', opt);
         });
     }
 
     async function loadLaborLogs() {
         const filterProj = document.getElementById('sel-filter-proj').value;
-        let query = supabaseClient.from('project_labor_logs').select('*, projects(project_name), technicians(tech_name, phone, bank_name, bank_account)').order('work_date', { ascending: false });
+        let query = supabaseClient.from('project_labor_logs').select('*, projects(project_name), technicians(tech_name, phone, bank_name, bank_account, default_daily_rate)').order('work_date', { ascending: false });
         if (filterProj) query = query.eq('project_id', filterProj);
         
         const { data } = await query;
@@ -506,11 +493,9 @@
         laborLogs.forEach(l => {
             const amt = Number(l.total_amount || 0);
             if (l.is_paid) { 
-                // 🌟 KPI จ่ายค่าแรงแล้ว ให้นับเฉพาะ "มูลค่างานที่ทำจริง (ยอดบวก)" เพื่อป้องกันยอดติดลบ
                 if (amt > 0) sumPaid += amt; 
                 cntPaid++; 
             } else { 
-                // 🌟 ยอดค้าง นำมาหักลบกันตามปกติ (งาน - เบิก)
                 sumPending += amt; 
                 cntPending++; 
             }
@@ -578,15 +563,24 @@
 
     // ================= ACTIONS (WORK) =================
     function openWorkModal() {
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('work-date').value = todayStr;
-        document.querySelectorAll('.tech-cb-input').forEach(cb => cb.checked = false);
+        document.getElementById('work-date').valueAsDate = new Date();
+        document.getElementById('work-tech').value = '';
         document.getElementById('work-details').value = '';
         document.getElementById('work-units').value = '1';
         document.getElementById('work-rate').value = '0';
         document.getElementById('work-ot').value = '0';
         calcWorkTotal();
         document.getElementById('modalWork').style.display = 'flex';
+    }
+
+    // 🌟 ระบบอัตโนมัติ: ดึงเรทของช่างมาใส่ให้เลย ไม่งง
+    function onTechSelectChanged() {
+        const tId = document.getElementById('work-tech').value;
+        const tech = technicians.find(t => t.id === tId);
+        if (tech) {
+            document.getElementById('work-rate').value = tech.default_daily_rate || 0;
+            calcWorkTotal();
+        }
     }
 
     function calcWorkTotal() {
@@ -599,56 +593,43 @@
 
     async function submitWork() {
         const projId = document.getElementById('work-proj').value;
-        const dateRaw = document.getElementById('work-date').value.trim();
+        const techId = document.getElementById('work-tech').value;
+        const date = document.getElementById('work-date').value;
         const type = document.getElementById('work-type').value;
         const units = parseFloat(document.getElementById('work-units').value) || 1;
-        const rateInput = parseFloat(document.getElementById('work-rate').value) || 0;
+        const rate = parseFloat(document.getElementById('work-rate').value) || 0;
         const ot = parseFloat(document.getElementById('work-ot').value) || 0;
         const details = document.getElementById('work-details').value.trim();
 
-        if (!projId || !dateRaw) return alert('⚠️ กรุณาระบุโครงการ และวันที่ให้ครบถ้วน');
+        if (!projId || !techId || !date) return alert('⚠️ กรุณาระบุโครงการ, ช่าง และวันที่ให้ครบถ้วน');
 
-        const selectedTechIds = Array.from(document.querySelectorAll('.tech-cb-input:checked')).map(cb => cb.value);
-        if (selectedTechIds.length === 0) return alert('⚠️ กรุณาติ๊กเลือกคนงานอย่างน้อย 1 คนครับ');
+        const total = (units * rate) + ot;
+        if (total <= 0) return alert('⚠️ ยอดรวมต้องมากกว่า 0 บาท');
 
-        const dateArray = dateRaw.split(',').map(d => d.trim()).filter(d => d !== '');
+        const tech = technicians.find(t => t.id === techId);
         
         setBtnLoading('btn-submit-work', true);
 
         try {
-            const logInserts = [];
-            
-            for (let tId of selectedTechIds) {
-                const tech = technicians.find(t => t.id === tId);
-                let actualRate = rateInput > 0 ? rateInput : (tech.default_daily_rate || 500);
-                let total = (units * actualRate) + ot;
+            const expItemName = `ค่าแรง: ${tech.tech_name} (${details || (type === 'daily' ? `${units} วัน` : `${units} ชิ้น`)})`;
 
-                const expItemName = `ค่าแรง: ${tech.tech_name} (${details || (type === 'daily' ? `${units} วัน` : `${units} จุด`)})`;
+            // ขา 1: โยนเข้า Expense ของ Project
+            const { data: expData, error: expErr } = await supabaseClient.from('project_expenses').insert([{
+                project_id: projId, category: 'labor', item_name: expItemName,
+                qty: units, unit: type === 'daily' ? 'วัน' : 'จุด', unit_price: rate,
+                amount: total, expense_date: date, is_paid: false
+            }]).select().single();
 
-                for (let workDate of dateArray) {
-                    // ขา 1: โยนเข้า Expense ของ Project
-                    const { data: expData, error: expErr } = await supabaseClient.from('project_expenses').insert([{
-                        project_id: projId, category: 'labor', item_name: expItemName,
-                        qty: units, unit: type === 'daily' ? 'วัน' : 'จุด', unit_price: actualRate,
-                        amount: total, expense_date: workDate, is_paid: false
-                    }]).select().single();
+            if (expErr) throw expErr;
 
-                    if (expErr) throw expErr;
+            // ขา 2: โยนเข้าประวัติช่าง
+            await supabaseClient.from('project_labor_logs').insert([{
+                project_id: projId, technician_id: techId, expense_id: expData.id,
+                work_date: date, work_type: type, units: units, unit_rate: rate,
+                ot_amount: ot, total_amount: total, work_details: details, is_paid: false
+            }]);
 
-                    // ขา 2: เตรียมโยนเข้าประวัติช่าง
-                    logInserts.push({
-                        project_id: projId, technician_id: tId, expense_id: expData.id,
-                        work_date: workDate, work_type: type, units: units, unit_rate: actualRate,
-                        ot_amount: ot, total_amount: total, work_details: details, is_paid: false
-                    });
-                }
-            }
-
-            if(logInserts.length > 0) {
-                await supabaseClient.from('project_labor_logs').insert(logInserts);
-            }
-
-            alert(`✅ บันทึกรายการสำเร็จแล้ว (${logInserts.length} รายการ)`);
+            alert(`✅ บันทึกค่าแรงให้ ${tech.tech_name} สำเร็จ!`);
             closeModal('modalWork');
             await loadLaborLogs();
 
@@ -682,8 +663,6 @@
         const finalTotal = -amount; // ทำให้ยอดติดลบ!
         
         try {
-            // 🌟 สำคัญ: การเบิกเงินล่วงหน้า จะบันทึกเฉพาะประวัติช่าง 
-            // จะไม่ถูกส่งไปตาราง project_expenses เด็ดขาด เพื่อป้องกันต้นทุนโปรเจกต์ติดลบและเพี้ยน
             await supabaseClient.from('project_labor_logs').insert([{
                 project_id: projId || null, technician_id: techId, expense_id: null,
                 work_date: date, work_type: 'advance', units: 1, unit_rate: amount,
@@ -730,7 +709,6 @@
 
     async function processPaymentStatusChange(logId, expId, newStatus) {
         await supabaseClient.from('project_labor_logs').update({ is_paid: newStatus }).eq('id', logId);
-        // ถ้าเป็นการเบิกเงิน (ไม่มี expense_id) จะไม่กระทบตาราง project_expenses
         if (expId && expId !== 'null' && expId !== '') {
             await supabaseClient.from('project_expenses').update({ is_paid: newStatus }).eq('id', expId);
         }
