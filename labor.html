@@ -512,7 +512,6 @@
             const card = document.createElement('div');
             card.className = `item-card ${l.is_paid ? 'paid' : (isAdvance ? 'advance' : '')}`;
             
-            // ปรับปุ่มให้เป็นปุ่มสวยๆ ไม่ใช่ Checkbox
             let payBtnHtml = '';
             if(l.is_paid) {
                 payBtnHtml = `<span style="font-size:11.5px; color:var(--emerald); font-weight:600;">เคลียร์แล้ว ✅</span>`;
@@ -818,6 +817,20 @@
     }
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // 🌟 ฟังก์ชันกันหน้าจอค้างเวลากดเซฟ 
+    function setBtnLoading(btnId, isLoading, originalText = 'บันทึก') {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        if (isLoading) {
+            btn.dataset.origText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ กำลังบันทึก...';
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = btn.dataset.origText || originalText;
+        }
+    }
 </script>
 </body>
 </html>
