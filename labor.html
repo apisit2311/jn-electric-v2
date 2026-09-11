@@ -20,14 +20,11 @@
             --text-sub: #64748b;
             --emerald: #059669;
             --emerald-bg: #ecfdf5;
-            --emerald-border: #bbf7d0;
             --amber: #d97706;
             --amber-bg: #fffbeb;
-            --amber-border: #fde68a;
             --rose: #e11d48;
             --rose-bg: #fff1f2;
             --purple: #7c3aed;
-            --purple-bg: #faf5ff;
             --radius-lg: 16px;
             --radius-md: 12px;
             --radius-sm: 8px;
@@ -39,22 +36,22 @@
         body { font-family: 'Prompt', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 14px 14px 80px 14px; line-height: 1.4; }
         .wrapper { max-width: 680px; margin: 0 auto; }
 
-        /* Minimal Header */
+        /* Header */
         .app-header { background: var(--surface); padding: 14px 18px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--card-shadow); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .header-title { display: flex; align-items: center; gap: 10px; }
         .header-logo-icon { width: 38px; height: 38px; background: #e0f2fe; color: #0284c7; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
         .header-title h1 { margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); }
         .header-title p { margin: 1px 0 0 0; font-size: 11.5px; color: var(--text-sub); }
         .btn-group { display: flex; gap: 6px; align-items: center; }
-        .btn { padding: 7px 12px; border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent; transition: all 0.15s ease; }
+        .btn { padding: 7px 12px; border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid transparent; transition: all 0.15s ease; }
         .btn-primary { background: var(--primary-accent); color: #fff; }
         .btn-white { background: #fff; border-color: var(--border); color: var(--text-main); }
         .btn-emerald { background: var(--emerald); color: #fff; }
         .btn-purple { background: var(--purple); color: #fff; }
-        .btn-danger { background: var(--rose-bg); color: var(--rose); border-color: #fecdd3; }
+        .btn-rose { background: var(--rose); color: #fff; }
         .btn-sm { padding: 4px 8px; font-size: 11.5px; border-radius: 6px; }
 
-        /* KPI Mini Cards */
+        /* KPIs */
         .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
         .kpi-card { background: var(--surface); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border); box-shadow: var(--card-shadow); }
         .kpi-card.amber { border-left: 4px solid var(--amber); }
@@ -63,24 +60,27 @@
         .kpi-val { font-size: 19px; font-weight: 700; }
         .kpi-sub { font-size: 10.5px; color: var(--text-sub); margin-top: 2px; }
 
-        /* Segmented Tab Switcher */
+        /* Tabs */
         .tab-switcher { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 14px; }
         .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 9px; font-family: 'Prompt'; font-size: 13px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 700; }
 
-        /* Filter Row */
+        /* Filter */
         .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
         .custom-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; outline: none; background: #fff; flex: 1; min-width: 200px; }
-
         .status-pill-group { display: flex; gap: 4px; background: #e2e8f0; padding: 3px; border-radius: 8px; }
         .status-pill { padding: 4px 8px; border: none; background: transparent; font-family: 'Prompt'; font-size: 11.5px; font-weight: 600; color: var(--text-sub); border-radius: 6px; cursor: pointer; }
         .status-pill.active { background: #fff; color: var(--primary); font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
-        /* Minimal Cards */
+        /* Cards */
         .card-list { display: flex; flex-direction: column; gap: 8px; }
-        .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; box-shadow: var(--card-shadow); transition: 0.15s; }
-        .item-card.paid { background: #f0fdf4; border-color: var(--emerald-border); }
+        .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; box-shadow: var(--card-shadow); transition: 0.15s; position: relative; overflow: hidden; }
+        .item-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary-accent); }
+        .item-card.paid { background: #f0fdf4; border-color: #bbf7d0; }
+        .item-card.paid::before { background: var(--emerald); }
         .item-card.advance { background: var(--rose-bg); border-color: #fecdd3; }
+        .item-card.advance::before { background: var(--rose); }
+
         .item-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
         .item-card-title { font-size: 13.5px; font-weight: 700; color: var(--text-main); line-height: 1.3; }
         .item-card-val { font-size: 14.5px; font-weight: 700; text-align: right; white-space: nowrap; }
@@ -89,32 +89,26 @@
 
         .btn-icon { border: none; background: none; cursor: pointer; padding: 4px 6px; border-radius: 4px; font-size: 12px; }
 
-        /* Floating Bottom Action */
+        /* Split Bottom Bar */
         .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border-top: 1px solid var(--border); padding: 10px 14px; z-index: 99; }
         .bottom-bar-inner { max-width: 680px; margin: 0 auto; display: flex; gap: 8px; }
-        .btn-main-action { flex: 1; background: var(--emerald); color: #fff; border: none; padding: 11px; border-radius: var(--radius-md); font-family: 'Prompt'; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
+        .btn-bottom { flex: 1; border: none; padding: 12px; border-radius: var(--radius-md); font-family: 'Prompt'; font-size: 13.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: white; }
+        .btn-bottom.log { background: var(--primary-accent); box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
+        .btn-bottom.advance { background: var(--rose); box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.2); }
 
-        /* Form Inputs & Modals */
-        .clean-input { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 13px; outline: none; }
-        .clean-input:focus { border-color: var(--primary-accent); }
-        .form-item { margin-bottom: 10px; }
-        .form-item label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 3px; color: var(--text-main); }
+        /* Form & Modals */
+        .clean-input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 13.5px; outline: none; background: #fff; }
+        .clean-input:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+        .form-item { margin-bottom: 12px; }
+        .form-item label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 4px; color: var(--text-main); }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; }
-        .modal-box { background: #fff; width: 480px; max-width: 92%; border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--card-shadow-lg); max-height: 90vh; overflow-y: auto; }
-        .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 12px; }
-        .modal-head h3 { margin: 0; font-size: 15.5px; font-weight: 700; color: var(--primary); }
+        .modal-box { background: #fff; width: 440px; max-width: 92%; border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--card-shadow-lg); max-height: 90vh; overflow-y: auto; }
+        .modal-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px; }
+        .modal-head h3 { margin: 0; font-size: 16.5px; font-weight: 700; color: var(--primary); }
 
-        /* Checkbox Grid for Techs */
-        .tech-checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 150px; overflow-y: auto; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
-        .tech-cb-label { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.2s; }
-        .tech-cb-label:hover { background: #e2e8f0; }
-        .tech-cb-input { width: 16px; height: 16px; accent-color: var(--primary-accent); }
-        
-        /* Payroll Table */
         .payroll-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12.5px; }
         .payroll-table th, .payroll-table td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
         .payroll-table th { background: var(--bg); font-weight: 600; color: var(--text-sub); }
-        .payroll-table td.money { text-align: right; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -149,13 +143,13 @@
         </div>
     </div>
 
-    <!-- Segmented Tabs Switcher -->
+    <!-- Segmented Tabs -->
     <div class="tab-switcher">
         <button class="tab-btn active" id="tab-btn-logs" onclick="switchLaborTab('logs')">
-            🕒 รายการเบิก/ค่าแรง (<span id="cnt-logs">0</span>)
+            🕒 ประวัติค่าแรง (<span id="cnt-logs">0</span>)
         </button>
         <button class="tab-btn" id="tab-btn-techs" onclick="switchLaborTab('techs')">
-            👷 ทะเบียนรายชื่อคนงาน (<span id="cnt-techs">0</span>)
+            👷 ทะเบียนช่าง (<span id="cnt-techs">0</span>)
         </button>
     </div>
 
@@ -170,15 +164,17 @@
                 <button class="status-pill" id="st-pending" onclick="setStatusFilter('pending')">รอโอน</button>
                 <button class="status-pill" id="st-paid" onclick="setStatusFilter('paid')">โอนแล้ว</button>
             </div>
-            <!-- 🌟 ปุ่มเคลียร์ยอดรายบุคคล -->
-            <button class="btn btn-purple btn-sm" onclick="openPayrollModal()">💳 ตัดยอดชำระแบบกลุ่ม</button>
+            <!-- ปุ่มกดดูยอดสรุปรายคน เพื่อง่ายต่อการจ่ายเงิน -->
+            <button class="btn btn-purple btn-sm" onclick="openPayrollModal()">💳 สรุปยอดจ่ายเงิน (ตัดวีค)</button>
         </div>
+        
+        <!-- รายการประวัติ -->
         <div class="card-list" id="labor-logs-list">
             <div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">กำลังโหลดข้อมูล...</div>
         </div>
     </div>
 
-    <!-- PANE 2: Technicians Roster -->
+    <!-- PANE 2: Technicians -->
     <div id="pane-techs" style="display: none;">
         <div class="filter-row">
             <div style="font-size:12.5px; font-weight:600; color:var(--text-sub);">รายชื่อคนงานทั้งหมดในระบบ:</div>
@@ -190,14 +186,162 @@
     </div>
 </div>
 
-<!-- Floating Action Bar -->
+<!-- Floating Bottom Bar (แยกปุ่มทำงาน กับ เบิกเงิน ชัดเจน) -->
 <div class="bottom-bar">
     <div class="bottom-bar-inner">
-        <button class="btn-main-action" onclick="openNewJobLogModal()">⚡ ลงบันทึกค่าแรง (เดี่ยว/กลุ่ม)</button>
+        <button class="btn-bottom log" onclick="openWorkModal()">👷 ลงค่าแรง</button>
+        <button class="btn-bottom advance" onclick="openAdvanceModal()">💸 ให้เบิกเงิน</button>
     </div>
 </div>
 
-<!-- Modal: New/Edit Technician -->
+<!-- ================= MODALS ================= -->
+
+<!-- 1. Modal: ลงค่าแรงทำงานปกติ (Work) -->
+<div class="modal-overlay" id="modalWork">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3>👷 ลงบันทึกค่าแรง</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalWork')">&times;</span>
+        </div>
+        
+        <div class="form-item">
+            <label>เลือกโครงการ:</label>
+            <select id="work-proj" class="clean-input"></select>
+        </div>
+        <div class="form-item">
+            <label>เลือกช่าง:</label>
+            <select id="work-tech" class="clean-input" onchange="onTechSelectChanged()"></select>
+        </div>
+        <div class="form-item">
+            <label>วันที่ทำงาน:</label>
+            <input type="date" id="work-date" class="clean-input">
+        </div>
+        <div class="form-item">
+            <label>รูปแบบการจ้าง:</label>
+            <select id="work-type" class="clean-input" onchange="calcWorkTotal()">
+                <option value="daily">รายวัน (จำนวนวัน x ค่าแรง)</option>
+                <option value="task">เหมาจุด / ชิ้นงาน</option>
+            </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="form-item">
+                <label>จำนวน (วัน/จุด):</label>
+                <input type="number" id="work-units" class="clean-input" min="0.5" step="0.5" value="1" oninput="calcWorkTotal()">
+            </div>
+            <div class="form-item">
+                <label>อัตรา (บาท):</label>
+                <input type="number" id="work-rate" class="clean-input" min="0" value="0" oninput="calcWorkTotal()">
+            </div>
+        </div>
+        <div class="form-item">
+            <label>OT / เบี้ยเลี้ยง (บาท):</label>
+            <input type="number" id="work-ot" class="clean-input" min="0" value="0" oninput="calcWorkTotal()">
+        </div>
+        <div class="form-item">
+            <label>รายละเอียดงาน (ถ้ามี):</label>
+            <input type="text" id="work-details" class="clean-input" placeholder="เช่น เดินท่อ, ติดกล้อง...">
+        </div>
+        
+        <!-- แถบสรุปยอด -->
+        <div style="background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600; color: var(--text-main); font-size: 13px;">ยอดรวมค่าแรงงวดนี้:</span>
+            <strong style="font-size: 18px; color: var(--primary-accent);" id="lbl-work-total">0.00 ฿</strong>
+        </div>
+
+        <button class="btn btn-primary" id="btn-submit-work" style="width:100%; justify-content:center; padding:12px; font-size:14px;" onclick="submitWork()">💾 บันทึกค่าแรง</button>
+    </div>
+</div>
+
+<!-- 2. Modal: เบิกเงินล่วงหน้า (Advance) -->
+<div class="modal-overlay" id="modalAdvance">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3 style="color:var(--rose);">💸 ให้เบิกเงินล่วงหน้า</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalAdvance')">&times;</span>
+        </div>
+        
+        <div class="form-item">
+            <label>ดึงจากงบโครงการ (ถ้ามี):</label>
+            <select id="adv-proj" class="clean-input"></select>
+        </div>
+        <div class="form-item">
+            <label>เลือกช่างที่ขอเบิก:</label>
+            <select id="adv-tech" class="clean-input"></select>
+        </div>
+        <div class="form-item">
+            <label>วันที่เบิก:</label>
+            <input type="date" id="adv-date" class="clean-input">
+        </div>
+        <div class="form-item">
+            <label style="color:var(--rose);">จำนวนเงินที่ให้เบิก (บาท):</label>
+            <input type="number" id="adv-amount" class="clean-input" min="1" value="" placeholder="ระบุจำนวนเงิน...">
+        </div>
+        <div class="form-item">
+            <label>รายละเอียด (ถ้ามี):</label>
+            <input type="text" id="adv-details" class="clean-input" placeholder="เช่น เบิกค่ากิน, เบิกค่าน้ำมัน...">
+        </div>
+        
+        <button class="btn btn-rose" id="btn-submit-adv" style="width:100%; justify-content:center; padding:12px; font-size:14px; margin-top:10px;" onclick="submitAdvance()">💾 บันทึกการเบิกเงิน</button>
+    </div>
+</div>
+
+<!-- 3. Modal: สรุปจ่ายเงินตัดวีค (Payroll) -->
+<div class="modal-overlay" id="modalPayroll">
+    <div class="modal-box modal-lg">
+        <div class="modal-head">
+            <h3>💳 สรุปยอดจ่ายเงินรายบุคคล (ตัดวีค)</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalPayroll')">&times;</span>
+        </div>
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:15px;">* ระบบนำค่าแรงมาหักลบกับยอดเบิกล่วงหน้าให้เรียบร้อยแล้ว</div>
+        
+        <table class="payroll-table">
+            <thead>
+                <tr>
+                    <th style="width:40%;">รายชื่อช่าง / เลขบัญชี</th>
+                    <th style="width:30%;" class="t-right">ยอดโอนสุทธิ (บาท)</th>
+                    <th style="width:30%;" class="t-center">แอคชัน</th>
+                </tr>
+            </thead>
+            <tbody id="tbl-payroll-body">
+                <!-- Data here -->
+            </tbody>
+        </table>
+
+        <button class="btn btn-white" style="width:100%; justify-content:center; margin-top:10px;" onclick="closeModal('modalPayroll')">ปิดหน้าต่าง</button>
+    </div>
+</div>
+
+<!-- 4. Modal: ป้องกันมือลั่นตอนจ่ายเงิน (Pay Confirm) -->
+<div class="modal-overlay" id="modalPayConfirm">
+    <div class="modal-box" style="width:360px; text-align:center;">
+        <h2 style="margin-top:0; color:var(--primary); font-size:18px;">ยืนยันการทำรายการ 💳</h2>
+        <div style="font-size:13.5px; margin-bottom:15px; color:var(--text-sub);">
+            เปลี่ยนสถานะรายการนี้เป็น <strong style="color:var(--emerald);">"เคลียร์ยอดแล้ว"</strong>
+        </div>
+        <div style="background: var(--bg); border: 1px solid var(--border); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; text-align:left;">
+            <div style="font-weight:700; font-size:15px; color:var(--primary-accent); margin-bottom:4px;" id="pc-name">ช่าง...</div>
+            <div style="font-size:12.5px; margin-bottom:10px; color:var(--text-sub);" id="pc-desc">รายละเอียด...</div>
+            
+            <div style="border-top:1px dashed var(--border); padding-top:10px; margin-top:10px;">
+                <div style="font-size:11.5px; color:var(--text-sub);">บัญชีธนาคาร:</div>
+                <div style="font-weight:700; font-size:14px;" id="pc-bank">-</div>
+            </div>
+            <div style="margin-top:15px; text-align:right;">
+                <span style="font-size:11.5px; color:var(--text-sub);">ยอดที่ต้องโอน:</span>
+                <span style="font-size:22px; font-weight:700; color:var(--amber);" id="pc-amount">0.00 ฿</span>
+            </div>
+        </div>
+        <input type="hidden" id="pc-log-id">
+        <input type="hidden" id="pc-exp-id">
+        
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-white" style="flex:1; justify-content:center;" onclick="closeModal('modalPayConfirm')">ยกเลิก</button>
+            <button class="btn btn-emerald font-bold" style="flex:1; justify-content:center;" onclick="executeLaborPaid()">✅ ยืนยัน</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: เพิ่มช่างใหม่ -->
 <div class="modal-overlay" id="modalTech">
     <div class="modal-box">
         <div class="modal-head">
@@ -205,129 +349,17 @@
             <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalTech')">&times;</span>
         </div>
         <input type="hidden" id="inp-tech-id">
-        <div class="form-item"><label>ชื่อคนงาน / ชื่อเล่น:</label><input type="text" id="inp-tech-name" class="clean-input" placeholder="เช่น คนงานเอก (ตู้คอนโทรล)"></div>
-        <div class="form-item"><label>เบอร์โทรศัพท์:</label><input type="text" id="inp-tech-phone" class="clean-input" placeholder="08x-xxx-xxxx"></div>
+        <div class="form-item"><label>ชื่อช่าง / ทีมงาน:</label><input type="text" id="inp-tech-name" class="clean-input"></div>
+        <div class="form-item"><label>เบอร์โทรศัพท์:</label><input type="text" id="inp-tech-phone" class="clean-input"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <div class="form-item"><label>ธนาคาร:</label><input type="text" id="inp-tech-bank" class="clean-input" placeholder="กสิกรไทย"></div>
             <div class="form-item"><label>เลขบัญชี:</label><input type="text" id="inp-tech-acc" class="clean-input" placeholder="xxx-x-xxxxx-x"></div>
         </div>
-        <div class="form-item"><label>ค่าแรงเริ่มต้นต่อวัน (บาท):</label><input type="number" id="inp-tech-rate" class="clean-input" value="500"></div>
-        <div class="form-item"><label>ความชำนาญ / หมายเหตุ:</label><input type="text" id="inp-tech-skills" class="clean-input" placeholder="เช่น เดินท่อ, ดึงสาย"></div>
+        <div class="form-item"><label>เรทค่าแรง (บาท/วัน):</label><input type="number" id="inp-tech-rate" class="clean-input" value="500"></div>
+        <div class="form-item"><label>หมายเหตุ:</label><input type="text" id="inp-tech-skills" class="clean-input"></div>
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
             <button class="btn btn-white" onclick="closeModal('modalTech')">ยกเลิก</button>
-            <button class="btn btn-purple font-bold" onclick="submitTechnician()">💾 บันทึกคนงาน</button>
-        </div>
-    </div>
-</div>
-
-<!-- 🌟 อัปเกรด Modal: Record Labor Log -->
-<div class="modal-overlay" id="modalJobLog">
-    <div class="modal-box">
-        <div class="modal-head">
-            <h3>⚡ ลงบันทึกค่าแรง / เบิกล่วงหน้า</h3>
-            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalJobLog')">&times;</span>
-        </div>
-        
-        <div class="form-item"><label>เลือกโครงการ:</label><select id="inp-log-proj" class="clean-input"></select></div>
-        
-        <div class="form-item">
-            <label>เลือกคนงาน (เลือกได้หลายคน):</label>
-            <div class="tech-checkbox-grid" id="container-tech-cbs">
-                <!-- Checkboxes injected here -->
-            </div>
-            <div style="font-size:11px; color:var(--text-sub); margin-top:4px;">* ถ้าระบุอัตราค่าแรง/หน่วยด้านล่างเป็น 0 ระบบจะดึงเรทพื้นฐานของช่างแต่ละคนมาคูณให้เอง</div>
-        </div>
-        
-        <div class="form-item">
-            <label>รูปแบบรายการ:</label>
-            <select id="inp-log-type" class="clean-input" onchange="calcJobLogTotal()">
-                <option value="daily">รายวัน (ทำงานปกติ)</option>
-                <option value="task">เหมาจุด / ชิ้นงาน</option>
-                <!-- 🌟 เพิ่มโหมดเบิกล่วงหน้า -->
-                <option value="advance" style="color:var(--rose); font-weight:bold;">💸 เบิกเงินล่วงหน้า (ยอดจะติดลบ)</option>
-            </select>
-        </div>
-
-        <div class="form-item">
-            <label>วันที่ (คั่นด้วยจุลภาคได้ถ้าต้องการลงหลายวันรวดเดียว):</label>
-            <input type="text" id="inp-log-date" class="clean-input" placeholder="เช่น 2026-09-10, 2026-09-11">
-            <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">* เช่น 10/09/2026, 11/09/2026 หรือใช้ YYYY-MM-DD ก็ได้</div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <div class="form-item"><label>จำนวน (หน่วยต่อวัน):</label><input type="number" id="inp-log-units" class="clean-input" min="0.5" step="0.5" value="1" oninput="calcJobLogTotal()"></div>
-            <div class="form-item"><label>อัตรา/หน่วย (0=ใช้เรทช่าง):</label><input type="number" id="inp-log-rate" class="clean-input" min="0" value="0" oninput="calcJobLogTotal()"></div>
-        </div>
-        
-        <div class="form-item"><label id="lbl-ot">ค่าล่วงเวลา/เบี้ยเลี้ยง (ต่อวัน):</label><input type="number" id="inp-log-ot" class="clean-input" min="0" value="0" oninput="calcJobLogTotal()"></div>
-        <div class="form-item"><label>รายละเอียด:</label><input type="text" id="inp-log-details" class="clean-input" placeholder="เช่น ติดตั้งตู้ควบคุม, เบิกค่าข้าว"></div>
-        
-        <div style="background: var(--amber-bg); border: 1px solid var(--amber-border); padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;" id="log-total-box">
-            <span style="font-weight: 600; color: var(--amber); font-size: 12.5px;">ยอดรวม/คน/วัน (คร่าวๆ):</span>
-            <strong style="font-size: 17px; color: var(--amber);" id="lbl-log-total">0.00 ฿</strong>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 8px;">
-            <button class="btn btn-white" onclick="closeModal('modalJobLog')">ยกเลิก</button>
-            <button class="btn btn-emerald font-bold" id="btn-submit-log" onclick="submitLaborLog()">💾 บันทึกเข้าระบบ</button>
-        </div>
-    </div>
-</div>
-
-<!-- 🌟 Modal: Pay Confirmation (กันมือลั่น) -->
-<div class="modal-overlay" id="modalPayConfirm">
-    <div class="modal-box" style="width:400px; text-align:center;">
-        <h2 style="margin-top:0; color:var(--primary); font-size:20px;">ยืนยันการโอนเงิน 💳</h2>
-        <div style="font-size:14px; margin-bottom:15px; color:var(--text-sub);">
-            คุณกำลังจะเปลี่ยนสถานะเป็น <strong style="color:var(--emerald);">"จ่ายแล้ว"</strong> สำหรับรายการนี้
-        </div>
-        <div style="background: var(--bg); border: 1px solid var(--border); padding: 15px; border-radius: var(--radius-md); margin-bottom: 20px; text-align:left;">
-            <div style="font-weight:700; font-size:16px; color:var(--primary-accent); margin-bottom:5px;" id="pc-name">ช่าง...</div>
-            <div style="font-size:13px; margin-bottom:10px;" id="pc-desc">รายละเอียด...</div>
-            <div style="border-top:1px dashed var(--border); padding-top:10px; margin-top:10px;">
-                <div style="font-size:12px; color:var(--text-sub);">ข้อมูลบัญชีรับโอน:</div>
-                <div style="font-weight:700; font-size:15px;" id="pc-bank">ธนาคาร... xxx-xxx-xxxx</div>
-            </div>
-            <div style="margin-top:15px; text-align:right;">
-                <span style="font-size:12px; color:var(--text-sub);">ยอดที่ต้องโอน:</span>
-                <span style="font-size:24px; font-weight:700; color:var(--amber);" id="pc-amount">0.00 ฿</span>
-            </div>
-        </div>
-        <input type="hidden" id="pc-log-id">
-        <input type="hidden" id="pc-exp-id">
-        <input type="hidden" id="pc-new-status">
-        <div style="display: flex; gap: 8px;">
-            <button class="btn btn-white" style="flex:1; justify-content:center;" onclick="closeModal('modalPayConfirm')">ยกเลิก</button>
-            <button class="btn btn-emerald font-bold" style="flex:1; justify-content:center;" onclick="executeLaborPaid()">✅ โอนเงินเรียบร้อย</button>
-        </div>
-    </div>
-</div>
-
-<!-- 🌟 Modal: Payroll (เคลียร์ยอดรวมรายบุคคล) -->
-<div class="modal-overlay" id="modalPayroll">
-    <div class="modal-box modal-lg">
-        <div class="modal-head">
-            <h3>💳 สรุปยอดค้างโอนรายบุคคล (Payroll)</h3>
-            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalPayroll')">&times;</span>
-        </div>
-        <div style="font-size:12.5px; color:var(--text-sub); margin-bottom:15px;">* ระบบคำนวณหักลบยอด "เบิกล่วงหน้า" ออกจากค่าแรงที่ยังไม่จ่ายให้แล้ว</div>
-        
-        <table class="payroll-table">
-            <thead>
-                <tr>
-                    <th style="width:30%;">ชื่อช่าง</th>
-                    <th style="width:20%;" class="t-center">จำนวนบิลค้าง</th>
-                    <th style="width:25%;" class="t-right">ยอดที่ต้องโอนสุทธิ</th>
-                    <th style="width:25%;" class="t-center">แอคชัน</th>
-                </tr>
-            </thead>
-            <tbody id="tbl-payroll-body">
-                <!-- Injected via JS -->
-            </tbody>
-        </table>
-
-        <div style="display: flex; justify-content: flex-end; margin-top:15px;">
-            <button class="btn btn-white" onclick="closeModal('modalPayroll')">ปิดหน้าต่าง</button>
+            <button class="btn btn-purple font-bold" onclick="submitTechnician()">💾 บันทึกช่าง</button>
         </div>
     </div>
 </div>
@@ -341,16 +373,12 @@
     let projects = [];
     let laborLogs = [];
     let activeTab = 'logs';
-    let statusFilter = 'all';
+    let statusFilter = 'pending'; // เปลี่ยน Default เป็นดูรายการที่ "รอโอน" ก่อน
 
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) { window.location.href = "index.html"; return; }
         
-        // เซ็ตวันที่ปัจจุบันเป็นค่าเริ่มต้น
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('inp-log-date').value = todayStr;
-
         await loadProjects();
         await loadTechnicians();
         await loadLaborLogs();
@@ -374,22 +402,22 @@
     async function loadProjects() {
         const { data } = await supabaseClient.from('projects').select('*').eq('status', 'active').order('created_at', { ascending: false });
         projects = data || [];
+        
         const selFilter = document.getElementById('sel-filter-proj');
-        const selLogProj = document.getElementById('inp-log-proj');
+        const workProj = document.getElementById('work-proj');
+        const advProj = document.getElementById('adv-proj');
         
-        selFilter.innerHTML = '<option value="">-- กรองทุกโครงการ Active --</option>';
-        selLogProj.innerHTML = '<option value="">-- เลือกโครงการที่กำลังดำเนินงาน --</option>';
-        
-        const lastSavedId = localStorage.getItem('erp_last_selected_project');
+        const opts = '<option value="">-- กรองทุกโครงการ --</option>';
+        const reqOpts = '<option value="">-- เลือกโครงการ --</option>';
+        selFilter.innerHTML = opts;
+        workProj.innerHTML = reqOpts;
+        advProj.innerHTML = reqOpts;
 
         projects.forEach(p => {
-            const opt1 = document.createElement('option'); opt1.value = p.id; opt1.textContent = `🟢 ${p.project_name}`;
-            if (lastSavedId && p.id === lastSavedId) opt1.selected = true;
-            selFilter.appendChild(opt1);
-
-            const opt2 = document.createElement('option'); opt2.value = p.id; opt2.textContent = `🟢 ${p.project_name}`;
-            if (lastSavedId && p.id === lastSavedId) opt2.selected = true;
-            selLogProj.appendChild(opt2);
+            const opt = `<option value="${p.id}">🟢 ${p.project_name}</option>`;
+            selFilter.insertAdjacentHTML('beforeend', opt);
+            workProj.insertAdjacentHTML('beforeend', opt);
+            advProj.insertAdjacentHTML('beforeend', opt);
         });
     }
 
@@ -398,19 +426,18 @@
         technicians = data || [];
         
         const container = document.getElementById('tech-list-container');
-        const cbContainer = document.getElementById('container-tech-cbs'); // สำหรับ Modal ใหม่
+        const workTech = document.getElementById('work-tech');
+        const advTech = document.getElementById('adv-tech');
+        
         container.innerHTML = '';
-        cbContainer.innerHTML = '';
-
+        const reqOpts = '<option value="">-- เลือกช่าง --</option>';
+        workTech.innerHTML = reqOpts;
+        advTech.innerHTML = reqOpts;
+        
         document.getElementById('cnt-techs').innerText = technicians.length;
 
-        if (technicians.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">ยังไม่มีคนงานในระบบ กดปุ่ม "➕ เพิ่มคนงานใหม่" ด้านบน</div>`;
-            return;
-        }
-
         technicians.forEach(t => {
-            // Card ในหน้า Techs
+            // Render Tech Card
             const card = document.createElement('div');
             card.className = 'item-card';
             card.innerHTML = `
@@ -427,54 +454,43 @@
                     </div>
                 </div>
                 <div class="item-card-body">
-                    <span>เรทเริ่มต้น: <strong style="color:var(--primary-accent);">${Number(t.default_daily_rate || 500).toLocaleString()} ฿/วัน</strong></span>
-                    <span>${t.skills || 'คนงานทั่วไป'}</span>
+                    <span>เรท: <strong style="color:var(--primary-accent);">${Number(t.default_daily_rate || 500).toLocaleString()} ฿/วัน</strong></span>
+                    <span>${t.skills || 'ช่างทั่วไป'}</span>
                 </div>
             `;
             container.appendChild(card);
 
-            // Checkbox สำหรับลงเวลา
-            const lbl = document.createElement('label');
-            lbl.className = 'tech-cb-label';
-            lbl.innerHTML = `<input type="checkbox" class="tech-cb-input" value="${t.id}"> ${t.tech_name}`;
-            cbContainer.appendChild(lbl);
+            // Populate Selects
+            const opt = `<option value="${t.id}">${t.tech_name}</option>`;
+            workTech.insertAdjacentHTML('beforeend', opt);
+            advTech.insertAdjacentHTML('beforeend', opt);
         });
     }
 
     async function loadLaborLogs() {
         const filterProj = document.getElementById('sel-filter-proj').value;
         let query = supabaseClient.from('project_labor_logs').select('*, projects(project_name), technicians(tech_name, phone, bank_name, bank_account)').order('work_date', { ascending: false });
-        
         if (filterProj) query = query.eq('project_id', filterProj);
+        
         const { data } = await query;
         laborLogs = data || [];
-
         renderLaborLogsView();
     }
 
     function renderLaborLogsView() {
-        let sumPending = 0;
-        let cntPending = 0;
-        let sumPaid = 0;
-        let cntPaid = 0;
+        let sumPending = 0; let cntPending = 0;
+        let sumPaid = 0; let cntPaid = 0;
 
         laborLogs.forEach(l => {
-            // 🌟 ถ้ารายการเป็นติดลบ (เบิก) ก็บวกลบตามคณิตศาสตร์ได้เลย
             const amt = Number(l.total_amount || 0);
-            if (l.is_paid) {
-                sumPaid += amt;
-                cntPaid++;
-            } else {
-                sumPending += amt;
-                cntPending++;
-            }
+            if (l.is_paid) { sumPaid += amt; cntPaid++; } 
+            else { sumPending += amt; cntPending++; }
         });
 
         document.getElementById('kpi-pending-labor').innerText = `${sumPending.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
-        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอโอน`;
+        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอเคลียร์`;
         document.getElementById('kpi-paid-labor').innerText = `${sumPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
-        document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการโอนแล้ว`;
-
+        document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการจ่ายแล้ว`;
         document.getElementById('cnt-logs').innerText = laborLogs.length;
 
         let displayList = laborLogs;
@@ -485,7 +501,7 @@
         container.innerHTML = '';
 
         if (displayList.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">ไม่มีรายการในเงื่อนไขนี้</div>`;
+            container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-sub); font-size:12.5px;">ไม่มีรายการประวัติในหมวดนี้</div>`;
             return;
         }
 
@@ -496,19 +512,19 @@
             const card = document.createElement('div');
             card.className = `item-card ${l.is_paid ? 'paid' : (isAdvance ? 'advance' : '')}`;
             
-            // เตรียมหน้าตาปุ่มจ่ายเงิน (ถ้าเบิกแล้ว จะจ่ายแล้วอัตโนมัติก็ขึ้นเครื่องหมายถูก)
+            // ปรับปุ่มให้เป็นปุ่มสวยๆ ไม่ใช่ Checkbox
             let payBtnHtml = '';
             if(l.is_paid) {
-                payBtnHtml = `<span style="font-size:12px; color:var(--emerald); font-weight:600; cursor:pointer;" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', false, '${l.technicians?.tech_name}', ${amt})">✅ เรียบร้อย</span>`;
+                payBtnHtml = `<span style="font-size:11.5px; color:var(--emerald); font-weight:600;">เคลียร์แล้ว ✅</span>`;
             } else {
-                payBtnHtml = `<button class="btn btn-sm ${isAdvance ? 'btn-danger' : 'btn-primary'}" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', true, '${l.technicians?.tech_name}', ${amt}, '${l.technicians?.bank_name} ${l.technicians?.bank_account}', '${l.work_details || l.work_type}')">💳 ${isAdvance ? 'ยืนยันหักยอด' : 'จ่าย/โอน'}</button>`;
+                payBtnHtml = `<button class="btn btn-sm ${isAdvance ? 'btn-danger' : 'btn-primary'}" onclick="openPayConfirmModal('${l.id}', '${l.expense_id}', '${l.technicians?.tech_name}', ${amt}, '${l.technicians?.bank_name} ${l.technicians?.bank_account}', '${l.work_details || l.work_type}')">💳 ${isAdvance ? 'ยืนยันหักยอด' : 'จ่ายเงิน'}</button>`;
             }
 
             card.innerHTML = `
                 <div class="item-card-top">
                     <div>
-                        <div class="item-card-title">${l.technicians?.tech_name || 'คนงาน'} ${isAdvance ? '<span style="color:var(--rose); font-size:11px;">(เบิกล่วงหน้า)</span>' : ''}</div>
-                        <div style="font-size:12px; color:var(--primary-accent); font-weight:600; margin-top:2px;">
+                        <div class="item-card-title">${l.technicians?.tech_name || 'คนงาน'} ${isAdvance ? '<span style="color:var(--rose); font-size:11px;">(เบิก)</span>' : ''}</div>
+                        <div style="font-size:11.5px; color:var(--primary-accent); font-weight:600; margin-top:2px;">
                             📁 ${l.projects?.project_name || '-'}
                         </div>
                     </div>
@@ -516,16 +532,15 @@
                         ${amt.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿
                     </div>
                 </div>
-                <div style="font-size:12px; color:var(--text-main); margin: 4px 0;">
-                    ${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : `${l.units} จุด`)}
-                    ${Number(l.ot_amount || 0) > 0 ? `<span style="font-size:11px; color:var(--purple); margin-left:4px;">(+OT ${Number(l.ot_amount).toLocaleString()} ฿)</span>` : ''}
+                <div style="font-size:12px; color:var(--text-main); margin: 6px 0;">
+                    ${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : (isAdvance ? 'เบิกเงินล่วงหน้า' : `${l.units} จุด`))}
+                    ${Number(l.ot_amount || 0) > 0 ? `<span style="font-size:11px; color:var(--purple); margin-left:4px;">(+OT ${Number(l.ot_amount).toLocaleString()})</span>` : ''}
                 </div>
                 <div class="item-card-body">
                     <span>🗓️ ${l.work_date || '-'}</span>
                     <div class="item-card-actions">
                         ${payBtnHtml}
-                        <button class="btn-icon" onclick="copyLaborPayToLine('${l.id}')" title="ส่งข้อมูลโอนเงินเข้า LINE">📱</button>
-                        <button class="btn-icon" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')">🗑️</button>
+                        <button class="btn-icon" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')" title="ลบรายการ">🗑️</button>
                     </div>
                 </div>
             `;
@@ -533,144 +548,136 @@
         });
     }
 
-    // 🌟 ระบบคำนวณเงินโชว์หน้าจอแบบฉลาด (ไม่ว่าจะเป็นบวกหรือลบ)
-    function calcJobLogTotal() {
-        const type = document.getElementById('inp-log-type').value;
-        const units = parseFloat(document.getElementById('inp-log-units').value) || 0;
-        const rate = parseFloat(document.getElementById('inp-log-rate').value) || 0; // ถ้าเป็น 0 เดี๋ยวตอนเซฟมันจะไปดึงเรทช่างมาเอง
-        const ot = parseFloat(document.getElementById('inp-log-ot').value) || 0;
-        
-        let total = (units * rate) + ot;
-        
-        const box = document.getElementById('log-total-box');
-        const lbl = document.getElementById('lbl-log-total');
-        
-        if (type === 'advance') {
-            document.getElementById('lbl-ot').style.color = '#ccc'; // เบิกเงิน ไม่ควรมี OT
-            total = -(units * rate); // ติดลบ
-            box.style.background = 'var(--rose-bg)';
-            box.style.borderColor = '#fecdd3';
-            lbl.style.color = 'var(--rose)';
-        } else {
-            document.getElementById('lbl-ot').style.color = 'var(--text-main)';
-            box.style.background = 'var(--amber-bg)';
-            box.style.borderColor = 'var(--amber-border)';
-            lbl.style.color = 'var(--amber)';
-        }
-
-        lbl.innerText = `${total.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+    // ================= ACTIONS (WORK) =================
+    function openWorkModal() {
+        document.getElementById('work-date').valueAsDate = new Date();
+        document.getElementById('work-tech').value = '';
+        document.getElementById('work-details').value = '';
+        document.getElementById('work-units').value = '1';
+        document.getElementById('work-rate').value = '0';
+        document.getElementById('work-ot').value = '0';
+        calcWorkTotal();
+        document.getElementById('modalWork').style.display = 'flex';
     }
 
-    // 🌟 บันทึกข้อมูลแบบรองรับ: เบิกเงิน / ทำงานหมู่ / ใส่วันที่หลายวัน
-    async function submitLaborLog() {
-        const projId = document.getElementById('inp-log-proj').value;
-        const dateRaw = document.getElementById('inp-log-date').value.trim();
-        const type = document.getElementById('inp-log-type').value;
-        const units = parseFloat(document.getElementById('inp-log-units').value) || 1;
-        const rateInput = parseFloat(document.getElementById('inp-log-rate').value) || 0;
-        const ot = parseFloat(document.getElementById('inp-log-ot').value) || 0;
-        const details = document.getElementById('inp-log-details').value.trim();
+    function onTechSelectChanged() {
+        const tId = document.getElementById('work-tech').value;
+        const tech = technicians.find(t => t.id === tId);
+        if (tech && tech.default_daily_rate) {
+            document.getElementById('work-rate').value = tech.default_daily_rate;
+            calcWorkTotal();
+        }
+    }
 
-        if (!projId || !dateRaw) return alert('⚠️ กรุณาเลือกโครงการและระบุวันที่');
+    function calcWorkTotal() {
+        const units = parseFloat(document.getElementById('work-units').value) || 0;
+        const rate = parseFloat(document.getElementById('work-rate').value) || 0;
+        const ot = parseFloat(document.getElementById('work-ot').value) || 0;
+        const total = (units * rate) + ot;
+        document.getElementById('lbl-work-total').innerText = `${total.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+    }
 
-        // หาว่าติ๊กช่างคนไหนมาบ้าง
-        const selectedTechIds = Array.from(document.querySelectorAll('.tech-cb-input:checked')).map(cb => cb.value);
-        if (selectedTechIds.length === 0) return alert('⚠️ กรุณาติ๊กเลือกคนงานอย่างน้อย 1 คนครับ');
+    async function submitWork() {
+        const projId = document.getElementById('work-proj').value;
+        const techId = document.getElementById('work-tech').value;
+        const date = document.getElementById('work-date').value;
+        const type = document.getElementById('work-type').value;
+        const units = parseFloat(document.getElementById('work-units').value) || 1;
+        let rate = parseFloat(document.getElementById('work-rate').value) || 0;
+        const ot = parseFloat(document.getElementById('work-ot').value) || 0;
+        const details = document.getElementById('work-details').value.trim();
 
-        // แยกวันที่ (เผื่อผู้ใช้กรอกมาหลายวันคั่นด้วยจุลภาค)
-        const dateArray = dateRaw.split(',').map(d => d.trim()).filter(d => d !== '');
-        
-        const btn = document.getElementById('btn-submit-log');
-        setBtnLoading('btn-submit-log', true);
+        if (!projId || !techId || !date) return alert('⚠️ กรุณาระบุโครงการ, ช่าง และวันที่ให้ครบถ้วน');
+
+        const tech = technicians.find(t => t.id === techId);
+        if (rate === 0) rate = tech.default_daily_rate || 0;
+
+        const total = (units * rate) + ot;
+        if (total <= 0) return alert('⚠️ ยอดรวมต้องมากกว่า 0 บาท');
+
+        setBtnLoading('btn-submit-work', true);
+        const expItemName = `ค่าแรง: ${tech.tech_name} (${details || (type === 'daily' ? `${units} วัน` : `${units} จุด`)})`;
 
         try {
-            const expenseInserts = [];
-            const logInserts = [];
-            
-            // วนลูป 1: คนงานแต่ละคน
-            for (let tId of selectedTechIds) {
-                const tech = technicians.find(t => t.id === tId);
-                let actualRate = rateInput > 0 ? rateInput : (tech.default_daily_rate || 500); // ถ้าไม่กรอกเรท ให้ดึงของช่างมาใช้
-                let baseTotal = (units * actualRate);
-                let finalTotal = baseTotal + ot;
+            // ขา 1: โยนเข้า Expense ของ Project
+            const { data: expData, error: expErr } = await supabaseClient.from('project_expenses').insert([{
+                project_id: projId, category: 'labor', item_name: expItemName,
+                qty: units, unit: type === 'daily' ? 'วัน' : 'จุด', unit_price: rate,
+                amount: total, expense_date: date, is_paid: false
+            }]).select().single();
 
-                let isAdvanceMode = false;
-                if (type === 'advance') {
-                    isAdvanceMode = true;
-                    finalTotal = -(baseTotal); // เบิกล่วงหน้า ไม่คิด OT และยอดเป็นติดลบ
-                }
+            if (expErr) throw expErr;
 
-                const expItemName = isAdvanceMode 
-                    ? `เบิกล่วงหน้า: ${tech.tech_name} (${details || 'เบิกเงิน'})` 
-                    : `ค่าแรง: ${tech.tech_name} (${details || (type === 'daily' ? `${units} วัน` : `${units} จุด`)})`;
+            // ขา 2: โยนเข้าประวัติช่าง
+            await supabaseClient.from('project_labor_logs').insert([{
+                project_id: projId, technician_id: techId, expense_id: expData.id,
+                work_date: date, work_type: type, units: units, unit_rate: rate,
+                ot_amount: ot, total_amount: total, work_details: details, is_paid: false
+            }]);
 
-                // วนลูป 2: วันที่แต่ละวัน
-                for (let workDate of dateArray) {
-                    
-                    // แทรก Expense ขาที่ 1
-                    const { data: expData, error: expErr } = await supabaseClient.from('project_expenses').insert([{
-                        project_id: projId,
-                        category: 'labor',
-                        item_name: expItemName,
-                        qty: units,
-                        unit: type === 'daily' ? 'วัน' : (type === 'advance' ? 'ครั้ง' : 'จุด'),
-                        unit_price: isAdvanceMode ? -actualRate : actualRate,
-                        amount: finalTotal,
-                        expense_date: workDate,
-                        is_paid: false
-                    }]).select().single();
-
-                    if (expErr) throw expErr;
-
-                    // แทรก Labor Log ขาที่ 2
-                    logInserts.push({
-                        project_id: projId,
-                        technician_id: tId,
-                        expense_id: expData.id,
-                        work_date: workDate,
-                        work_type: type,
-                        units: units,
-                        unit_rate: actualRate,
-                        ot_amount: isAdvanceMode ? 0 : ot,
-                        total_amount: finalTotal,
-                        work_details: details,
-                        is_paid: false
-                    });
-                }
-            }
-
-            if(logInserts.length > 0){
-                const { error: logErr } = await supabaseClient.from('project_labor_logs').insert(logInserts);
-                if (logErr) throw logErr;
-            }
-
-            alert(`✅ บันทึกรายการสำเร็จแล้ว (${logInserts.length} รายการ)`);
-            closeModal('modalJobLog');
-            
-            // ล้างหน้าจอเล็กน้อย
-            document.querySelectorAll('.tech-cb-input').forEach(cb => cb.checked = false);
-            document.getElementById('inp-log-details').value = '';
-            
+            closeModal('modalWork');
             await loadLaborLogs();
-
         } catch(e) {
             alert('❌ เกิดข้อผิดพลาด: ' + e.message);
         } finally {
-            setBtnLoading('btn-submit-log', false, '💾 บันทึกเข้าระบบ');
+            setBtnLoading('btn-submit-work', false, '💾 บันทึกค่าแรง');
         }
     }
 
-    // 🌟 ระบบ Popup ยืนยันจ่ายเงิน (กันลั่น)
-    function toggleLaborPaidSafe(logId, expId, isCheckingOut, techName, amount, bankInfo, desc) {
-        if (!isCheckingOut) {
-            // ถ้าเป็นการ "ยกเลิกการจ่าย" ยอมให้ถามง่ายๆ แล้วยกเลิกเลย
-            if(confirm(`ต้องการยกเลิกสถานะโอนเงินของบิลนี้ใช่ไหม?`)) {
-                processPaymentStatusChange(logId, expId, false);
-            }
-            return;
-        }
+    // ================= ACTIONS (ADVANCE) =================
+    function openAdvanceModal() {
+        document.getElementById('adv-date').valueAsDate = new Date();
+        document.getElementById('adv-tech').value = '';
+        document.getElementById('adv-amount').value = '';
+        document.getElementById('adv-details').value = '';
+        document.getElementById('modalAdvance').style.display = 'flex';
+    }
 
-        // ถ้าจะจ่ายเงิน เปิด Modal ให้ชัวร์ก่อน
+    async function submitAdvance() {
+        const projId = document.getElementById('adv-proj').value; // โปรเจกต์มีหรือไม่มีก็ได้
+        const techId = document.getElementById('adv-tech').value;
+        const date = document.getElementById('adv-date').value;
+        const amount = parseFloat(document.getElementById('adv-amount').value) || 0;
+        const details = document.getElementById('adv-details').value.trim();
+
+        if (!techId || !date || amount <= 0) return alert('⚠️ กรุณาระบุช่าง วันที่ และจำนวนเงินเบิกให้ถูกต้อง');
+
+        setBtnLoading('btn-submit-adv', true);
+        const tech = technicians.find(t => t.id === techId);
+        const finalTotal = -amount; // ทำให้ยอดติดลบ!
+        const expItemName = `เบิกล่วงหน้า: ${tech.tech_name} (${details || 'เบิกเงิน'})`;
+
+        try {
+            let expId = null;
+            // ถ้ามีการเลือกโปรเจกต์ ให้ไปหักจากโปรเจกต์ด้วย
+            if (projId) {
+                const { data: expData, error: expErr } = await supabaseClient.from('project_expenses').insert([{
+                    project_id: projId, category: 'labor', item_name: expItemName,
+                    qty: 1, unit: 'ครั้ง', unit_price: finalTotal, amount: finalTotal, 
+                    expense_date: date, is_paid: false
+                }]).select().single();
+                if (expErr) throw expErr;
+                expId = expData.id;
+            }
+
+            // บันทึกประวัติช่าง
+            await supabaseClient.from('project_labor_logs').insert([{
+                project_id: projId || null, technician_id: techId, expense_id: expId,
+                work_date: date, work_type: 'advance', units: 1, unit_rate: amount,
+                ot_amount: 0, total_amount: finalTotal, work_details: details, is_paid: false
+            }]);
+
+            closeModal('modalAdvance');
+            await loadLaborLogs();
+        } catch(e) {
+            alert('❌ เกิดข้อผิดพลาด: ' + e.message);
+        } finally {
+            setBtnLoading('btn-submit-adv', false, '💾 บันทึกการเบิกเงิน');
+        }
+    }
+
+    // ================= PAYROLL & CONFIRM =================
+    function openPayConfirmModal(logId, expId, techName, amount, bankInfo, desc) {
         document.getElementById('pc-name').innerText = techName || 'คนงาน';
         document.getElementById('pc-desc').innerText = desc || '-';
         document.getElementById('pc-bank').innerText = bankInfo && bankInfo.trim() !== 'null null' ? bankInfo : 'ไม่ได้ระบุบัญชี';
@@ -681,45 +688,95 @@
 
         document.getElementById('pc-log-id').value = logId;
         document.getElementById('pc-exp-id').value = expId || '';
-        document.getElementById('pc-new-status').value = 'true';
-
         document.getElementById('modalPayConfirm').style.display = 'flex';
     }
 
     async function executeLaborPaid() {
         const logId = document.getElementById('pc-log-id').value;
         const expId = document.getElementById('pc-exp-id').value;
-        const isPaid = document.getElementById('pc-new-status').value === 'true';
-
-        await processPaymentStatusChange(logId, expId, isPaid);
-        closeModal('modalPayConfirm');
-    }
-
-    async function processPaymentStatusChange(logId, expId, newStatus) {
-        await supabaseClient.from('project_labor_logs').update({ is_paid: newStatus }).eq('id', logId);
+        
+        await supabaseClient.from('project_labor_logs').update({ is_paid: true }).eq('id', logId);
         if (expId) {
-            await supabaseClient.from('project_expenses').update({ is_paid: newStatus }).eq('id', expId);
+            await supabaseClient.from('project_expenses').update({ is_paid: true }).eq('id', expId);
         }
+        
+        closeModal('modalPayConfirm');
         await loadLaborLogs();
     }
 
     async function deleteLaborLog(logId, expenseId) {
-        if (!confirm('ยืนยันลบรายการนี้? (ข้อมูลในหน้าโปรเจกต์จะถูกหักออกด้วย)')) return;
+        if (!confirm('ยืนยันลบรายการนี้? (ข้อมูลจะถูกลบออกจากทั้งประวัติและโปรเจกต์)')) return;
         await supabaseClient.from('project_labor_logs').delete().eq('id', logId);
-        if (expenseId) {
+        if (expenseId && expenseId !== 'null') {
             await supabaseClient.from('project_expenses').delete().eq('id', expenseId);
         }
         await loadLaborLogs();
     }
 
+    // 🌟 ระบบตัดวีค Payroll
+    function openPayrollModal() {
+        const pendingLogs = laborLogs.filter(l => !l.is_paid);
+        if(pendingLogs.length === 0) return alert('ไม่มีรายการค้างจ่ายในขณะนี้ครับ');
+
+        const grouped = {};
+        pendingLogs.forEach(l => {
+            const tId = l.technician_id;
+            if(!grouped[tId]) {
+                grouped[tId] = {
+                    techName: l.technicians?.tech_name || 'ไม่ระบุชื่อ',
+                    bankInfo: `${l.technicians?.bank_name || ''} <br> ${l.technicians?.bank_account || ''}`,
+                    logs: [], netTotal: 0
+                };
+            }
+            grouped[tId].logs.push(l);
+            grouped[tId].netTotal += Number(l.total_amount || 0);
+        });
+
+        const tbody = document.getElementById('tbl-payroll-body');
+        tbody.innerHTML = '';
+
+        Object.values(grouped).forEach(g => {
+            const isNegative = g.netTotal < 0;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <div style="font-weight:700; color:var(--primary); font-size:13.5px;">${g.techName}</div>
+                    <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">${g.bankInfo}</div>
+                </td>
+                <td class="money" style="color:${isNegative ? 'var(--rose)' : 'var(--amber)'}; font-size:16px;">
+                    ${g.netTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}
+                </td>
+                <td class="t-center">
+                    <button class="btn btn-sm btn-emerald" style="width:100%; justify-content:center; padding:8px 0;" onclick="executeGroupPayroll('${g.logs.map(x=>x.id).join(',')}', '${g.logs.map(x=>x.expense_id).join(',')}')">
+                        ✅ โอนแล้ว
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        document.getElementById('modalPayroll').style.display = 'flex';
+    }
+
+    async function executeGroupPayroll(logIdsStr, expIdsStr) {
+        if(!confirm('ยืนยันว่าทำการโอนยอดสุทธินี้เรียบร้อยแล้วใช่ไหม? (ระบบจะปรับสถานะทุกบิลของช่างคนนี้เป็น "เคลียร์แล้ว")')) return;
+        
+        const logIds = logIdsStr.split(',');
+        const expIds = expIdsStr.split(',').filter(e => e !== 'undefined' && e !== '' && e !== 'null');
+
+        for(let id of logIds) await supabaseClient.from('project_labor_logs').update({ is_paid: true }).eq('id', id);
+        for(let eid of expIds) await supabaseClient.from('project_expenses').update({ is_paid: true }).eq('id', eid);
+
+        closeModal('modalPayroll');
+        await loadLaborLogs();
+    }
+
+    // ================= TECH DB =================
     function openNewTechModal() {
-        document.getElementById('modal-tech-title').innerText = '➕ เพิ่มทะเบียนคนงานใหม่';
-        document.getElementById('inp-tech-id').value = '';
-        document.getElementById('inp-tech-name').value = '';
-        document.getElementById('inp-tech-phone').value = '';
-        document.getElementById('inp-tech-bank').value = '';
-        document.getElementById('inp-tech-acc').value = '';
-        document.getElementById('inp-tech-rate').value = '500';
+        document.getElementById('modal-tech-title').innerText = '➕ เพิ่มคนงานใหม่';
+        document.getElementById('inp-tech-id').value = ''; document.getElementById('inp-tech-name').value = '';
+        document.getElementById('inp-tech-phone').value = ''; document.getElementById('inp-tech-bank').value = '';
+        document.getElementById('inp-tech-acc').value = ''; document.getElementById('inp-tech-rate').value = '500';
         document.getElementById('inp-tech-skills').value = '';
         document.getElementById('modalTech').style.display = 'flex';
     }
@@ -728,12 +785,9 @@
         const t = technicians.find(x => x.id === id);
         if (!t) return;
         document.getElementById('modal-tech-title').innerText = '✏️ แก้ไขข้อมูลคนงาน';
-        document.getElementById('inp-tech-id').value = t.id;
-        document.getElementById('inp-tech-name').value = t.tech_name;
-        document.getElementById('inp-tech-phone').value = t.phone || '';
-        document.getElementById('inp-tech-bank').value = t.bank_name || '';
-        document.getElementById('inp-tech-acc').value = t.bank_account || '';
-        document.getElementById('inp-tech-rate').value = t.default_daily_rate || 500;
+        document.getElementById('inp-tech-id').value = t.id; document.getElementById('inp-tech-name').value = t.tech_name;
+        document.getElementById('inp-tech-phone').value = t.phone || ''; document.getElementById('inp-tech-bank').value = t.bank_name || '';
+        document.getElementById('inp-tech-acc').value = t.bank_account || ''; document.getElementById('inp-tech-rate').value = t.default_daily_rate || 500;
         document.getElementById('inp-tech-skills').value = t.skills || '';
         document.getElementById('modalTech').style.display = 'flex';
     }
@@ -750,11 +804,9 @@
         if (!name) return alert('⚠️ กรุณากรอกชื่อคนงาน');
         const payload = { tech_name: name, phone: phone, bank_name: bank, bank_account: acc, default_daily_rate: rate, skills: skills };
 
-        if (id) {
-            await supabaseClient.from('technicians').update(payload).eq('id', id);
-        } else {
-            await supabaseClient.from('technicians').insert([payload]);
-        }
+        if (id) await supabaseClient.from('technicians').update(payload).eq('id', id);
+        else await supabaseClient.from('technicians').insert([payload]);
+        
         closeModal('modalTech');
         await loadTechnicians();
     }
@@ -765,120 +817,7 @@
         await loadTechnicians();
     }
 
-    function openNewJobLogModal() {
-        // ให้ค่าวันเป็นวันนี้ หรือ ค่าเก่าที่เคยพิมพ์ทิ้งไว้
-        if(!document.getElementById('inp-log-date').value) {
-            document.getElementById('inp-log-date').value = new Date().toISOString().split('T')[0];
-        }
-        document.getElementById('inp-log-details').value = '';
-        document.getElementById('inp-log-units').value = '1';
-        document.getElementById('inp-log-ot').value = '0';
-        document.getElementById('inp-log-rate').value = '0'; // default ใช้เรทช่าง
-        calcJobLogTotal();
-        document.getElementById('modalJobLog').style.display = 'flex';
-    }
-
-    function copyLaborPayToLine(logId) {
-        const l = laborLogs.find(x => x.id === logId);
-        if (!l) return;
-        const amt = Number(l.total_amount);
-        const isAdv = amt < 0;
-        
-        const text = `💸 ข้อมูลการโอน: ${l.technicians?.tech_name || 'คนงาน'}
-📁 โครงการ: ${l.projects?.project_name || '-'}
-🗓️ วันที่: ${l.work_date || '-'}
-📝 ${isAdv ? 'เบิกเงิน' : 'งาน'}: ${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : `${l.units} จุด`)}
-💰 ยอดสุทธิ: ${Math.abs(amt).toLocaleString()} บาท ${isAdv ? '(หักเงิน)' : ''}
-🏦 ธนาคาร: ${l.technicians?.bank_name || ''} ${l.technicians?.bank_account || '-'}`;
-
-        navigator.clipboard.writeText(text).then(() => {
-            alert('คัดลอกข้อมูลสรุปเรียบร้อยแล้ว นำไปส่งใน LINE ได้ทันที!');
-        });
-    }
-
-    // 🌟 ฟีเจอร์: สรุปยอด Payroll และกดเคลียร์จ่ายทีเดียว
-    function openPayrollModal() {
-        const pendingLogs = laborLogs.filter(l => !l.is_paid);
-        if(pendingLogs.length === 0) {
-            return alert('ไม่มีรายการค้างจ่ายในขณะนี้ครับ');
-        }
-
-        // จัดกลุ่มตาม Tech ID
-        const grouped = {};
-        pendingLogs.forEach(l => {
-            const tId = l.technician_id;
-            if(!grouped[tId]) {
-                grouped[tId] = {
-                    techName: l.technicians?.tech_name || 'ไม่ระบุชื่อ',
-                    bankInfo: `${l.technicians?.bank_name || ''} ${l.technicians?.bank_account || ''}`,
-                    logs: [],
-                    netTotal: 0
-                };
-            }
-            grouped[tId].logs.push(l);
-            grouped[tId].netTotal += Number(l.total_amount || 0);
-        });
-
-        const tbody = document.getElementById('tbl-payroll-body');
-        tbody.innerHTML = '';
-
-        Object.values(grouped).forEach(g => {
-            const isNegative = g.netTotal < 0;
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>
-                    <div style="font-weight:700; color:var(--primary);">${g.techName}</div>
-                    <div style="font-size:11px; color:var(--text-sub);">${g.bankInfo}</div>
-                </td>
-                <td class="t-center">${g.logs.length} บิล</td>
-                <td class="money" style="color:${isNegative ? 'var(--rose)' : 'var(--amber)'}; font-size:15px;">
-                    ${g.netTotal.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿
-                </td>
-                <td class="t-center">
-                    <button class="btn btn-sm btn-emerald" onclick="executeGroupPayroll('${g.logs.map(x=>x.id).join(',')}', '${g.logs.map(x=>x.expense_id).join(',')}')">
-                        ✅ จ่ายแล้ว
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        document.getElementById('modalPayroll').style.display = 'flex';
-    }
-
-    async function executeGroupPayroll(logIdsStr, expIdsStr) {
-        if(!confirm('ยืนยันว่าทำการโอนยอดสุทธินี้เรียบร้อยแล้วใช่ไหม? (ระบบจะปรับทุกบิลของช่างคนนี้เป็น จ่ายแล้ว)')) return;
-        
-        const logIds = logIdsStr.split(',');
-        const expIds = expIdsStr.split(',').filter(e => e !== 'undefined' && e !== '');
-
-        // อัปเดตตาราง labor logs
-        for(let id of logIds) {
-            await supabaseClient.from('project_labor_logs').update({ is_paid: true }).eq('id', id);
-        }
-        // อัปเดตตาราง expenses
-        for(let eid of expIds) {
-            await supabaseClient.from('project_expenses').update({ is_paid: true }).eq('id', eid);
-        }
-
-        alert('✅ เคลียร์บิลสำเร็จ!');
-        closeModal('modalPayroll');
-        await loadLaborLogs();
-    }
-
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function setBtnLoading(btnId, isLoading, originalText = 'บันทึก') {
-        const btn = document.getElementById(btnId);
-        if (!btn) return;
-        if (isLoading) {
-            btn.dataset.origText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '⏳ กำลังบันทึก...';
-        } else {
-            btn.disabled = false;
-            btn.innerHTML = btn.dataset.origText || originalText;
-        }
-    }
 </script>
 </body>
 </html>
