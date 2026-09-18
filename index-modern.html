@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JN electric&Technology (Modern SaaS)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <style>
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        
+        /* 🌟 Theme Colors - Modern SaaS Palette */
+        :root { 
+            --primary-color: #0f172a;     /* สีหลักเป็นโทนกรมท่าเข้ม ดูสุขุม */
+            --accent-color: #2563eb;      /* สีน้ำเงินสว่างสำหรับจุดสนใจ */
+            --text-main: #334155;         /* สีข้อความหลัก (ไม่ดำสนิทเพื่อให้สบายตา) */
+            --text-muted: #64748b;        /* สีเทาสำหรับข้อความรอง */
+            --bg-color: #f1f5f9;          /* สีพื้นหลังนอกกระดาษ */
+            --border-color: #e2e8f0;      /* สีเส้นขอบอ่อนๆ */
+            --surface-bg: #f8fafc;        /* สีพื้นหลังกล่องรอง */
+        }
+        
+        body { font-family: 'Sarabun', sans-serif; color: var(--text-main); line-height: 1.5; background-color: var(--bg-color); padding: 85px 20px 30px; }
+        
+        /* 🌟 Document Container - มีความโค้งมนและเงาฟุ้งๆ */
+        .document-container { 
+            width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; 
+            padding: 15mm 20mm; /* ขอบกระดาษกำลังดี */
+            border-radius: 12px; 
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1); 
+            box-sizing: border-box; position: relative; 
+        }
+        
+        input[type="text"], input[type="number"], textarea, select {
+            font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
+            border: 1px solid transparent; border-radius: 6px; padding: 4px 8px; width: 100%; 
+            box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
+        }
+        input:hover, textarea:hover, select:hover { background-color: var(--surface-bg); border-color: var(--border-color); }
+        input:focus, textarea:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        
+        textarea { resize: vertical; overflow: hidden; }
+
+        textarea.item-desc {
+            font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
+            border: 1px solid transparent; border-radius: 6px; padding: 4px 8px; width: 100%; 
+            box-sizing: border-box; background-color: transparent; 
+            resize: vertical; overflow: hidden; min-height: 28px; line-height: 1.4; transition: all 0.2s ease;
+        }
+        textarea.item-desc:hover { background-color: var(--surface-bg); border-color: var(--border-color); }
+        textarea.item-desc:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+        .autocomplete-wrapper { position: relative; width: 100%; text-align: left; }
+        .autocomplete-list { position: absolute; z-index: 100; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--accent-color); border-top: none; border-radius: 0 0 6px 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; display: none; }
+        .autocomplete-list div { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--surface-bg); font-size: 14px; font-family: 'Sarabun'; color: var(--text-main); line-height: 1.4; }
+        .autocomplete-list div:hover { background-color: #eff6ff; }
+        .autocomplete-list div:last-child { border-bottom: none; }
+
+        select.unit-select { cursor: pointer; text-align: center; text-align-last: center; }
+        select.unit-select optgroup { text-align: left; font-weight: bold; background: #eee; }
+        select.unit-select option { text-align: left; background: #fff; }
+
+        /* 🌟 Header Section - คลีนๆ เส้นคั่นบางๆ */
+        .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .title-area { width: 62%; }
+        .doc-title-editable { 
+            font-size: 24px !important; 
+            font-weight: 700; color: var(--primary-color); text-align: left;
+            padding: 8px 8px 8px 10px; 
+            line-height: 1.5; display: inline-block; outline: none; border: 1px solid transparent;
+            letter-spacing: 0.5px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
+            min-height: 48px; border-radius: 6px;
+        }
+        select.doc-title-editable option { font-size: 16px; color: var(--text-main); background: #fff; font-weight: 500; padding: 8px; }
+        .doc-title-editable:hover { background-color: var(--surface-bg); border-color: var(--border-color); }
+        .doc-title-editable:focus { border: 1px solid var(--accent-color); background-color: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+        .meta-area { width: 35%; text-align: right; }
+        .meta-area table { width: 100%; border-spacing: 0 4px; }
+        .meta-area td { vertical-align: middle; padding: 2px 0; }
+        .meta-area td:first-child { font-weight: 600; width: 45%; color: var(--text-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;}
+        .meta-area input { text-align: right; font-weight: 600; font-size: 14px; padding: 4px; border-radius: 6px; }
+
+        .address-section { display: flex; justify-content: space-between; margin-bottom: 25px; }
+        .company-area, .customer-area { width: 48%; }
+        .section-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+        .company-logo { max-width: 85px; height: auto; margin-bottom: 5px; display: block; border-radius: 4px; }
+
+        /* 🌟 Items Table - มินิมอล ไม่มีเส้นทึบ หัวตารางสีเทาอ่อน */
+        .items-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 15px; table-layout: fixed; }
+        .items-table th { background-color: var(--surface-bg); color: var(--text-muted); padding: 10px 8px; text-align: left; font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; }
+        .items-table th:first-child { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+        .items-table th:last-child { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        .items-table th.text-center, .items-table td.text-center { text-align: center; }
+        .items-table th.text-right, .items-table td.text-right { text-align: right; }
+        .items-table td { padding: 6px 4px; border-bottom: 1px solid var(--surface-bg); vertical-align: top; }
+        .row-number { font-weight: 600; color: var(--text-muted); padding-top: 10px !important; font-size: 13px; }
+        
+        .btn { padding: 8px 16px; cursor: pointer; font-family: 'Sarabun'; border: none; border-radius: 6px; font-weight: 600; transition: all 0.2s ease; text-decoration: none; font-size: 13.5px; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn:active { transform: translateY(0); }
+        .btn-add { background-color: var(--surface-bg); color: var(--accent-color); border: 1px dashed var(--accent-color); border-radius: 8px; padding: 8px 20px; width: 100%; margin-bottom: 20px;}
+        .btn-add:hover { background-color: #eff6ff; }
+        .btn-del { background-color: #fee2e2; color: #ef4444; padding: 4px 8px; font-size: 11px; margin-top: 4px; border-radius: 4px; }
+        .btn-del:hover { background-color: #ef4444; color: white; }
+        
+        /* 🌟 Top App Bar */
+        .top-controls { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; display: flex; gap: 8px; justify-content: center; align-items: center; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); padding: 12px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); box-sizing: border-box; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); }
+        .top-controls .btn { padding: 6px 14px; font-size: 13px; }
+        .btn-dashboard { background-color: var(--surface-bg); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-search-page { background-color: #e0f2fe; color: #0284c7; }
+        .btn-new-doc { background-color: #fce7f3; color: #db2777; }
+        .btn-cloud-save { background-color: var(--accent-color); color: white; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
+        .btn-stock { background-color: #fef3c7; color: #d97706; }
+        .btn-save { background-color: var(--surface-bg); color: var(--text-muted); }
+        .btn-load { background-color: #f3e8ff; color: #9333ea; }
+        .btn-excel { background-color: #ccfbf1; color: #0d9488; } 
+        .btn-print { background-color: var(--primary-color); color: white; }
+        .btn-logout { background-color: #fee2e2; color: #ef4444; }
+
+        /* 🌟 Summary Section - กล่องรวมยอดแบบหรูหรา */
+        .summary-section { display: flex; justify-content: flex-end; margin-bottom: 30px; margin-top: 10px; position: relative; }
+        .summary-table { width: 45%; border-collapse: collapse; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
+        .summary-table td { padding: 8px 12px; font-size: 14px; border-bottom: 1px solid var(--border-color); background: #fff; }
+        .summary-table tr.total td { font-weight: 700; color: #fff; font-size: 16px; border-bottom: none; background-color: var(--primary-color); padding: 12px; }
+
+        .footer-signatures { display: flex; justify-content: space-between; margin-top: 40px; text-align: center; }
+        .signature-box { width: 35%; }
+        .signature-line { border-bottom: 1px solid var(--border-color); margin: 30px auto 10px; width: 100%; }
+        
+        .toggle-box { cursor: pointer; display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 500;}
+        .toggle-box input { width: auto; transform: scale(1.1); cursor: pointer; margin: 0; accent-color: var(--accent-color); }
+
+        .drag-handle { cursor: grab; color: #cbd5e1; font-size: 18px; padding-top: 10px !important; user-select: none; }
+        .drag-handle:active { cursor: grabbing; color: var(--primary-color); }
+        tr.dragging { opacity: 0.6; background-color: #eff6ff; }
+
+        .discount-toggle-btn { background: transparent; color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: 'Sarabun'; font-weight: 600; margin-bottom: 6px; float: right; transition: 0.2s;}
+        .discount-toggle-btn:hover { background: var(--surface-bg); color: var(--text-main); }
+
+        .sn-container { display: flex; align-items: center; gap: 5px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e2e8f0; }
+        .sn-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        .sn-input { border: 1px solid transparent; border-bottom: 1px solid var(--border-color) !important; padding: 2px 4px !important; font-size: 12px !important; color: var(--accent-color) !important; font-weight: 600; border-radius: 0; }
+        .btn-scan { background: var(--surface-bg); color: var(--text-muted); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; transition: 0.2s; }
+        .btn-scan:hover { background: var(--primary-color); color: white; }
+
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(4px); z-index: 10000; display: flex; justify-content: center; align-items: center; }
+        .login-card { background: #fff; padding: 40px 30px; border-radius: 16px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); }
+        .login-card h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 10px; font-size: 24px; font-weight: 700; }
+        .login-card input { border: 1px solid var(--border-color); background: var(--surface-bg); padding: 12px; border-radius: 8px; width: 100%; font-size: 15px; margin-bottom: 15px; font-family: 'Sarabun'; box-sizing: border-box; text-align: center;}
+        .login-card input:focus { border-color: var(--accent-color); background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .login-card .btn-submit { background: var(--accent-color); color: #fff; width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; font-weight: 700; margin-top: 5px; }
+
+        #scanner-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        .scanner-box { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
+        #reader { width: 100%; border-radius: 8px; overflow: hidden; }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .document-container { width: 100%; height: auto; min-height: auto; box-shadow: none; padding: 0; margin: 0; border-radius: 0; }
+            .no-print { display: none !important; }
+            
+            input, textarea, select, .doc-title-editable, .sn-input { 
+                border: none !important; 
+                background: transparent !important; 
+                padding: 0 !important; 
+                box-shadow: none !important; 
+                appearance: none; 
+                -webkit-appearance: none; 
+                -moz-appearance: none; 
+                resize: none !important; 
+                line-height: 1.4 !important;
+            }
+            /* คงความสวยงามของตารางยอดรวมตอนพริ้นท์ */
+            .summary-table { border: 1px solid var(--border-color) !important; }
+            .summary-table tr.total td { background-color: var(--primary-color) !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .items-table th { background-color: var(--surface-bg) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            
+            select::-ms-expand { display: none; } 
+            textarea { overflow: visible !important; white-space: pre-wrap !important; }
+            tr { page-break-inside: avoid; }
+            ::-webkit-input-placeholder, ::placeholder { color: transparent !important; }
+            .sn-input:placeholder-shown { display: none !important; }
+            #customer-extra:placeholder-shown { display: none !important; }
+            #login-overlay, #scanner-modal { display: none !important; }
+            .autocomplete-list { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="scanner-modal" class="no-print">
+    <div class="scanner-box">
+        <h3 style="margin-top:0; color:var(--primary-color);">📷 สแกน S/N</h3>
+        <div id="reader"></div>
+        <button class="btn" style="margin-top: 15px; background: #fee2e2; color:#ef4444; width: 100%;" onclick="closeScanner()">❌ ยกเลิก</button>
+    </div>
+</div>
+
+<div id="login-overlay">
+    <div class="login-card">
+        <h2>JN Electric ERP</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">กรุณาล็อกอินเพื่อเข้าสู่ระบบร้าน</p>
+        <input type="email" id="email-input" placeholder="อีเมลแอดมิน">
+        <input type="password" id="pass-input" placeholder="รหัสผ่านระบบ">
+        <button class="btn btn-submit" onclick="submitSupabaseLogin()">🔓 เข้าสู่ระบบ</button>
+    </div>
+</div>
+
+<div class="top-controls no-print" id="controls-panel" style="display: none;">
+    <a href="dashboard.html" class="btn btn-dashboard" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าแดชบอร์ดไหม?')) return false;">📊 แดชบอร์ด</a>
+    <a href="project.html" class="btn btn-stock" style="background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe;">📊 โครงการ</a>
+    <a href="checklist.html" class="btn btn-stock" style="background-color: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff;">🛒 เตรียมของ</a>
+    <button class="btn btn-search-page" onclick="goToSearchPage()">📁 ค้นหาบิล</button>
+    <button class="btn btn-new-doc" onclick="createNewDocument()">✨ บิลใหม่</button>
+    <button class="btn btn-load" onclick="duplicateDocument()">📋 Copy</button>
+    <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึกระบบ</button>
+    <a href="stock.html" class="btn btn-stock" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าคลังสินค้าไหม?')) return false;">📦 สต็อก</a>
+    
+    <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 4px;"></div>
+    
+    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel</button>
+    <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์</button>
+    <button class="btn btn-logout" onclick="logoutSupabase()">🚪 ออกระบบ</button>
+</div>
+
+<div class="document-container" id="main-app" style="display: none;">
+    <div class="top-section">
+        <div class="title-area">
+            <select class="doc-title-editable" id="docType" onchange="handleDocTypeChange()">
+                <option value="ใบเสนอราคา">ใบเสนอราคา</option>
+                <option value="ใบส่งงาน">ใบส่งงาน</option>
+                <option value="ใบแจ้งหนี้/ใบส่งสินค้า">ใบแจ้งหนี้/ใบส่งสินค้า</option>
+                <option value="ใบส่งสินค้า">ใบส่งสินค้า</option>
+                <option value="ใบแจ้งหนี้">ใบแจ้งหนี้</option>
+                <option value="ใบเสร็จรับเงิน">ใบเสร็จรับเงิน</option>
+                <option value="CUSTOM_DOC">✏️ กำหนดชื่อเอง...</option>
+            </select><br>
+            <input type="text" id="docSubTitle" style="text-align: left; font-weight: 600; border:none; color:var(--text-muted); font-size: 15px; padding-left: 10px;" value="(QUOTATION)">
+        </div>
+        <div class="meta-area">
+            <table>
+                <tr>
+                    <td>เลขที่เอกสาร (NO.)</td>
+                    <td><input type="text" id="doc-num" value="" style="color: var(--primary-color);"></td>
+                </tr>
+                <tr>
+                    <td>วันที่ (DATE)</td>
+                    <td>
+                        <input type="text" id="doc-date" value="" placeholder="ระบุวันที่">
+                        <label class="toggle-box no-print"><input type="checkbox" id="blank-date" onchange="toggleDate()"> เว้นว่าง</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>ครบกำหนด (DUE DATE)</td>
+                    <td><input type="text" id="due-date" value="" placeholder="ปล่อยว่างได้"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="address-section">
+        <div class="company-area">
+            <div class="section-label">ผู้ออกเอกสาร (FROM)</div>
+            <img src="logo.png" alt="JN Electric Logo" class="company-logo" onerror="this.style.display='none'">
+            <input type="text" value="เจเอนอิเล็กทริกแอนด์เทคโนโลยี" style="font-weight: 700; font-size: 16px; color: var(--primary-color); padding-left: 0; margin-bottom: 2px;">
+            <textarea rows="3" style="color: var(--text-muted); padding-left: 0;">101/1 ม.1 ต.หนองนาคำ อ.เมือง&#10;จ.อุดรธานี 41000&#10;โทร: 083-417-5143 | Line: apisit2311</textarea>
+        </div>
+        <div class="customer-area">
+            <div class="section-label">ลูกค้า (BILL TO)</div>
+            <input type="text" id="customer-name" value="บริษัท ลูกค้าองค์กร จำกัด" style="font-weight: 700; font-size: 16px; padding-left: 0; color: var(--primary-color);">
+            <textarea id="customer-address" rows="3" style="padding-left: 0; margin-bottom: 0;">ที่อยู่</textarea>
+            <textarea id="customer-extra" rows="2" placeholder="เลขประจำตัวผู้เสียภาษี / สาขา / โครงการ..." style="font-weight: 700; padding-left: 0; border-top: 1px dashed var(--border-color);"></textarea>
+        </div>
+    </div>
+
+    <table class="items-table" id="invoice-table">
+        <thead>
+             <tr>
+                <th class="no-print text-center" style="width: 3%;"></th>
+                <th class="no-print text-center" style="width: 5%;">ลบ</th>
+                <th class="text-center" style="width: 6%;">ลำดับ</th>
+                <th style="width: 48%;">รายการ</th> 
+                <th class="text-center" style="width: 8%;">จำนวน</th>
+                <th class="text-center" style="width: 10%;">หน่วย</th> 
+                <th class="text-right" style="width: 10%;">ราคา/หน่วย</th>
+                <th class="text-right" style="width: 10%;">จำนวนเงิน</th>
+            </tr>
+        </thead>
+        <tbody id="items-body"></tbody>
+    </table>
+    
+    <button class="btn btn-add no-print" onclick="addRow()">+ เพิ่มรายการใหม่</button>
+
+    <div class="summary-section">
+        <div class="no-print" style="width: 55%; text-align: right; padding-right: 15px;">
+            <button type="button" class="discount-toggle-btn" id="btn-toggle-discount" onclick="toggleDiscountRow()">- เปิด/ปิด ส่วนลด</button>
+        </div>
+        <table class="summary-table">
+            <tr>
+                <td style="color: var(--text-muted);">รวมเป็นเงิน (SUBTOTAL)</td>
+                <td class="text-right" id="subtotal" style="font-weight: 600;">0.00</td>
+            </tr>
+            <tr id="discount-row" style="display:none; background: #fff5f5;">
+                <td>
+                    <input type="text" id="discount-label" value="ส่วนลด (DISCOUNT)" style="color: #ef4444; font-size: 14px; padding:0; font-weight: 500;">
+                </td>
+                <td class="text-right" style="padding: 4px 12px;">
+                    <input type="number" id="discount-val" value="0" min="0" oninput="calculateTotal()" style="text-align: right; font-weight: 700; color: #ef4444; width: 100%; font-size: 15px; background: transparent;">
+                </td>
+            </tr>
+            <tr class="total">
+                <td>ยอดชำระสุทธิ (TOTAL)</td>
+                <td class="text-right" id="grand-total">0.00</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer-signatures">
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <input type="text" id="sig-left" value="ผู้อนุมัติสั่งซื้อ" style="text-align: center; font-weight: 600; font-size: 14px; color: var(--primary-color);">
+            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 12px;">
+        </div>
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <input type="text" id="sig-right" value="ผู้เสนอราคา" style="text-align: center; font-weight: 600; font-size: 14px; color: var(--primary-color);">
+            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 12px;">
+        </div>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let isDirty = false;
+    let globalProducts = [];
+    let currentDocId = null; 
+    let currentProjectId = null; 
+
+    const unitDropdownHTML = `
+        <select class="unit-select text-center" onchange="markDirty(); checkCustomUnit(this)">
+            <option value="ตัว">ตัว</option><option value="ชิ้น">ชิ้น</option><option value="ชุด">ชุด</option>
+            <option value="เครื่อง">เครื่อง</option><option value="ม้วน">ม้วน</option><option value="เมตร">เมตร</option>
+            <option value="งาน">งาน</option><option value="จุด">จุด</option><option value="เหมา">เหมา</option>
+            <option value="CUSTOM_UNIT">++ เพิ่มหน่วย ++</option>
+        </select>
+    `;
+
+    window.onload = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            document.getElementById("login-overlay").style.display = "none";
+            document.getElementById("controls-panel").style.display = "flex";
+            document.getElementById("main-app").style.display = "block";
+            
+            await fetchProducts(); 
+            initializeDoc();
+        }
+
+        document.getElementById("pass-input").addEventListener("keypress", function(e){
+            if(e.key === "Enter") submitSupabaseLogin();
+        });
+    };
+
+    function initializeDoc() {
+        document.getElementById('doc-date').value = getTodayThai();
+        document.getElementById('docType').value = "ใบเสนอราคา";
+        updateDocTypeSync(true); 
+        
+        const pendingDoc = localStorage.getItem("jn_selected_cloud_doc");
+        if (pendingDoc) {
+            try {
+                const cloudData = JSON.parse(pendingDoc);
+                localStorage.removeItem("jn_selected_cloud_doc");
+                loadSelectedDoc(cloudData);
+                return;
+            } catch(e) {}
+        }
+        
+        if(document.getElementById('items-body').children.length === 0) addRow();
+        calculateTotal();
+        isDirty = false;
+        document.getElementById('customer-name').addEventListener('input', markDirty);
+        document.getElementById('customer-address').addEventListener('input', markDirty);
+        document.getElementById('customer-extra').addEventListener('input', markDirty);
+    }
+
+    async function fetchProducts() {
+        const { data } = await supabaseClient.from('products').select('*');
+        if (data) {
+            globalProducts = data;
+        }
+    }
+
+    function handleCustomAutocomplete(textarea) {
+        const wrapper = textarea.closest('.autocomplete-wrapper');
+        const listEl = wrapper.querySelector('.autocomplete-list');
+        const row = textarea.closest('tr');
+        
+        const lines = textarea.value.split('\n');
+        const searchWord = lines[0].trim().toLowerCase();
+        
+        if (!searchWord) {
+            listEl.style.display = 'none';
+            row.removeAttribute('data-product-id');
+            return;
+        }
+
+        const filtered = globalProducts.filter(p => {
+            const pName = (p.product_name || '').toLowerCase();
+            const pCode = (p.product_code || '').toLowerCase();
+            return pName.includes(searchWord) || pCode.includes(searchWord);
+        });
+
+        const exactMatch = globalProducts.find(p => (p.product_name || '').toLowerCase() === searchWord);
+        if (exactMatch) {
+            row.setAttribute('data-product-id', exactMatch.id);
+        } else {
+            row.removeAttribute('data-product-id');
+        }
+
+        if (filtered.length === 0) {
+            listEl.style.display = 'none';
+            return;
+        }
+
+        listEl.innerHTML = '';
+        filtered.forEach(p => {
+            const item = document.createElement('div');
+            item.innerHTML = `<strong style="color:var(--accent-color);">[${p.product_code || '-'}]</strong> ${p.product_name} <span style="color:#10b981; float:right; font-weight:bold;">${p.price || 0}.-</span>`;
+            
+            item.onmousedown = function(e) { 
+                e.preventDefault(); 
+                applySelectedProduct(textarea, p);
+            };
+            listEl.appendChild(item);
+        });
+        listEl.style.display = 'block';
+    }
+
+    function closeAutocomplete(textarea) {
+        const wrapper = textarea.closest('.autocomplete-wrapper');
+        if(wrapper) {
+            const listEl = wrapper.querySelector('.autocomplete-list');
+            if(listEl) listEl.style.display = 'none';
+        }
+    }
+
+    function applySelectedProduct(textarea, product) {
+        const row = textarea.closest('tr');
+        
+        const lines = textarea.value.split('\n');
+        lines[0] = product.product_name;
+        textarea.value = lines.join('\n');
+        
+        row.querySelector('.price').value = product.price;
+        const unitSelect = row.querySelector('.unit-select');
+        let optionExists = Array.from(unitSelect.options).some(opt => opt.value === product.unit);
+        if(!optionExists) {
+            const newOpt = document.createElement('option');
+            newOpt.value = product.unit; newOpt.innerText = product.unit;
+            unitSelect.insertBefore(newOpt, unitSelect.options[unitSelect.options.length - 1]);
+        }
+        unitSelect.value = product.unit;
+        row.setAttribute('data-product-id', product.id); 
+        
+        autoResizeTextarea(textarea);
+        calculateTotal();
+        markDirty();
+        closeAutocomplete(textarea);
+    }
+
+    async function submitSupabaseLogin() {
+        const email = document.getElementById('email-input').value;
+        const pass = document.getElementById('pass-input').value;
+        const btn = document.querySelector('.btn-submit');
+        if(!email || !pass) { alert("กรุณากรอกอีเมลและรหัสผ่านครับ!"); return; }
+        
+        btn.innerText = "กำลังตรวจสอบ...";
+        const { error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
+        if (error) {
+            btn.innerText = "🔓 เข้าสู่ระบบ";
+            alert("❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+        } else {
+            window.location.reload();
+        }
+    }
+    async function logoutSupabase() {
+        if(isDirty && !confirm("มีงานยังไม่ได้บันทึก ต้องการออกจากระบบใช่ไหม?")) return;
+        await supabaseClient.auth.signOut();
+        window.location.reload();
+    }
+
+    function markDirty() { isDirty = true; }
+    function goToSearchPage() {
+        if (isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการเปลี่ยนหน้าใช่หรือไม่?")) return;
+        window.location.href = "search.html"; 
+    }
+
+    function fetchNextDocNumber() {
+        const docText = document.getElementById('docType').value;
+        let prefix = "QUO"; 
+        if (docText.includes("เสนอราคา")) prefix = "QUO"; 
+        else if (docText.includes("ส่งงาน") || docText.includes("ตรวจรับ")) prefix = "JOB"; 
+        else if (docText.includes("รับเงิน") || docText.includes("เสร็จ")) prefix = "REC"; 
+        else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) prefix = "DLV";
+        else prefix = "INV";
+
+        const currentNum = document.getElementById('doc-num').value;
+        
+        if (currentNum && currentNum.includes('-')) {
+            const parts = currentNum.split('-');
+            parts[0] = prefix;
+            document.getElementById('doc-num').value = parts.join('-');
+        } else {
+            const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+            const randomStr = Math.floor(100 + Math.random() * 900); 
+            document.getElementById('doc-num').value = `${prefix}-${dateStr}-${randomStr}`;
+        }
+    }
+
+    function createNewDocument() {
+        if(isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการล้างหน้าจอหรือไม่?")) return;
+        currentDocId = null; 
+        currentProjectId = null; 
+        
+        document.getElementById('customer-name').value = "";
+        document.getElementById('customer-address').value = "";
+        document.getElementById('customer-extra').value = "";
+        document.getElementById('due-date').value = "";
+        document.getElementById('blank-date').checked = false;
+        document.getElementById('doc-date').value = getTodayThai();
+        
+        document.getElementById('discount-val').value = 0;
+        document.getElementById('discount-row').style.display = "none";
+        document.getElementById('btn-toggle-discount').innerText = "- เปิด/ปิด ส่วนลด";
+        
+        document.getElementById('items-body').innerHTML = '';
+        addRow();
+        calculateTotal();
+        isDirty = false;
+        
+        document.getElementById('doc-num').value = "";
+        fetchNextDocNumber();
+    }
+
+    function duplicateDocument() {
+        if (!currentDocId) {
+            alert("ตอนนี้คุณกำลังอยู่ในโหมด 'สร้างเอกสารใหม่' อยู่แล้วครับ!\nสามารถเปลี่ยนประเภทเอกสารด้านบนซ้ายได้เลย");
+            return;
+        }
+        
+        if (!confirm("ต้องการนำข้อมูลทั้งหมดนี้ ไปสร้างเป็น 'เอกสารใบใหม่' ใช่หรือไม่?\n(เอกสารใบเก่าจะยังถูกเก็บไว้ในประวัติ ไม่ถูกลบทับ)")) {
+            return;
+        }
+        
+        currentDocId = null; 
+        document.getElementById('doc-date').value = getTodayThai(); 
+        
+        alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
+    }
+
+    async function saveToSupabase() {
+        const btnSave = document.getElementById('btnSave');
+        const docNum = document.getElementById('doc-num').value;
+        if(!docNum) { alert("กรุณาระบุเลขที่เอกสารก่อนบันทึกครับ"); return; }
+        
+        btnSave.innerText = "กำลังตรวจสอบสต็อก..."; btnSave.disabled = true;
+
+        try {
+            const docType = document.getElementById('docType').value;
+            const docDate = document.getElementById('doc-date').value;
+            const dueDate = document.getElementById('due-date').value;
+            const customerName = document.getElementById('customer-name').value;
+            const customerAddress = document.getElementById('customer-address').value;
+            
+            const subtotal = parseFloat(document.getElementById('subtotal').innerText.replace(/,/g, '')) || 0;
+            const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
+            const discount = isDiscountVisible ? (parseFloat(document.getElementById('discount-val').value) || 0) : 0;
+            const grandTotal = parseFloat(document.getElementById('grand-total').innerText.replace(/,/g, '')) || 0;
+
+            const rows = document.querySelectorAll('#items-body tr');
+            if(rows.length === 0) throw new Error("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ");
+
+            const cutStockTypes = ['ใบส่งงาน', 'ใบแจ้งหนี้/ใบส่งสินค้า', 'ใบส่งสินค้า', 'ใบแจ้งหนี้', 'ใบเสร็จรับเงิน'];
+            const shouldCutStock = cutStockTypes.includes(docType);
+
+            if (shouldCutStock) {
+                for (let row of rows) {
+                    const textarea = row.querySelector('.item-desc');
+                    const desc = textarea ? textarea.value.split('\n')[0].trim() : ''; 
+                    const qtyToSell = parseFloat(row.querySelector('.qty').value) || 0;
+                    
+                    if (desc && qtyToSell > 0) {
+                        let p = globalProducts.find(x => x.product_name === desc);
+                        if (p) {
+                            const { data: liveStock } = await supabaseClient.from('products').select('qty_in_stock, product_name').eq('id', p.id).single();
+                            if (liveStock) {
+                                if (qtyToSell > liveStock.qty_in_stock) {
+                                    const confirmProceed = confirm(`⚠️ คำเตือน: สินค้าในคลังไม่พอ!\n\nสินค้า: "${liveStock.product_name}"\n- ในคลังเหลือ: ${liveStock.qty_in_stock}\n- ที่ต้องการขาย: ${qtyToSell}\n\nต้องการ "ยอมให้สต็อกติดลบ" เพื่อบันทึกต่อใช่หรือไม่?\n(กด Cancel เพื่อยกเลิกไปเช็กสต็อกก่อน)`);
+                                    if (!confirmProceed) {
+                                        btnSave.innerHTML = "☁️ บันทึกระบบ"; btnSave.disabled = false;
+                                        return; 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            const { data: customerData, error: custErr } = await supabaseClient
+                .from('customers').insert([{ customer_name: customerName, address: customerAddress }]).select();
+            if (custErr) throw custErr;
+            const customerId = customerData[0].id; 
+
+            let documentIdToUse = null;
+
+            if (currentDocId) {
+                const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
+                const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
+
+                const { error: updateErr } = await supabaseClient.from('documents').update({
+                    doc_type: docType, doc_date: docDate, due_date: dueDate,
+                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
+                    project_id: currentProjectId || null
+                }).eq('id', currentDocId);
+                if (updateErr) throw updateErr;
+
+                if (oldShouldCutStock) {
+                    const { data: oldItems } = await supabaseClient.from('document_items').select('product_id, qty').eq('document_id', currentDocId);
+                    if (oldItems && oldItems.length > 0) {
+                        for(let old of oldItems) {
+                            if(old.product_id && old.qty > 0) {
+                                const { data: cStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', old.product_id).single();
+                                if(cStock) {
+                                    await supabaseClient.from('products').update({ qty_in_stock: parseFloat(cStock.qty_in_stock) + parseFloat(old.qty) }).eq('id', old.product_id);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                await supabaseClient.from('document_items').delete().eq('document_id', currentDocId);
+                documentIdToUse = currentDocId; 
+                
+            } else {
+                const { data: docData, error: docErr } = await supabaseClient.from('documents').insert([{ 
+                    doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
+                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
+                    project_id: currentProjectId || null
+                }]).select();
+                
+                if (docErr) {
+                    if(docErr.code === '23505') throw new Error("เลขที่เอกสารซ้ำ! กรุณาเปลี่ยนเลขที่เอกสารครับ");
+                    throw docErr;
+                }
+                documentIdToUse = docData[0].id; 
+                currentDocId = documentIdToUse; 
+            }
+
+            const itemsToInsert = [];
+            for(let row of rows) {
+                const textarea = row.querySelector('.item-desc');
+                const fullDesc = textarea ? textarea.value.trim() : '';
+                const searchDesc = fullDesc.split('\n')[0].trim();
+                const sn = row.querySelector('.sn-input').value;
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const unit = row.querySelector('.unit-select').value;
+                const price = parseFloat(row.querySelector('.price').value) || 0;
+                
+                let productId = row.getAttribute('data-product-id');
+                if (!productId) {
+                    const p = globalProducts.find(x => x.product_name === searchDesc);
+                    if (p) productId = p.id;
+                }
+                
+                if(fullDesc !== "") {
+                    itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: fullDesc, sn: sn, qty: qty, unit: unit, price: price });
+                    
+                    if(productId && qty > 0 && shouldCutStock) {
+                        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
+                        if(currentStock) {
+                            await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
+                        }
+                    }
+                }
+            }
+            
+            if(itemsToInsert.length > 0) {
+                const { error: itemsErr } = await supabaseClient.from('document_items').insert(itemsToInsert);
+                if (itemsErr) throw itemsErr;
+            }
+
+            if(shouldCutStock) {
+                alert(`✅ บันทึกข้อมูลและตัดสต็อกเรียบร้อยแล้ว!\n(เลขที่เอกสาร: ${docNum})`);
+            } else {
+                alert(`✅ บันทึกเอกสารเรียบร้อยแล้ว!\n(ข้อมูลบันทึกสำเร็จ และสต็อกยังไม่ถูกตัดครับ)`);
+            }
+            
+            isDirty = false;
+            await fetchProducts(); 
+
+        } catch (error) {
+            alert("❌ ข้อผิดพลาด: " + error.message);
+        } finally {
+            btnSave.innerHTML = "☁️ บันทึกระบบ"; btnSave.disabled = false;
+        }
+    }
+
+    function handleDocTypeChange() {
+        markDirty();
+        const selectEl = document.getElementById('docType');
+        if (selectEl.value === "CUSTOM_DOC") {
+            const custom = prompt("กรุณาพิมพ์ชื่อหัวข้อเอกสารที่ต้องการ:");
+            if (custom && custom.trim() !== "") {
+                const cleanValue = custom.trim();
+                let exists = Array.from(selectEl.options).some(opt => opt.value === cleanValue);
+                if (!exists) {
+                    const newOpt = document.createElement("option");
+                    newOpt.value = cleanValue; newOpt.textContent = cleanValue;
+                    selectEl.insertBefore(newOpt, selectEl.options[selectEl.options.length - 1]);
+                }
+                selectEl.value = cleanValue;
+            } else selectEl.value = selectEl.options[0].value;
+        }
+        updateDocTypeSync(true);
+    }
+
+    function updateDocTypeSync(shouldFetchNum = true) {
+        const docText = document.getElementById('docType').value;
+        const subTitle = document.getElementById('docSubTitle');
+        const sigLeft = document.getElementById('sig-left');
+        const sigRight = document.getElementById('sig-right');
+        
+        if (docText.includes("เสนอราคา")) { subTitle.value = "(QUOTATION)"; sigLeft.value = "ผู้อนุมัติสั่งซื้อ"; sigRight.value = "ผู้เสนอราคา"; }
+        else if (docText.includes("ส่งงาน") || docText.includes("ตรวจรับ")) { subTitle.value = "(JOB COMPLETION REPORT)"; sigLeft.value = "ผู้ตรวจรับงาน / ลูกค้า"; sigRight.value = "ผู้ส่งมอบงาน / ช่างผู้ติดตั้ง"; }
+        else if (docText.includes("รับเงิน") || docText.includes("เสร็จ")) { subTitle.value = "(RECEIPT)"; sigLeft.value = "ผู้ชำระเงิน"; sigRight.value = "ผู้รับเงิน"; }
+        else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) { subTitle.value = "(INVOICE / DELIVERY ORDER)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ส่งสินค้า / ผู้ออกเอกสาร"; }
+        else { subTitle.value = "(INVOICE)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ออกเอกสาร"; }
+        
+        if(shouldFetchNum) fetchNextDocNumber(); 
+    }
+
+    function getTodayThai() {
+        const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        const d = new Date(); return d.getDate() + ' ' + m[d.getMonth()] + ' ' + (d.getFullYear() + 543);
+    }
+
+    function toggleDate() {
+        markDirty(); const dateInput = document.getElementById('doc-date');
+        if (document.getElementById('blank-date').checked) { dateInput.dataset.savedDate = dateInput.value; dateInput.value = ""; } 
+        else { dateInput.value = dateInput.dataset.savedDate || getTodayThai(); }
+    }
+
+    function toggleDiscountRow() {
+        markDirty();
+        const row = document.getElementById('discount-row');
+        if (row.style.display === "none") { row.style.display = ""; } 
+        else { row.style.display = "none"; document.getElementById('discount-val').value = 0; }
+        calculateTotal();
+    }
+
+    function checkCustomUnit(selectEl) {
+        if (selectEl.value === "CUSTOM_UNIT") {
+            const custom = prompt("กรุณาระบุหน่วยนับที่ต้องการเพิ่ม:");
+            if (custom && custom.trim() !== "") {
+                const cleanValue = custom.trim();
+                let exists = Array.from(selectEl.options).some(opt => opt.value === cleanValue);
+                if (!exists) {
+                    const newOpt = document.createElement("option");
+                    newOpt.value = cleanValue; newOpt.textContent = cleanValue;
+                    selectEl.insertBefore(newOpt, selectEl.options[selectEl.options.length - 1]);
+                }
+                selectEl.value = cleanValue;
+            } else selectEl.value = selectEl.options[0].value;
+        }
+    }
+
+    function calculateTotal() {
+        let subtotal = 0;
+        document.querySelectorAll('#items-body tr').forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty').value) || 0;
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            const total = qty * price;
+            row.querySelector('.row-total').innerText = total.toLocaleString('th-TH', {minimumFractionDigits: 2});
+            subtotal += total;
+        });
+        let discount = 0;
+        if (document.getElementById('discount-row').style.display !== "none") {
+            discount = parseFloat(document.getElementById('discount-val').value) || 0;
+            if (discount > subtotal) { discount = subtotal; document.getElementById('discount-val').value = discount; }
+        }
+        document.getElementById('subtotal').innerText = subtotal.toLocaleString('th-TH', {minimumFractionDigits: 2});
+        document.getElementById('grand-total').innerText = (subtotal - discount).toLocaleString('th-TH', {minimumFractionDigits: 2});
+    }
+
+    function addRow(data = null) {
+        if(!data) markDirty();
+        const tbody = document.getElementById('items-body');
+        const tr = document.createElement('tr');
+        tr.className = 'item-row';
+        const desc = data ? (data.desc || data.description || '') : ''; 
+        const qty = data ? data.qty : 1; 
+        const unit = data ? data.unit : 'ตัว'; 
+        const price = data ? data.price : 0; 
+        const sn = data ? (data.sn || '') : '';
+        
+        tr.innerHTML = `
+            <td class="no-print text-center drag-handle" title="คลิกค้างเพื่อลาก">⋮⋮</td>
+            <td class="no-print text-center"><button class="btn btn-del" onclick="deleteRow(this)">ลบ</button></td>
+            <td class="text-center row-number"></td>
+            <td>
+                <div class="autocomplete-wrapper">
+                    <textarea class="item-desc" placeholder="🔍 ค้นหา (รหัส/ชื่อ) หรือพิมพ์รายละเอียด..." rows="1" oninput="markDirty(); autoResizeTextarea(this); handleCustomAutocomplete(this)" onfocus="handleCustomAutocomplete(this)" onblur="closeAutocomplete(this)" style="font-weight: 600; color: var(--primary-color);">${desc}</textarea>
+                    <div class="autocomplete-list"></div>
+                </div>
+                <div class="sn-container no-print">
+                    <span class="sn-label">S/N:</span>
+                    <input type="text" class="sn-input" placeholder="สแกน S/N หรือพิมพ์..." value="${sn}" oninput="markDirty()">
+                    <button class="btn-scan" onclick="openScanner(this)">📷 สแกน</button>
+                </div>
+            </td>
+            <td><input type="number" class="qty text-center" value="${qty}" min="1" oninput="markDirty(); calculateTotal()"></td>
+            <td>${unitDropdownHTML}</td>
+            <td><input type="number" class="price text-right" value="${price}" min="0" oninput="markDirty(); calculateTotal()"></td>
+            <td class="text-right row-total" style="padding-top: 10px; font-weight: 600;">0.00</td>
+        `;
+        tbody.appendChild(tr);
+        
+        const unitSelect = tr.querySelector('.unit-select');
+        if (data && unit) {
+            let hasUnit = Array.from(unitSelect.options).some(opt => opt.value === unit);
+            if (!hasUnit) {
+                const opt = document.createElement("option"); opt.value = unit; opt.textContent = unit;
+                unitSelect.insertBefore(opt, unitSelect.options[unitSelect.options.length - 1]);
+            }
+        }
+        unitSelect.value = unit;
+
+        const textareaEl = tr.querySelector('.item-desc');
+        autoResizeTextarea(textareaEl);
+
+        attachDragEvents(tr);
+        updateRowNumbers(); calculateTotal();
+        if(!data) textareaEl.focus();
+    }
+
+    function autoResizeTextarea(el) {
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
+
+    function deleteRow(btn) { markDirty(); btn.closest('tr').remove(); updateRowNumbers(); calculateTotal(); }
+    function updateRowNumbers() { document.querySelectorAll('#items-body tr').forEach((row, idx) => { row.querySelector('.row-number').innerText = idx + 1; }); }
+
+    let draggedRow = null;
+    function attachDragEvents(tr) {
+        const handle = tr.querySelector('.drag-handle');
+        handle.addEventListener('mouseenter', () => tr.setAttribute('draggable', 'true'));
+        handle.addEventListener('mouseleave', () => tr.removeAttribute('draggable'));
+        tr.addEventListener('dragstart', () => { draggedRow = tr; setTimeout(() => tr.classList.add('dragging'), 0); });
+        tr.addEventListener('dragend', () => { tr.classList.remove('dragging'); draggedRow = null; updateRowNumbers(); markDirty(); });
+    }
+    document.getElementById('items-body').addEventListener('dragover', e => {
+        e.preventDefault(); if (!draggedRow) return;
+        const draggableElements = [...document.getElementById('items-body').querySelectorAll('.item-row:not(.dragging)')];
+        const afterElement = draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect(); const offset = e.clientY - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) return { offset: offset, element: child }; else return closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+        if (afterElement == null) document.getElementById('items-body').appendChild(draggedRow); 
+        else document.getElementById('items-body').insertBefore(draggedRow, afterElement);
+    });
+
+    let html5QrcodeScanner; let targetSnInput = null;
+    function openScanner(btn) {
+        targetSnInput = btn.previousElementSibling; document.getElementById('scanner-modal').style.display = 'flex';
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+        html5QrcodeScanner.render((decodedText) => { targetSnInput.value = decodedText; markDirty(); closeScanner(); }, () => {});
+    }
+    function closeScanner() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
+
+    function exportToExcel() {
+        if (typeof XLSX === 'undefined') { alert('กำลังโหลดข้อมูลสำหรับการสร้าง Excel กรุณารอสักครู่แล้วกดใหม่อีกครั้ง'); return; }
+        const docType = document.getElementById('docType').value; const docNum = document.getElementById('doc-num').value;
+        const docDate = document.getElementById('doc-date').value; const dueDate = document.getElementById('due-date').value;
+        const customerName = document.getElementById('customer-name').value; 
+        const customerAddress = document.getElementById('customer-address').value;
+        const customerExtra = document.getElementById('customer-extra').value;
+
+        let excelData = [];
+        excelData.push(["JN electric&Technology"]); excelData.push([docType]); excelData.push([]);
+        excelData.push(["ลูกค้า (BILL TO):", customerName]); excelData.push(["ที่อยู่:", customerAddress]);
+        if (customerExtra) excelData.push(["ข้อมูลเพิ่มเติม:", customerExtra]);
+        excelData.push(["เลขที่เอกสาร:", docNum, "วันที่:", docDate]); if(dueDate) excelData.push(["ครบกำหนด:", dueDate]); excelData.push([]);
+        excelData.push(["ลำดับ", "รายการ", "S/N", "จำนวน", "หน่วย", "ราคา/หน่วย", "จำนวนเงิน"]);
+
+        let index = 1;
+        document.querySelectorAll('#items-body tr').forEach(tr => {
+            const textarea = tr.querySelector('.item-desc');
+            const desc = textarea ? textarea.value : ''; 
+            const sn = tr.querySelector('.sn-input').value;
+            const qty = parseFloat(tr.querySelector('.qty').value) || 0; const unit = tr.querySelector('.unit-select').value;
+            const price = parseFloat(tr.querySelector('.price').value) || 0; const total = qty * price;
+            excelData.push([index++, desc, sn, qty, unit, price, total]);
+        });
+
+        const subtotal = document.getElementById('subtotal').innerText.replace(/,/g, '');
+        const grandTotal = document.getElementById('grand-total').innerText.replace(/,/g, '');
+        const discountVal = parseFloat(document.getElementById('discount-val').value) || 0;
+        const discountLabel = document.getElementById('discount-label').value;
+
+        excelData.push([]);
+        if (document.getElementById('discount-row').style.display !== "none" && discountVal > 0) {
+            excelData.push(["", "", "", "", "", "รวมเป็นเงิน (SUBTOTAL)", parseFloat(subtotal)]);
+            excelData.push(["", "", "", "", "", discountLabel, discountVal]);
+        }
+        excelData.push(["", "", "", "", "", "ยอดชำระสุทธิ (TOTAL)", parseFloat(grandTotal)]);
+
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        ws['!cols'] = [{ wch: 8 }, { wch: 40 }, {wch: 20}, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 15 }];
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Document");
+        XLSX.writeFile(wb, (docNum || "Document") + ".xlsx");
+    }
+
+    window.addEventListener("beforeunload", function (e) { if (isDirty) { e.preventDefault(); e.returnValue = "คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการออกจากหน้านี้หรือไม่?"; } });
+</script>
+</body>
+</html>
