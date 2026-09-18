@@ -193,7 +193,7 @@
     <a href="project.html" class="btn btn-stock" style="background-color: #1e3a8a;">📊 บริหารโครงการ</a>
     <a href="checklist.html" class="btn btn-stock" style="background-color: #8b5cf6;">🛒 เตรียมของ/สั่งซื้อ</a>
     <button class="btn btn-search-page" onclick="goToSearchPage()">📁 ค้นหา/ประวัติ</button>
-    <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำ ใบใหม่</button>
+    <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
     <button class="btn btn-load" style="background-color: #8b5cf6;" onclick="duplicateDocument()">📋 Copy เอกสาร</button>
     <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึกข้อมูล</button>
     <a href="stock.html" class="btn btn-stock" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าคลังสินค้าไหม?')) return false;">📦 คลังสินค้า</a>
@@ -210,12 +210,12 @@
     <div class="top-section">
         <div class="title-area">
             <select class="doc-title-editable" id="docType" onchange="handleDocTypeChange()">
-                <option value=" ใบเสนอราคา"> ใบเสนอราคา</option>
-                <option value=" ใบส่งงาน"> ใบส่งงาน</option>
-                <option value=" ใบแจ้งหนี้/ ใบส่งสินค้า"> ใบแจ้งหนี้/ ใบส่งสินค้า</option>
-                <option value=" ใบส่งสินค้า"> ใบส่งสินค้า</option>
-                <option value=" ใบแจ้งหนี้"> ใบแจ้งหนี้</option>
-                <option value=" ใบเสร็จรับเงิน"> ใบเสร็จรับเงิน</option>
+                <option value="ใบเสนอราคา">ใบเสนอราคา</option>
+                <option value="ใบส่งงาน">ใบส่งงาน</option>
+                <option value="ใบแจ้งหนี้/ใบส่งสินค้า">ใบแจ้งหนี้/ใบส่งสินค้า</option>
+                <option value="ใบส่งสินค้า">ใบส่งสินค้า</option>
+                <option value="ใบแจ้งหนี้">ใบแจ้งหนี้</option>
+                <option value="ใบเสร็จรับเงิน">ใบเสร็จรับเงิน</option>
                 <option value="CUSTOM_DOC">✏️ กำหนดชื่อเอง...</option>
             </select><br>
             <input type="text" id="docSubTitle" style="text-align: left; font-weight: 600; border:none; color:var(--text-muted); font-size: 15px; padding: 0;" value="(QUOTATION)">
@@ -351,7 +351,7 @@
 
     function initializeDoc() {
         document.getElementById('doc-date').value = getTodayThai();
-        document.getElementById('docType').value = " ใบเสนอราคา";
+        document.getElementById('docType').value = "ใบเสนอราคา";
         updateDocTypeSync(true); 
         
         const pendingDoc = localStorage.getItem("jn_selected_cloud_doc");
@@ -537,14 +537,14 @@
             return;
         }
         
-        if (!confirm("ต้องการนำข้อมูลทั้งหมดนี้ ไปสร้างเป็น 'เอกสาร ใบใหม่' ใช่หรือไม่?\n(เอกสาร ใบเก่าจะยังถูกเก็บไว้ในประวัติ ไม่ถูกลบทับ)")) {
+        if (!confirm("ต้องการนำข้อมูลทั้งหมดนี้ ไปสร้างเป็น 'เอกสารใบใหม่' ใช่หรือไม่?\n(เอกสารใบเก่าจะยังถูกเก็บไว้ในประวัติ ไม่ถูกลบทับ)")) {
             return;
         }
         
         currentDocId = null; 
         document.getElementById('doc-date').value = getTodayThai(); 
         
-        alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็น ใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
+        alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
     }
 
     async function saveToSupabase() {
@@ -569,7 +569,7 @@
             const rows = document.querySelectorAll('#items-body tr');
             if(rows.length === 0) throw new Error("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ");
 
-            const cutStockTypes = [' ใบส่งงาน', ' ใบแจ้งหนี้/ ใบส่งสินค้า', ' ใบส่งสินค้า', ' ใบแจ้งหนี้', ' ใบเสร็จรับเงิน'];
+            const cutStockTypes = ['ใบส่งงาน', 'ใบแจ้งหนี้/ใบส่งสินค้า', 'ใบส่งสินค้า', 'ใบแจ้งหนี้', 'ใบเสร็จรับเงิน'];
             const shouldCutStock = cutStockTypes.includes(docType);
 
             if (shouldCutStock) {
@@ -910,7 +910,7 @@
         currentProjectId = cloudData.projectId || null; 
         
         const selectEl = document.getElementById('docType');
-        const targetType = cloudData.docType || " ใบเสนอราคา";
+        const targetType = cloudData.docType || "ใบเสนอราคา";
         let exists = Array.from(selectEl.options).some(opt => opt.value === targetType);
         if(!exists){ const newOpt = document.createElement("option"); newOpt.value = targetType; newOpt.textContent = targetType; selectEl.insertBefore(newOpt, selectEl.options[selectEl.options.length - 1]); }
         selectEl.value = targetType;
