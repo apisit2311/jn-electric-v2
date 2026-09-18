@@ -167,6 +167,22 @@
             #login-overlay, #scanner-modal { display: none !important; }
             .autocomplete-list { display: none !important; }
         }
+       /* สไตล์สำหรับ Dropdown สลับธีม */
+        .theme-switcher {
+            background-color: #f8fafc;
+            color: #475569;
+            border: 1px solid #cbd5e1 !important;
+            padding: 4px 10px !important;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            width: auto;
+            font-family: 'Sarabun', sans-serif;
+        }
+        .theme-switcher:hover {
+            background-color: #f1f5f9;
+            border-color: #94a3b8 !important;
+        } 
     </style>
 </head>
 <body>
@@ -202,6 +218,19 @@
     <button class="btn btn-save" onclick="saveData()">💾 เซฟ (JSON)</button>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">📂 เปิดไฟล์</button>
     <input type="file" id="file-input" accept=".json" style="display: none;" onchange="loadData(event)">
+    <!-- ... ปุ่มเมนูอื่นๆ ก่อนหน้า ... -->
+    <a href="stock.html" class="btn btn-stock" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าคลังสินค้าไหม?')) return false;">📦 สต็อก</a>
+    
+    <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 4px;"></div>
+    
+    <!-- 🌟 โค้ดเพิ่มใหม่: Dropdown เลือกธีม -->
+    <select class="btn theme-switcher" id="themeSelector" onchange="switchTheme(this.value)">
+        <option value="index.html">🎨 ธีม: คลาสสิก</option>
+        <option value="index-modern.html">🎨 ธีม: โมเดิร์น SaaS</option>
+    </select>
+    
+    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel</button>
+    <!-- ... ปุ่ม Print และ ออกระบบ ... -->
     <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel</button>
     <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์</button>
     <button class="btn btn-logout" onclick="logoutSupabase()">🚪 ออกระบบ</button>
@@ -979,6 +1008,31 @@
         const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Document");
         XLSX.writeFile(wb, (docNum || "Document") + ".xlsx");
     }
+    // 🌟 ระบบสลับธีมเอกสาร
+    function switchTheme(url) {
+        if (isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการเปลี่ยนธีมหรือไม่? (ข้อมูลที่พิมพ์ไว้จะหายไป)")) {
+            // ถ้ากดยกเลิก ให้ Dropdown เด้งกลับมาเป็นชื่อธีมปัจจุบัน
+            setCorrectThemeDropdown();
+            return;
+        }
+        window.location.href = url;
+    }
+
+    // 🌟 ฟังก์ชันตั้งค่าให้ Dropdown แสดงชื่อธีมตรงกับหน้าปัจจุบันอัตโนมัติ
+    function setCorrectThemeDropdown() {
+        const selector = document.getElementById('themeSelector');
+        if(!selector) return;
+        
+        // เช็กจาก URL ว่าตอนนี้อยู่หน้าไหน
+        if (window.location.pathname.includes('index-modern.html')) {
+            selector.value = 'index-modern.html';
+        } else {
+            selector.value = 'index.html';
+        }
+    }
+    
+    // เรียกใช้งานตอนโหลดหน้าเว็บเสร็จ
+    setTimeout(setCorrectThemeDropdown, 100);
 
     window.addEventListener("beforeunload", function (e) { if (isDirty) { e.preventDefault(); e.returnValue = "คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการออกจากหน้านี้หรือไม่?"; } });
 </script>
