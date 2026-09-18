@@ -46,18 +46,20 @@
         select.unit-select option { text-align: left; background: #fff; }
 
         /* ปรับ Margin ของส่วนหัวให้แคบลง */
+       /* ปรับสัดส่วนซ้าย-ขวาใหม่ */
         .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; }
-        .title-area { width: 50%; }
+        .title-area { width: 62%; } /* 🌟 ขยายฝั่งซ้ายเป็น 62% (จากเดิม 50%) */
         .doc-title-editable { 
-            font-size: 32px !important; font-weight: 700; color: var(--primary-color); text-align: left;
+            font-size: 28px !important; /* 🌟 ปรับขนาดลงนิดนึงจาก 32px เป็น 28px ให้พอดีสวยงาม */
+            font-weight: 700; color: var(--primary-color); text-align: left;
             padding: 4px 8px 4px 0; line-height: 1.2; display: inline-block; outline: none; border: 1px dashed transparent;
             letter-spacing: 0.5px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
         }
         select.doc-title-editable option { font-size: 16px; color: var(--text-main); background: #fff; font-weight: 500; padding: 8px; }
         .doc-title-editable:hover { border-color: var(--border-color); background-color: #f1f5f9; }
-        .doc-title-editable:focus { border-color: var(--accent-color); background-color: #fff; }
+        .doc-title-editable:focus { border: 1px solid var(--accent-color); background-color: #fff; }
 
-        .meta-area { width: 45%; text-align: right; }
+        .meta-area { width: 35%; text-align: right; } /* 🌟 บีบฝั่งขวาลงเหลือ 35% (จากเดิม 45%) */
         .meta-area table { width: 100%; border-spacing: 0 2px; }
         .meta-area td { vertical-align: middle; padding: 2px 0; }
         .meta-area td:first-child { font-weight: 600; width: 45%; color: var(--text-muted); text-transform: uppercase; font-size: 12px;}
