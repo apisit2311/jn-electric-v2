@@ -972,25 +972,47 @@
         window.location.href = url;
     }
 
-  // 🌟 ระบบสลับธีมเอกสาร (แบบข้อมูลไม่หาย)
+  // 🌟 ระบบสลับธีมเอกสาร (แบบข้อมูลไม่หาย 100%)
     function switchTheme(url) {
-        // 1. เก็บข้อมูลทั้งหมดบนหน้าจอปัจจุบัน
+        // ดึงค่าสถานะส่วนลดปัจจุบัน
         const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
-        const tempSaveData = {
-            docId: currentDocId, // สำคัญ: เพื่อไม่ให้หลุดจากการแก้ไขบิลเดิม
+        
+        // รวบรวมข้อมูลทั้งหมดบนหน้าจอตอนนี้ (ใช้ชื่อตัวแปรให้ตรงกับระบบโหลดเดิมทุกประการ)
+        const currentDocData = {
+            docId: currentDocId,
             projectId: currentProjectId,
-            docType: document.getElementById('docType').value, 
+            docType: document.getElementById('docType').value,
             docNum: document.getElementById('doc-num').value,
-            docDate: document.getElementById('doc-date').value, 
+            docDate: document.getElementById('doc-date').value,
             dueDate: document.getElementById('due-date').value,
-            customerName: document.getElementById('customer-name').value, 
+            customerName: document.getElementById('customer-name').value,
             customerAddress: document.getElementById('customer-address').value,
             customerExtra: document.getElementById('customer-extra').value,
             discountLabel: isDiscountVisible ? document.getElementById('discount-label').value : "ส่วนลด (DISCOUNT)",
-            discount: isDiscountVisible ? (parseFloat(document.getElementById('discount-val').value) || 0) : 0, 
+            discount: isDiscountVisible ? (parseFloat(document.getElementById('discount-val').value) || 0) : 0,
             hasDiscount: isDiscountVisible,
             items: []
         };
+
+        // วนลูปเก็บข้อมูลสินค้าในตารางทุกบรรทัด
+        document.querySelectorAll('#items-body tr').forEach(tr => {
+            const textarea = tr.querySelector('.item-desc');
+            currentDocData.items.push({
+                desc: textarea ? textarea.value : '',
+                sn: tr.querySelector('.sn-input').value,
+                qty: tr.querySelector('.qty').value,
+                unit: tr.querySelector('.unit-select').value,
+                price: tr.querySelector('.price').value
+            });
+        });
+
+        // บันทึกลง localStorage ด้วยชื่อคีย์เดียวกับระบบโหลดบิลเดิม
+        localStorage.setItem("jn_selected_cloud_doc", JSON.stringify(currentDocData));
+        
+        // ปิดการแจ้งเตือนเตือนทิ้งงาน แล้วเปลี่ยนหน้าทันที
+        isDirty = false;
+        window.location.href = url;
+    }
 
         // เก็บข้อมูลในตารางสินค้า
         document.querySelectorAll('#items-body tr').forEach(tr => {
