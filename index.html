@@ -49,10 +49,10 @@
        /* ปรับสัดส่วนซ้าย-ขวาใหม่ */
         .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; }
         .title-area { width: 62%; } /* 🌟 ขยายฝั่งซ้ายเป็น 62% (จากเดิม 50%) */
-        .doc-title-editable { 
-            font-size: 28px !important; /* 🌟 ปรับขนาดลงนิดนึงจาก 32px เป็น 28px ให้พอดีสวยงาม */
-            font-weight: 700; color: var(--primary-color); text-align: left;
-            padding: 4px 8px 4px 0; line-height: 1.2; display: inline-block; outline: none; border: 1px dashed transparent;
+       .doc-title-editable { 
+            font-size: 28px !important; font-weight: 700; color: var(--primary-color); text-align: left;
+            /* 🌟 เพิ่ม padding-top จาก 4px เป็น 8px และขยาย line-height เป็น 1.4 ให้สระมีที่อยู่ */
+            padding: 8px 8px 4px 0; line-height: 1.4; display: inline-block; outline: none; border: 1px dashed transparent;
             letter-spacing: 0.5px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
         }
         select.doc-title-editable option { font-size: 16px; color: var(--text-main); background: #fff; font-weight: 500; padding: 8px; }
