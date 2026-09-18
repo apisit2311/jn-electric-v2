@@ -379,29 +379,32 @@
         });
     };
 
-    function initializeDoc() {
-        document.getElementById('doc-date').value = getTodayThai();
-        document.getElementById('docType').value = "ใบเสนอราคา";
-        updateDocTypeSync(true); 
-        
+   function initializeDoc() {
+        // 🌟 1. เช็กข้อมูลที่ส่งมาจากปุ่มสลับธีมหรือคลาวด์ก่อนเป็นอันดับแรกสุด!
         const pendingDoc = localStorage.getItem("jn_selected_cloud_doc");
         if (pendingDoc) {
             try {
                 const cloudData = JSON.parse(pendingDoc);
                 localStorage.removeItem("jn_selected_cloud_doc");
                 loadSelectedDoc(cloudData);
-                return;
+                isDirty = true; // คงสถานะว่ามีข้อมูลยังไม่ได้เซฟไว้
+                return; // หยุดการทำงานส่วนอื่น เพื่อไม่ให้ค่าเริ่มต้นมาทับข้อมูลเก่า
             } catch(e) {}
         }
+
+        // 2. ถ้าไม่มีข้อมูลค้างอยู่ ถึงค่อยเริ่มสร้างบิลใหม่ตามปกติ
+        document.getElementById('doc-date').value = getTodayThai();
+        document.getElementById('docType').value = "ใบเสนอราคา";
+        updateDocTypeSync(true); 
         
         if(document.getElementById('items-body').children.length === 0) addRow();
         calculateTotal();
         isDirty = false;
+        
         document.getElementById('customer-name').addEventListener('input', markDirty);
         document.getElementById('customer-address').addEventListener('input', markDirty);
         document.getElementById('customer-extra').addEventListener('input', markDirty);
     }
-
     async function fetchProducts() {
         const { data } = await supabaseClient.from('products').select('*');
         if (data) {
