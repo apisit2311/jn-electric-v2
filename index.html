@@ -48,15 +48,13 @@
       /* ปรับสัดส่วนซ้าย-ขวาใหม่ */
         .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; }
         .title-area { width: 62%; } /* 🌟 ขยายฝั่งซ้ายเป็น 62% (จากเดิม 50%) */
-        .doc-title-editable { 
+       .doc-title-editable { 
             font-size: 24px !important; 
             font-weight: 700; color: var(--primary-color); text-align: left;
-            /* 🌟 เพิ่ม padding-left เป็น 15px และเพิ่ม margin-left เผื่อพื้นที่ให้อีกนิด */
-            padding: 8px 4px 8px 15px !important; 
-            margin-left: -4px; /* ดึงกล่องโดยรวมให้ออกมาทางซ้ายนิดนึง */
+            /* 🌟 เปลี่ยนเลขตัวสุดท้ายจาก 0 เป็น 12px เพื่อดันตัว "ใ" ให้มีพื้นที่ห่างจากขอบ */
+            padding: 8px 2px 8px 0px; 
             line-height: 1.8; display: inline-block; outline: none; border: 1px dashed transparent;
-            letter-spacing: 1.5px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
-            -webkit-appearance: none; -moz-appearance: none;
+            letter-spacing: 1.9px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
             min-height: 48px;
         }
         select.doc-title-editable option { font-size: 16px; color: var(--text-main); background: #fff; font-weight: 500; padding: 8px; }
