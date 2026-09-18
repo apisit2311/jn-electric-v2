@@ -45,29 +45,32 @@
         select.unit-select optgroup { text-align: left; font-weight: bold; background: #eee; }
         select.unit-select option { text-align: left; background: #fff; }
 
-        /* ปรับ Margin ของส่วนหัวให้แคบลง */
+      /* ปรับสัดส่วนซ้าย-ขวาใหม่ */
         .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; }
-        .title-area { width: 50%; }
+        .title-area { width: 62%; } /* 🌟 ขยายฝั่งซ้ายเป็น 62% (จากเดิม 50%) */
         .doc-title-editable { 
-            font-size: 32px !important; font-weight: 700; color: var(--primary-color); text-align: left;
-            padding: 4px 8px 4px 0; line-height: 1.2; display: inline-block; outline: none; border: 1px dashed transparent;
-            letter-spacing: 0.5px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
+            font-size: 24px !important; /* 🌟 ลดขนาดฟอนต์ลงเหลือ 24px */
+            font-weight: 700; color: var(--primary-color); text-align: left;
+            /* 🌟 เพิ่ม padding บน/ล่าง ให้มีพื้นที่หายใจ */
+            padding: 8px 2px 8px 0; line-height: 1.5; display: inline-block; outline: none; border: 1px dashed transparent;
+            letter-spacing: 0.9px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
+            /* 🌟 เพิ่มความสูงขั้นต่ำกันกล่องบีบตัว */
+            min-height: 48px;
         }
         select.doc-title-editable option { font-size: 16px; color: var(--text-main); background: #fff; font-weight: 500; padding: 8px; }
         .doc-title-editable:hover { border-color: var(--border-color); background-color: #f1f5f9; }
-        .doc-title-editable:focus { border-color: var(--accent-color); background-color: #fff; }
+        .doc-title-editable:focus { border: 1px solid var(--accent-color); background-color: #fff; }
 
-        .meta-area { width: 45%; text-align: right; }
+        .meta-area { width: 35%; text-align: right; } /* 🌟 บีบฝั่งขวาลงเหลือ 35% (จากเดิม 45%) */
         .meta-area table { width: 100%; border-spacing: 0 2px; }
         .meta-area td { vertical-align: middle; padding: 2px 0; }
         .meta-area td:first-child { font-weight: 600; width: 45%; color: var(--text-muted); text-transform: uppercase; font-size: 12px;}
         .meta-area input { text-align: right; font-weight: 600; font-size: 14px; padding: 2px; }
-
         /* ปรับ Margin ของที่อยู่ให้แคบลง */
         .address-section { display: flex; justify-content: space-between; margin-bottom: 15px; }
         .company-area, .customer-area { width: 48%; }
         .section-label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; }
-        .company-logo { max-width: 100px; height: auto; margin-bottom: 2px; display: block; }
+        .company-logo { max-width: 85px; height: auto; margin-bottom: 2px; display: block; }
 
         /* ปรับตารางให้ชิดขึ้น */
         .items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; border-bottom: 2px solid var(--primary-color); }
@@ -242,6 +245,9 @@
         <div class="company-area">
             <div class="section-label">ผู้ออกเอกสาร (FROM)</div>
             <img src="logo.png" alt="JN Electric Logo" class="company-logo" onerror="this.style.display='none'">
+            <!-- แยกชื่อบริษัทออกมาทำตัวหนาและเน้นสี -->
+            <input type="text" value="เจเอนอิเล็กทริกแอนด์เทคโนโลยี" style="font-weight: 700; font-size: 16px; color: var(--primary-color); padding-left: 0; margin-bottom: 2px;">
+            <!-- ที่อยู่และเบอร์โทรให้อยู่ใน textarea เหมือนเดิม แต่ลดเหลือ 3 บรรทัด -->
             <textarea rows="3" style="color: var(--text-muted); padding-left: 0;">101/1 ม.1 ต.หนองนาคำ อ.เมือง&#10;จ.อุดรธานี 41000&#10;โทร: 083-417-5143 | Line: apisit2311</textarea>
         </div>
         <div class="customer-area">
