@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JN electric&Technology (V2 สมบูรณ์แบบ)</title>
+    <title>JN electric&Technology (V2 กระชับ)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,13 +13,14 @@
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
         :root { --primary-color: #1e3a8a; --accent-color: #3b82f6; --text-main: #0f172a; --text-muted: #475569; --bg-color: #f8fafc; --border-color: #cbd5e1; }
-        body { font-family: 'Sarabun', sans-serif; color: var(--text-main); line-height: 1.5; background-color: var(--bg-color); padding: 85px 20px 30px; }
+        body { font-family: 'Sarabun', sans-serif; color: var(--text-main); line-height: 1.4; background-color: var(--bg-color); padding: 75px 20px 20px; }
         
-        .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 20mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
+        /* ลดขอบกระดาษลงเพื่อให้กระชับขึ้น */
+        .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 12mm 15mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
         
         input[type="text"], input[type="number"], textarea, select {
-            font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
-            border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
+            font-family: 'Sarabun', sans-serif; font-size: 13.5px; color: var(--text-main);
+            border: 1px dashed transparent; border-radius: 2px; padding: 2px 4px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
         }
         input:hover, textarea:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
         input:focus, textarea:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
@@ -27,59 +28,62 @@
         textarea { resize: vertical; overflow: hidden; }
 
         textarea.item-desc {
-            font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text-main);
-            border: 1px dashed transparent; border-radius: 2px; padding: 4px 6px; width: 100%; box-sizing: border-box; background-color: transparent; 
-            resize: vertical; overflow: hidden; min-height: 32px; line-height: 1.4; transition: all 0.2s ease;
+            font-family: 'Sarabun', sans-serif; font-size: 13.5px; color: var(--text-main);
+            border: 1px dashed transparent; border-radius: 2px; padding: 3px 5px; width: 100%; box-sizing: border-box; background-color: transparent; 
+            resize: vertical; overflow: hidden; min-height: 26px; line-height: 1.3; transition: all 0.2s ease;
         }
         textarea.item-desc:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
         textarea.item-desc:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
 
         .autocomplete-wrapper { position: relative; width: 100%; text-align: left; }
         .autocomplete-list { position: absolute; z-index: 100; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--accent-color); border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; display: none; }
-        .autocomplete-list div { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 14px; font-family: 'Sarabun'; color: var(--text-main); line-height: 1.4; }
+        .autocomplete-list div { padding: 8px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; font-family: 'Sarabun'; color: var(--text-main); line-height: 1.3; }
         .autocomplete-list div:hover { background-color: #eff6ff; }
         .autocomplete-list div:last-child { border-bottom: none; }
 
-        select.unit-select { cursor: pointer; text-align: center; text-align-last: center; }
+        select.unit-select { cursor: pointer; text-align: center; text-align-last: center; padding: 2px; }
         select.unit-select optgroup { text-align: left; font-weight: bold; background: #eee; }
         select.unit-select option { text-align: left; background: #fff; }
 
-        .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 3px solid var(--primary-color); padding-bottom: 20px; }
+        /* ปรับ Margin ของส่วนหัวให้แคบลง */
+        .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; }
         .title-area { width: 50%; }
         .doc-title-editable { 
-            font-size: 38px !important; font-weight: 700; color: var(--primary-color); text-align: left;
-            padding: 10px 10px 10px 0; line-height: 1.4; display: inline-block; outline: none; border: 1px dashed transparent;
-            letter-spacing: 1px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
+            font-size: 32px !important; font-weight: 700; color: var(--primary-color); text-align: left;
+            padding: 4px 8px 4px 0; line-height: 1.2; display: inline-block; outline: none; border: 1px dashed transparent;
+            letter-spacing: 0.5px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
         }
-        select.doc-title-editable option { font-size: 18px; color: var(--text-main); background: #fff; font-weight: 500; padding: 10px; }
+        select.doc-title-editable option { font-size: 16px; color: var(--text-main); background: #fff; font-weight: 500; padding: 8px; }
         .doc-title-editable:hover { border-color: var(--border-color); background-color: #f1f5f9; }
         .doc-title-editable:focus { border-color: var(--accent-color); background-color: #fff; }
 
         .meta-area { width: 45%; text-align: right; }
-        .meta-area table { width: 100%; border-spacing: 0 5px; }
-        .meta-area td { vertical-align: middle; }
-        .meta-area td:first-child { font-weight: 600; width: 45%; color: var(--text-muted); text-transform: uppercase; font-size: 13px;}
-        .meta-area input { text-align: right; font-weight: 600; font-size: 15px;}
+        .meta-area table { width: 100%; border-spacing: 0 2px; }
+        .meta-area td { vertical-align: middle; padding: 2px 0; }
+        .meta-area td:first-child { font-weight: 600; width: 45%; color: var(--text-muted); text-transform: uppercase; font-size: 12px;}
+        .meta-area input { text-align: right; font-weight: 600; font-size: 14px; padding: 2px; }
 
-        .address-section { display: flex; justify-content: space-between; margin-bottom: 40px; }
+        /* ปรับ Margin ของที่อยู่ให้แคบลง */
+        .address-section { display: flex; justify-content: space-between; margin-bottom: 15px; }
         .company-area, .customer-area { width: 48%; }
-        .section-label { font-size: 13px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
-        .company-logo { max-width: 120px; height: auto; margin-bottom: 5px; display: block; }
+        .section-label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; }
+        .company-logo { max-width: 100px; height: auto; margin-bottom: 2px; display: block; }
 
-        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; border-bottom: 2px solid var(--primary-color); }
-        .items-table th { background-color: #fff; color: var(--primary-color); padding: 12px 8px; text-align: left; font-size: 14px; font-weight: 700; border-top: 2px solid var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+        /* ปรับตารางให้ชิดขึ้น */
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; border-bottom: 2px solid var(--primary-color); }
+        .items-table th { background-color: #fff; color: var(--primary-color); padding: 8px 4px; text-align: left; font-size: 13px; font-weight: 700; border-top: 2px solid var(--primary-color); border-bottom: 2px solid var(--primary-color); }
         .items-table th.text-center, .items-table td.text-center { text-align: center; }
         .items-table th.text-right, .items-table td.text-right { text-align: right; }
-        .items-table td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
-        .row-number { font-weight: 600; color: var(--text-muted); padding-top: 15px !important; }
+        .items-table td { padding: 4px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+        .row-number { font-weight: 600; color: var(--text-muted); padding-top: 8px !important; font-size: 13px; }
         
-        .btn { padding: 8px 16px; cursor: pointer; font-family: 'Sarabun'; border: none; border-radius: 4px; font-weight: 600; transition: 0.2s; text-decoration: none;}
+        .btn { padding: 6px 14px; cursor: pointer; font-family: 'Sarabun'; border: none; border-radius: 4px; font-weight: 600; transition: 0.2s; text-decoration: none; font-size: 13px;}
         .btn:hover { opacity: 0.9; }
-        .btn-add { background-color: var(--primary-color); color: white; border-radius: 20px; padding: 8px 20px; box-shadow: 0 4px 6px rgba(30, 58, 138, 0.2);}
-        .btn-del { background-color: #ef4444; color: white; padding: 4px 10px; font-size: 12px; margin-top: 4px; border-radius: 4px; }
+        .btn-add { background-color: var(--primary-color); color: white; border-radius: 20px; padding: 6px 16px; box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);}
+        .btn-del { background-color: #ef4444; color: white; padding: 2px 8px; font-size: 11px; margin-top: 4px; border-radius: 4px; }
         
-        .top-controls { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; display: flex; gap: 8px; justify-content: center; align-items: center; background: #1e3a8a; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); box-sizing: border-box; flex-wrap: wrap; }
-        .top-controls .btn { padding: 6px 12px; font-size: 13px; border-radius: 4px; }
+        .top-controls { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; display: flex; gap: 6px; justify-content: center; align-items: center; background: #1e3a8a; padding: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); box-sizing: border-box; flex-wrap: wrap; }
+        .top-controls .btn { padding: 5px 10px; font-size: 12px; border-radius: 4px; }
         .btn-dashboard { background-color: #0f172a; color: white; border: 1px solid #334155; }
         .btn-search-page { background-color: #3b82f6; color: white; border: 1px solid #93c5fd; }
         .btn-new-doc { background-color: #ec4899; color: white; }
@@ -91,37 +95,39 @@
         .btn-print { background-color: #3b82f6; color: white; }
         .btn-logout { background-color: #475569; color: white; }
 
-        .summary-section { display: flex; justify-content: flex-end; margin-bottom: 40px; margin-top: 10px; position: relative; }
-        .summary-table { width: 50%; border-collapse: collapse; }
-        .summary-table td { padding: 8px 12px; font-size: 15px; border-bottom: 1px solid var(--border-color); }
-        .summary-table tr.total td { font-weight: 700; color: var(--primary-color); font-size: 18px; border-bottom: none; border-top: 2px solid var(--primary-color); background-color: #f8fafc; }
+        /* ปรับส่วนสรุปด้านล่างให้แคบลง */
+        .summary-section { display: flex; justify-content: flex-end; margin-bottom: 20px; margin-top: 5px; position: relative; }
+        .summary-table { width: 45%; border-collapse: collapse; }
+        .summary-table td { padding: 4px 8px; font-size: 14px; border-bottom: 1px solid var(--border-color); }
+        .summary-table tr.total td { font-weight: 700; color: var(--primary-color); font-size: 16px; border-bottom: none; border-top: 2px solid var(--primary-color); background-color: #f8fafc; padding: 6px 8px; }
 
-        .footer-signatures { display: flex; justify-content: space-between; margin-top: 60px; text-align: center; }
+        /* ขยับลายเซ็นขึ้นมา */
+        .footer-signatures { display: flex; justify-content: space-between; margin-top: 25px; text-align: center; }
         .signature-box { width: 35%; }
-        .signature-line { border-bottom: 1px solid var(--text-main); margin: 40px auto 10px; width: 100%; }
+        .signature-line { border-bottom: 1px solid var(--text-main); margin: 30px auto 6px; width: 100%; }
         
-        .toggle-box { cursor: pointer; display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 500;}
-        .toggle-box input { width: auto; transform: scale(1.1); cursor: pointer; margin: 0; }
+        .toggle-box { cursor: pointer; display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 500;}
+        .toggle-box input { width: auto; transform: scale(1); cursor: pointer; margin: 0; }
 
-        .drag-handle { cursor: grab; color: #cbd5e1; font-size: 18px; padding-top: 12px !important; user-select: none; }
+        .drag-handle { cursor: grab; color: #cbd5e1; font-size: 16px; padding-top: 8px !important; user-select: none; }
         .drag-handle:active { cursor: grabbing; color: var(--primary-color); }
-        .item-row.dragging { opacity: 0.6; background-color: #eff6ff; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        tr.dragging { opacity: 0.6; background-color: #eff6ff; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
 
-        .discount-toggle-btn { background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 4px; padding: 2px 8px; font-size: 12px; cursor: pointer; font-family: 'Sarabun'; font-weight: 600; margin-bottom: 5px; float: right; }
+        .discount-toggle-btn { background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 4px; padding: 2px 6px; font-size: 11.5px; cursor: pointer; font-family: 'Sarabun'; font-weight: 600; margin-bottom: 4px; float: right; }
         .discount-toggle-btn:hover { background: #eff6ff; }
 
-        .sn-container { display: flex; align-items: center; gap: 5px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e2e8f0; }
-        .sn-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
-        .sn-input { border: 1px solid transparent; border-bottom: 1px solid var(--border-color) !important; padding: 2px 5px !important; font-size: 12px !important; color: var(--accent-color) !important; font-weight: 600; }
-        .btn-scan { background: #e2e8f0; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: 0.2s; }
+        .sn-container { display: flex; align-items: center; gap: 4px; margin-top: 4px; padding-top: 4px; border-top: 1px dashed #e2e8f0; }
+        .sn-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        .sn-input { border: 1px solid transparent; border-bottom: 1px solid var(--border-color) !important; padding: 1px 4px !important; font-size: 11.5px !important; color: var(--accent-color) !important; font-weight: 600; }
+        .btn-scan { background: #e2e8f0; border: none; padding: 2px 5px; border-radius: 3px; cursor: pointer; font-size: 11px; transition: 0.2s; }
         .btn-scan:hover { background: var(--accent-color); color: white; }
 
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 10000; display: flex; justify-content: center; align-items: center; }
-        .login-card { background: #fff; padding: 40px 30px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .login-card h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 10px; font-size: 24px; }
-        .login-card input { border: 1px solid var(--border-color); background: #f8fafc; padding: 12px; border-radius: 6px; width: 100%; font-size: 16px; margin-bottom: 15px; font-family: 'Sarabun'; box-sizing: border-box; text-align: center;}
+        .login-card { background: #fff; padding: 30px 25px; border-radius: 10px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .login-card h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 10px; font-size: 20px; }
+        .login-card input { border: 1px solid var(--border-color); background: #f8fafc; padding: 10px; border-radius: 5px; width: 100%; font-size: 14px; margin-bottom: 12px; font-family: 'Sarabun'; box-sizing: border-box; text-align: center;}
         .login-card input:focus { border-color: var(--primary-color); background: #fff; outline: none; }
-        .login-card .btn-submit { background: var(--primary-color); color: #fff; width: 100%; padding: 12px; font-size: 16px; border-radius: 6px; font-weight: 700;}
+        .login-card .btn-submit { background: var(--primary-color); color: #fff; width: 100%; padding: 10px; font-size: 15px; border-radius: 5px; font-weight: 700;}
 
         #scanner-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; }
         .scanner-box { background: #fff; padding: 15px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
@@ -141,8 +147,9 @@
                 -webkit-appearance: none; 
                 -moz-appearance: none; 
                 resize: none !important; 
+                line-height: 1.3 !important;
             }
-            .summary-table tr.total td { background-color: transparent; }
+            .summary-table tr.total td { background-color: transparent; padding: 4px 8px; }
             select::-ms-expand { display: none; } 
             
             textarea { overflow: visible !important; white-space: pre-wrap !important; }
@@ -171,7 +178,7 @@
 <div id="login-overlay">
     <div class="login-card">
         <h2>JN Electric ERP</h2>
-        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">กรุณาล็อกอินเพื่อเข้าสู่ระบบร้าน</p>
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">กรุณาล็อกอินเพื่อเข้าสู่ระบบร้าน</p>
         <input type="email" id="email-input" placeholder="อีเมลแอดมิน">
         <input type="password" id="pass-input" placeholder="รหัสผ่านระบบ">
         <button class="btn btn-submit" onclick="submitSupabaseLogin()">🔓 เข้าสู่ระบบ</button>
@@ -184,14 +191,14 @@
     <a href="checklist.html" class="btn btn-stock" style="background-color: #8b5cf6;">🛒 เตรียมของ/สั่งซื้อ</a>
     <button class="btn btn-search-page" onclick="goToSearchPage()">📁 ค้นหา/ประวัติ</button>
     <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
-    <button class="btn btn-load" style="background-color: #8b5cf6;" onclick="duplicateDocument()">📋 นำไปสร้างใบใหม่ (Copy)</button>
-    <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึก / อัปเดตข้อมูล</button>
+    <button class="btn btn-load" style="background-color: #8b5cf6;" onclick="duplicateDocument()">📋 Copy เอกสาร</button>
+    <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึกข้อมูล</button>
     <a href="stock.html" class="btn btn-stock" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าคลังสินค้าไหม?')) return false;">📦 คลังสินค้า</a>
     
-    <button class="btn btn-save" onclick="saveData()">💾 เซฟไฟล์ (JSON)</button>
+    <button class="btn btn-save" onclick="saveData()">💾 เซฟ (JSON)</button>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">📂 เปิดไฟล์</button>
     <input type="file" id="file-input" accept=".json" style="display: none;" onchange="loadData(event)">
-    <button class="btn btn-excel" onclick="exportToExcel()">📊 โหลด Excel</button>
+    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel</button>
     <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์</button>
     <button class="btn btn-logout" onclick="logoutSupabase()">🚪 ออกระบบ</button>
 </div>
@@ -206,9 +213,9 @@
                 <option value="ใบส่งสินค้า">ใบส่งสินค้า</option>
                 <option value="ใบแจ้งหนี้">ใบแจ้งหนี้</option>
                 <option value="ใบเสร็จรับเงิน">ใบเสร็จรับเงิน</option>
-                <option value="CUSTOM_DOC">✏️ กำหนดชื่อเอกสารเอง...</option>
+                <option value="CUSTOM_DOC">✏️ กำหนดชื่อเอง...</option>
             </select><br>
-            <input type="text" id="docSubTitle" style="text-align: left; font-weight: 600; border:none; color:var(--text-muted); font-size: 16px; padding: 0;" value="(QUOTATION)">
+            <input type="text" id="docSubTitle" style="text-align: left; font-weight: 600; border:none; color:var(--text-muted); font-size: 15px; padding: 0;" value="(QUOTATION)">
         </div>
         <div class="meta-area">
             <table>
@@ -235,12 +242,12 @@
         <div class="company-area">
             <div class="section-label">ผู้ออกเอกสาร (FROM)</div>
             <img src="logo.png" alt="JN Electric Logo" class="company-logo" onerror="this.style.display='none'">
-            <textarea rows="4" style="color: var(--text-muted); padding-left: 0;">101/1 ม.1 ต.หนองนาคำ อ.เมือง&#10;จ.อุดรธานี 41000&#10;โทร: 083-417-5143 &#10;Line: apisit2311</textarea>
+            <textarea rows="3" style="color: var(--text-muted); padding-left: 0;">101/1 ม.1 ต.หนองนาคำ อ.เมือง&#10;จ.อุดรธานี 41000&#10;โทร: 083-417-5143 | Line: apisit2311</textarea>
         </div>
         <div class="customer-area">
             <div class="section-label">ลูกค้า (BILL TO)</div>
-            <input type="text" id="customer-name" value="บริษัท ลูกค้าองค์กร จำกัด" style="font-weight: 700; font-size: 18px; padding-left: 0;">
-            <textarea id="customer-address" rows="5" style="padding-left: 0; margin-bottom: 0;">888 ถนนรัชดาภิเษก แขวงดินแดง&#10;เขตดินแดง กรุงเทพฯ 10400&#10;โทร: 02-888-9999</textarea>
+            <input type="text" id="customer-name" value="บริษัท ลูกค้าองค์กร จำกัด" style="font-weight: 700; font-size: 16px; padding-left: 0;">
+            <textarea id="customer-address" rows="3" style="padding-left: 0; margin-bottom: 0;">888 ถนนรัชดาภิเษก แขวงดินแดง&#10;เขตดินแดง กรุงเทพฯ 10400&#10;โทร: 02-888-9999</textarea>
             <textarea id="customer-extra" rows="2" placeholder="เลขประจำตัวผู้เสียภาษี / สาขา / โครงการ..." style="font-weight: 700; padding-left: 0; border-top: 1px dashed var(--border-color);"></textarea>
         </div>
     </div>
@@ -249,13 +256,13 @@
         <thead>
              <tr>
                 <th class="no-print text-center" style="width: 2%;"></th>
-                <th class="no-print text-center" style="width: 5%;">ลบ</th>
+                <th class="no-print text-center" style="width: 4%;">ลบ</th>
                 <th class="text-center" style="width: 5%;">ลำดับ</th>
-                <th style="width: 47%;">รายการ</th> 
+                <th style="width: 49%;">รายการ</th> 
                 <th class="text-center" style="width: 8%;">จำนวน</th>
-                <th class="text-center" style="width: 12%;">หน่วย</th> 
-                <th class="text-right" style="width: 12%;">ราคา/หน่วย</th>
-                <th class="text-right" style="width: 14%;">จำนวนเงิน</th>
+                <th class="text-center" style="width: 10%;">หน่วย</th> 
+                <th class="text-right" style="width: 10%;">ราคา/หน่วย</th>
+                <th class="text-right" style="width: 12%;">จำนวนเงิน</th>
             </tr>
         </thead>
         <tbody id="items-body"></tbody>
@@ -274,10 +281,10 @@
             </tr>
             <tr id="discount-row" style="display:none;">
                 <td>
-                    <input type="text" id="discount-label" value="ส่วนลด (DISCOUNT)" style="color: var(--text-muted); font-size: 15px; padding:0;">
+                    <input type="text" id="discount-label" value="ส่วนลด (DISCOUNT)" style="color: var(--text-muted); font-size: 14px; padding:0;">
                 </td>
-                <td class="text-right" style="padding: 4px 8px;">
-                    <input type="number" id="discount-val" value="0" min="0" oninput="calculateTotal()" style="text-align: right; font-weight: 600; color: #ef4444; width: 100%; font-size: 15px;">
+                <td class="text-right" style="padding: 2px 4px;">
+                    <input type="number" id="discount-val" value="0" min="0" oninput="calculateTotal()" style="text-align: right; font-weight: 600; color: #ef4444; width: 100%; font-size: 14px;">
                 </td>
             </tr>
             <tr class="total">
@@ -290,13 +297,13 @@
     <div class="footer-signatures">
         <div class="signature-box">
             <div class="signature-line"></div>
-            <input type="text" id="sig-left" value="ผู้อนุมัติสั่งซื้อ" style="text-align: center; font-weight: 600; font-size: 15px;">
-            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 13px;">
+            <input type="text" id="sig-left" value="ผู้อนุมัติสั่งซื้อ" style="text-align: center; font-weight: 600; font-size: 14px;">
+            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 12px;">
         </div>
         <div class="signature-box">
             <div class="signature-line"></div>
-            <input type="text" id="sig-right" value="ผู้เสนอราคา" style="text-align: center; font-weight: 600; font-size: 15px;">
-            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 13px;">
+            <input type="text" id="sig-right" value="ผู้เสนอราคา" style="text-align: center; font-weight: 600; font-size: 14px;">
+            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 12px;">
         </div>
     </div>
 </div>
@@ -471,7 +478,6 @@
         window.location.href = "search.html"; 
     }
 
-    // 🌟 อัปเดตฟังก์ชันนี้ ให้สลับคำนำหน้าเมื่อมีรหัสเอกสารอยู่แล้ว
     function fetchNextDocNumber() {
         const docText = document.getElementById('docType').value;
         let prefix = "QUO"; 
@@ -515,7 +521,6 @@
         calculateTotal();
         isDirty = false;
         
-        // ล้างเลขเก่าทิ้งเพื่อให้มันสุ่มเลขใหม่ทั้งหมด
         document.getElementById('doc-num').value = "";
         fetchNextDocNumber();
     }
@@ -703,7 +708,6 @@
         updateDocTypeSync(true);
     }
 
-    // 🌟 อัปเดตฟังก์ชันนี้ ให้ปรับเลขเมื่ออัปเดต Document Type
     function updateDocTypeSync(shouldFetchNum = true) {
         const docText = document.getElementById('docType').value;
         const subTitle = document.getElementById('docSubTitle');
@@ -773,7 +777,6 @@
         document.getElementById('grand-total').innerText = (subtotal - discount).toLocaleString('th-TH', {minimumFractionDigits: 2});
     }
 
-    // 🌟 อัปเดตฟังก์ชันนี้ ให้รองรับทั้งคำว่า desc และ description จาก object
     function addRow(data = null) {
         if(!data) markDirty();
         const tbody = document.getElementById('items-body');
@@ -803,7 +806,7 @@
             <td><input type="number" class="qty text-center" value="${qty}" min="1" oninput="markDirty(); calculateTotal()"></td>
             <td>${unitDropdownHTML}</td>
             <td><input type="number" class="price text-right" value="${price}" min="0" oninput="markDirty(); calculateTotal()"></td>
-            <td class="text-right row-total" style="padding-top: 14px;">0.00</td>
+            <td class="text-right row-total" style="padding-top: 10px;">0.00</td>
         `;
         tbody.appendChild(tr);
         
