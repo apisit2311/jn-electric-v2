@@ -1,1092 +1,986 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JN electric&Technology</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JN electric&Technology</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-    <style>
-        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        :root { --primary-color: #1e3a8a; --accent-color: #3b82f6; --text-main: #0f172a; --text-muted: #475569; --bg-color: #f8fafc; --border-color: #cbd5e1; }
-        body { font-family: 'Sarabun', sans-serif; color: var(--text-main); line-height: 1.4; background-color: var(--bg-color); padding: 75px 20px 20px; }
-        
-        /* ลดขอบกระดาษลงเพื่อให้กระชับขึ้น */
-        .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 12mm 15mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
-        
-        input[type="text"], input[type="number"], textarea, select {
-            font-family: 'Sarabun', sans-serif; font-size: 13.5px; color: var(--text-main);
-            border: 1px dashed transparent; border-radius: 2px; padding: 2px 4px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
-        }
-        input:hover, textarea:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
-        input:focus, textarea:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
-        
-        textarea { resize: vertical; overflow: hidden; }
+    <style>
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        :root { --primary-color: #1e3a8a; --accent-color: #3b82f6; --text-main: #0f172a; --text-muted: #475569; --bg-color: #f8fafc; --border-color: #cbd5e1; }
+        body { font-family: 'Sarabun', sans-serif; color: var(--text-main); line-height: 1.4; background-color: var(--bg-color); padding: 75px 20px 20px; }
+        
+        /* ลดขอบกระดาษลงเพื่อให้กระชับขึ้น */
+        .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 12mm 15mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
+        
+        input[type="text"], input[type="number"], textarea, select {
+            font-family: 'Sarabun', sans-serif; font-size: 13.5px; color: var(--text-main);
+            border: 1px dashed transparent; border-radius: 2px; padding: 2px 4px; width: 100%; box-sizing: border-box; background-color: transparent; transition: all 0.2s ease;
+        }
+        input:hover, textarea:hover, select:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
+        input:focus, textarea:focus, select:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
+        
+        textarea { resize: vertical; overflow: hidden; }
 
-        textarea.item-desc {
-            font-family: 'Sarabun', sans-serif; font-size: 13.5px; color: var(--text-main);
-            border: 1px dashed transparent; border-radius: 2px; padding: 3px 5px; width: 100%; box-sizing: border-box; background-color: transparent; 
-            resize: vertical; overflow: hidden; min-height: 26px; line-height: 1.3; transition: all 0.2s ease;
-        }
-        textarea.item-desc:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
-        textarea.item-desc:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
+        textarea.item-desc {
+            font-family: 'Sarabun', sans-serif; font-size: 13.5px; color: var(--text-main);
+            border: 1px dashed transparent; border-radius: 2px; padding: 3px 5px; width: 100%; box-sizing: border-box; background-color: transparent; 
+            resize: vertical; overflow: hidden; min-height: 26px; line-height: 1.3; transition: all 0.2s ease;
+        }
+        textarea.item-desc:hover { background-color: #f1f5f9; border-color: #e2e8f0; }
+        textarea.item-desc:focus { border: 1px solid var(--accent-color); outline: none; background-color: #fff; }
 
-        .autocomplete-wrapper { position: relative; width: 100%; text-align: left; }
-        .autocomplete-list { position: absolute; z-index: 100; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--accent-color); border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; display: none; }
-        .autocomplete-list div { padding: 8px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; font-family: 'Sarabun'; color: var(--text-main); line-height: 1.3; }
-        .autocomplete-list div:hover { background-color: #eff6ff; }
-        .autocomplete-list div:last-child { border-bottom: none; }
+        .autocomplete-wrapper { position: relative; width: 100%; text-align: left; }
+        .autocomplete-list { position: absolute; z-index: 100; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--accent-color); border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; display: none; }
+        .autocomplete-list div { padding: 8px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; font-family: 'Sarabun'; color: var(--text-main); line-height: 1.3; }
+        .autocomplete-list div:hover { background-color: #eff6ff; }
+        .autocomplete-list div:last-child { border-bottom: none; }
 
-        select.unit-select { cursor: pointer; text-align: center; text-align-last: center; padding: 2px; }
-        select.unit-select optgroup { text-align: left; font-weight: bold; background: #eee; }
-        select.unit-select option { text-align: left; background: #fff; }
+        select.unit-select { cursor: pointer; text-align: center; text-align-last: center; padding: 2px; }
+        select.unit-select optgroup { text-align: left; font-weight: bold; background: #eee; }
+        select.unit-select option { text-align: left; background: #fff; }
 
-        /* ปรับ Margin ของส่วนหัวให้แคบลง */
-       /* ปรับสัดส่วนซ้าย-ขวาใหม่ */
-        .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; }
-       .title-area { width: 62%;} /* 🌟 ขยายฝั่งซ้ายเป็น 62% (จากเดิม 50%) */
-.doc-title-editable { 
-            font-size: 24px !important; 
-            font-weight: 700; color: var(--primary-color); text-align: left;
-            padding: px 8px 0px 0px; /* 🌟 เปลี่ยนจาก 0 เป็น 10px (ขยับเท่ากับ 1 spacebar) */
-            line-height: 2; display: inline-block; outline: none; border: 1px dashed transparent;
-            letter-spacing: 1px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
-            min-height: 48px;
-        }
-        select.doc-title-editable option { font-size: 16px; color: var(--text-main); background: #fff; font-weight: 500; padding: 8px; }
-        .doc-title-editable:hover { border-color: var(--border-color); background-color: #f1f5f9; }
-        .doc-title-editable:focus { border: 1px solid var(--accent-color); background-color: #fff; }
+        /* ปรับ Margin ของส่วนหัวให้แคบลง */
+       /* ปรับสัดส่วนซ้าย-ขวาใหม่ */
+        .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; }
+       .title-area { width: 62%;} /* 🌟 ขยายฝั่งซ้ายเป็น 62% (จากเดิม 50%) */
+.doc-title-editable { 
+            font-size: 24px !important; 
+            font-weight: 700; color: var(--primary-color); text-align: left;
+            padding: 9px 9px 9px 0px; /* 🌟 เปลี่ยนจาก 0 เป็น 10px (ขยับเท่ากับ 1 spacebar) */
+            line-height: 2; display: inline-block; outline: none; border: 1px dashed transparent;
+            letter-spacing: 1px; cursor: pointer; width: auto; max-width: 100%; appearance: none;
+            min-height: 48px;
+        }
+        select.doc-title-editable option { font-size: 16px; color: var(--text-main); background: #fff; font-weight: 500; padding: 8px; }
+        .doc-title-editable:hover { border-color: var(--border-color); background-color: #f1f5f9; }
+        .doc-title-editable:focus { border: 1px solid var(--accent-color); background-color: #fff; }
 
-        .meta-area { width: 35%; text-align: right; } /* 🌟 บีบฝั่งขวาลงเหลือ 35% (จากเดิม 45%) */
-        .meta-area table { width: 100%; border-spacing: 0 2px; }
-        .meta-area td { vertical-align: middle; padding: 2px 0; }
-        .meta-area td:first-child { font-weight: 600; width: 45%; color: var(--text-muted); text-transform: uppercase; font-size: 12px;}
-        .meta-area input { text-align: right; font-weight: 600; font-size: 14px; padding: 2px; }
+        .meta-area { width: 35%; text-align: right; } /* 🌟 บีบฝั่งขวาลงเหลือ 35% (จากเดิม 45%) */
+        .meta-area table { width: 100%; border-spacing: 0 2px; }
+        .meta-area td { vertical-align: middle; padding: 2px 0; }
+        .meta-area td:first-child { font-weight: 600; width: 45%; color: var(--text-muted); text-transform: uppercase; font-size: 12px;}
+        .meta-area input { text-align: right; font-weight: 600; font-size: 14px; padding: 2px; }
 
-        /* ปรับ Margin ของที่อยู่ให้แคบลง */
-        .address-section { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .company-area, .customer-area { width: 48%; }
-        .section-label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; }
-        .company-logo { max-width: 85px; height: auto; margin-bottom: 2px; display: block; }
+        /* ปรับ Margin ของที่อยู่ให้แคบลง */
+        .address-section { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .company-area, .customer-area { width: 48%; }
+        .section-label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; }
+        .company-logo { max-width: 85px; height: auto; margin-bottom: 2px; display: block; }
 
-        /* ปรับตารางให้ชิดขึ้น */
-        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; border-bottom: 2px solid var(--primary-color); }
-        .items-table th { background-color: #fff; color: var(--primary-color); padding: 8px 4px; text-align: left; font-size: 13px; font-weight: 700; border-top: 2px solid var(--primary-color); border-bottom: 2px solid var(--primary-color); }
-        .items-table th.text-center, .items-table td.text-center { text-align: center; }
-        .items-table th.text-right, .items-table td.text-right { text-align: right; }
-        .items-table td { padding: 4px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
-        .row-number { font-weight: 600; color: var(--text-muted); padding-top: 8px !important; font-size: 13px; }
-        
-        .btn { padding: 6px 14px; cursor: pointer; font-family: 'Sarabun'; border: none; border-radius: 4px; font-weight: 600; transition: 0.2s; text-decoration: none; font-size: 13px;}
-        .btn:hover { opacity: 0.9; }
-        .btn-add { background-color: var(--primary-color); color: white; border-radius: 20px; padding: 6px 16px; box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);}
-        .btn-del { background-color: #ef4444; color: white; padding: 2px 8px; font-size: 11px; margin-top: 4px; border-radius: 4px; }
-        
-        .top-controls { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; display: flex; gap: 6px; justify-content: center; align-items: center; background: #1e3a8a; padding: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); box-sizing: border-box; flex-wrap: wrap; }
-        .top-controls .btn { padding: 5px 10px; font-size: 12px; border-radius: 4px; }
-        .btn-dashboard { background-color: #0f172a; color: white; border: 1px solid #334155; }
-        .btn-search-page { background-color: #3b82f6; color: white; border: 1px solid #93c5fd; }
-        .btn-new-doc { background-color: #ec4899; color: white; }
-        .btn-cloud-save { background-color: #10b981; color: white; }
-        .btn-stock { background-color: #f59e0b; color: white; }
-        .btn-save { background-color: #64748b; color: white; }
-        .btn-load { background-color: #8b5cf6; color: white; }
-        .btn-excel { background-color: #14b8a6; color: white; } 
-        .btn-print { background-color: #3b82f6; color: white; }
-        .btn-logout { background-color: #475569; color: white; }
+        /* ปรับตารางให้ชิดขึ้น */
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; border-bottom: 2px solid var(--primary-color); }
+        .items-table th { background-color: #fff; color: var(--primary-color); padding: 8px 4px; text-align: left; font-size: 13px; font-weight: 700; border-top: 2px solid var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+        .items-table th.text-center, .items-table td.text-center { text-align: center; }
+        .items-table th.text-right, .items-table td.text-right { text-align: right; }
+        .items-table td { padding: 4px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+        .row-number { font-weight: 600; color: var(--text-muted); padding-top: 8px !important; font-size: 13px; }
+        
+        .btn { padding: 6px 14px; cursor: pointer; font-family: 'Sarabun'; border: none; border-radius: 4px; font-weight: 600; transition: 0.2s; text-decoration: none; font-size: 13px;}
+        .btn:hover { opacity: 0.9; }
+        .btn-add { background-color: var(--primary-color); color: white; border-radius: 20px; padding: 6px 16px; box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);}
+        .btn-del { background-color: #ef4444; color: white; padding: 2px 8px; font-size: 11px; margin-top: 4px; border-radius: 4px; }
+        
+        .top-controls { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; display: flex; gap: 6px; justify-content: center; align-items: center; background: #1e3a8a; padding: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); box-sizing: border-box; flex-wrap: wrap; }
+        .top-controls .btn { padding: 5px 10px; font-size: 12px; border-radius: 4px; }
+        .btn-dashboard { background-color: #0f172a; color: white; border: 1px solid #334155; }
+        .btn-search-page { background-color: #3b82f6; color: white; border: 1px solid #93c5fd; }
+        .btn-new-doc { background-color: #ec4899; color: white; }
+        .btn-cloud-save { background-color: #10b981; color: white; }
+        .btn-stock { background-color: #f59e0b; color: white; }
+        .btn-save { background-color: #64748b; color: white; }
+        .btn-load { background-color: #8b5cf6; color: white; }
+        .btn-excel { background-color: #14b8a6; color: white; } 
+        .btn-print { background-color: #3b82f6; color: white; }
+        .btn-logout { background-color: #475569; color: white; }
 
-        /* ปรับส่วนสรุปด้านล่างให้แคบลง */
-        .summary-section { display: flex; justify-content: flex-end; margin-bottom: 20px; margin-top: 5px; position: relative; }
-        .summary-table { width: 45%; border-collapse: collapse; }
-        .summary-table td { padding: 4px 8px; font-size: 14px; border-bottom: 1px solid var(--border-color); }
-        .summary-table tr.total td { font-weight: 700; color: var(--primary-color); font-size: 16px; border-bottom: none; border-top: 2px solid var(--primary-color); background-color: #f8fafc; padding: 6px 8px; }
+        /* ปรับส่วนสรุปด้านล่างให้แคบลง */
+        .summary-section { display: flex; justify-content: flex-end; margin-bottom: 20px; margin-top: 5px; position: relative; }
+        .summary-table { width: 45%; border-collapse: collapse; }
+        .summary-table td { padding: 4px 8px; font-size: 14px; border-bottom: 1px solid var(--border-color); }
+        .summary-table tr.total td { font-weight: 700; color: var(--primary-color); font-size: 16px; border-bottom: none; border-top: 2px solid var(--primary-color); background-color: #f8fafc; padding: 6px 8px; }
 
-        /* ขยับลายเซ็นขึ้นมา */
-        .footer-signatures { display: flex; justify-content: space-between; margin-top: 25px; text-align: center; }
-        .signature-box { width: 35%; }
-        .signature-line { border-bottom: 1px solid var(--text-main); margin: 30px auto 6px; width: 100%; }
-        
-        .toggle-box { cursor: pointer; display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 500;}
-        .toggle-box input { width: auto; transform: scale(1); cursor: pointer; margin: 0; }
+        /* ขยับลายเซ็นขึ้นมา */
+        .footer-signatures { display: flex; justify-content: space-between; margin-top: 25px; text-align: center; }
+        .signature-box { width: 35%; }
+        .signature-line { border-bottom: 1px solid var(--text-main); margin: 30px auto 6px; width: 100%; }
+        
+        .toggle-box { cursor: pointer; display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 500;}
+        .toggle-box input { width: auto; transform: scale(1); cursor: pointer; margin: 0; }
 
-        .drag-handle { cursor: grab; color: #cbd5e1; font-size: 16px; padding-top: 8px !important; user-select: none; }
-        .drag-handle:active { cursor: grabbing; color: var(--primary-color); }
-        tr.dragging { opacity: 0.6; background-color: #eff6ff; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .drag-handle { cursor: grab; color: #cbd5e1; font-size: 16px; padding-top: 8px !important; user-select: none; }
+        .drag-handle:active { cursor: grabbing; color: var(--primary-color); }
+        tr.dragging { opacity: 0.6; background-color: #eff6ff; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
 
-        .discount-toggle-btn { background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 4px; padding: 2px 6px; font-size: 11.5px; cursor: pointer; font-family: 'Sarabun'; font-weight: 600; margin-bottom: 4px; float: right; }
-        .discount-toggle-btn:hover { background: #eff6ff; }
+        .discount-toggle-btn { background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 4px; padding: 2px 6px; font-size: 11.5px; cursor: pointer; font-family: 'Sarabun'; font-weight: 600; margin-bottom: 4px; float: right; }
+        .discount-toggle-btn:hover { background: #eff6ff; }
 
-        .sn-container { display: flex; align-items: center; gap: 4px; margin-top: 4px; padding-top: 4px; border-top: 1px dashed #e2e8f0; }
-        .sn-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .sn-input { border: 1px solid transparent; border-bottom: 1px solid var(--border-color) !important; padding: 1px 4px !important; font-size: 11.5px !important; color: var(--accent-color) !important; font-weight: 600; }
-        .btn-scan { background: #e2e8f0; border: none; padding: 2px 5px; border-radius: 3px; cursor: pointer; font-size: 11px; transition: 0.2s; }
-        .btn-scan:hover { background: var(--accent-color); color: white; }
+        .sn-container { display: flex; align-items: center; gap: 4px; margin-top: 4px; padding-top: 4px; border-top: 1px dashed #e2e8f0; }
+        .sn-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        .sn-input { border: 1px solid transparent; border-bottom: 1px solid var(--border-color) !important; padding: 1px 4px !important; font-size: 11.5px !important; color: var(--accent-color) !important; font-weight: 600; }
+        .btn-scan { background: #e2e8f0; border: none; padding: 2px 5px; border-radius: 3px; cursor: pointer; font-size: 11px; transition: 0.2s; }
+        .btn-scan:hover { background: var(--accent-color); color: white; }
 
-        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 10000; display: flex; justify-content: center; align-items: center; }
-        .login-card { background: #fff; padding: 30px 25px; border-radius: 10px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .login-card h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 10px; font-size: 20px; }
-        .login-card input { border: 1px solid var(--border-color); background: #f8fafc; padding: 10px; border-radius: 5px; width: 100%; font-size: 14px; margin-bottom: 12px; font-family: 'Sarabun'; box-sizing: border-box; text-align: center;}
-        .login-card input:focus { border-color: var(--primary-color); background: #fff; outline: none; }
-        .login-card .btn-submit { background: var(--primary-color); color: #fff; width: 100%; padding: 10px; font-size: 15px; border-radius: 5px; font-weight: 700;}
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 10000; display: flex; justify-content: center; align-items: center; }
+        .login-card { background: #fff; padding: 30px 25px; border-radius: 10px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .login-card h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 10px; font-size: 20px; }
+        .login-card input { border: 1px solid var(--border-color); background: #f8fafc; padding: 10px; border-radius: 5px; width: 100%; font-size: 14px; margin-bottom: 12px; font-family: 'Sarabun'; box-sizing: border-box; text-align: center;}
+        .login-card input:focus { border-color: var(--primary-color); background: #fff; outline: none; }
+        .login-card .btn-submit { background: var(--primary-color); color: #fff; width: 100%; padding: 10px; font-size: 15px; border-radius: 5px; font-weight: 700;}
 
-        #scanner-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; }
-        .scanner-box { background: #fff; padding: 15px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
-        #reader { width: 100%; }
+        #scanner-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        .scanner-box { background: #fff; padding: 15px; border-radius: 8px; width: 90%; max-width: 400px; text-align: center; }
+        #reader { width: 100%; }
 
-        @media print {
-            body { background: #fff; padding: 0; }
-            .document-container { width: 100%; height: auto; min-height: auto; box-shadow: none; padding: 0; margin: 0; }
-            .no-print { display: none !important; }
-            
-            input, textarea, select, .doc-title-editable, .sn-input { 
-                border: none !important; 
-                background: transparent !important; 
-                padding: 0 !important; 
-                box-shadow: none !important; 
-                appearance: none; 
-                -webkit-appearance: none; 
-                -moz-appearance: none; 
-                resize: none !important; 
-                line-height: 1.3 !important;
-            }
-            .summary-table tr.total td { background-color: transparent; padding: 4px 8px; }
-            select::-ms-expand { display: none; } 
-            
-            textarea { overflow: visible !important; white-space: pre-wrap !important; }
-            
-            tr { page-break-inside: avoid; }
-            ::-webkit-input-placeholder, ::placeholder { color: transparent !important; }
-            .sn-input:placeholder-shown { display: none !important; }
-            
-            #customer-extra:placeholder-shown { display: none !important; }
-            
-            #login-overlay, #scanner-modal { display: none !important; }
-            .autocomplete-list { display: none !important; }
-        }
-       /* สไตล์สำหรับ Dropdown สลับธีม */
-        .theme-switcher {
-            background-color: #f8fafc;
-            color: #475569;
-            border: 1px solid #cbd5e1 !important;
-            padding: 4px 10px !important;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            width: auto;
-            font-family: 'Sarabun', sans-serif;
-        }
-        .theme-switcher:hover {
-            background-color: #f1f5f9;
-            border-color: #94a3b8 !important;
-        } 
-    </style>
+        @media print {
+            body { background: #fff; padding: 0; }
+            .document-container { width: 100%; height: auto; min-height: auto; box-shadow: none; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            
+            input, textarea, select, .doc-title-editable, .sn-input { 
+                border: none !important; 
+                background: transparent !important; 
+                padding: 0 !important; 
+                box-shadow: none !important; 
+                appearance: none; 
+                -webkit-appearance: none; 
+                -moz-appearance: none; 
+                resize: none !important; 
+                line-height: 1.3 !important;
+            }
+            .summary-table tr.total td { background-color: transparent; padding: 4px 8px; }
+            select::-ms-expand { display: none; } 
+            
+            textarea { overflow: visible !important; white-space: pre-wrap !important; }
+            
+            tr { page-break-inside: avoid; }
+            ::-webkit-input-placeholder, ::placeholder { color: transparent !important; }
+            .sn-input:placeholder-shown { display: none !important; }
+            
+            #customer-extra:placeholder-shown { display: none !important; }
+            
+            #login-overlay, #scanner-modal { display: none !important; }
+            .autocomplete-list { display: none !important; }
+        }
+    </style>
 </head>
 <body>
 
 <div id="scanner-modal" class="no-print">
-    <div class="scanner-box">
-        <h3 style="margin-top:0; color:var(--primary-color);">📷 สแกน S/N</h3>
-        <div id="reader"></div>
-        <button class="btn" style="margin-top: 15px; background: #ef4444; color:white;" onclick="closeScanner()">❌ ยกเลิก</button>
-    </div>
+    <div class="scanner-box">
+        <h3 style="margin-top:0; color:var(--primary-color);">📷 สแกน S/N</h3>
+        <div id="reader"></div>
+        <button class="btn" style="margin-top: 15px; background: #ef4444; color:white;" onclick="closeScanner()">❌ ยกเลิก</button>
+    </div>
 </div>
 
 <div id="login-overlay">
-    <div class="login-card">
-        <h2>JN Electric ERP</h2>
-        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">กรุณาล็อกอินเพื่อเข้าสู่ระบบร้าน</p>
-        <input type="email" id="email-input" placeholder="อีเมลแอดมิน">
-        <input type="password" id="pass-input" placeholder="รหัสผ่านระบบ">
-        <button class="btn btn-submit" onclick="submitSupabaseLogin()">🔓 เข้าสู่ระบบ</button>
-    </div>
+    <div class="login-card">
+        <h2>JN Electric ERP</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">กรุณาล็อกอินเพื่อเข้าสู่ระบบร้าน</p>
+        <input type="email" id="email-input" placeholder="อีเมลแอดมิน">
+        <input type="password" id="pass-input" placeholder="รหัสผ่านระบบ">
+        <button class="btn btn-submit" onclick="submitSupabaseLogin()">🔓 เข้าสู่ระบบ</button>
+    </div>
 </div>
 
 <div class="top-controls no-print" id="controls-panel" style="display: none;">
-    <a href="dashboard.html" class="btn btn-dashboard" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าแดชบอร์ดไหม?')) return false;">📊 แดชบอร์ด</a>
-    <a href="project.html" class="btn btn-stock" style="background-color: #1e3a8a;">📊 บริหารโครงการ</a>
-    <a href="checklist.html" class="btn btn-stock" style="background-color: #8b5cf6;">🛒 เตรียมของ/สั่งซื้อ</a>
-    <button class="btn btn-search-page" onclick="goToSearchPage()">📁 ค้นหา/ประวัติ</button>
-    <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
-    <button class="btn btn-load" style="background-color: #8b5cf6;" onclick="duplicateDocument()">📋 Copy เอกสาร</button>
-    <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึกข้อมูล</button>
-    <a href="stock.html" class="btn btn-stock" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าคลังสินค้าไหม?')) return false;">📦 คลังสินค้า</a>
-    
-    <button class="btn btn-save" onclick="saveData()">💾 เซฟ (JSON)</button>
-    <button class="btn btn-load" onclick="document.getElementById('file-input').click()">📂 เปิดไฟล์</button>
-    <input type="file" id="file-input" accept=".json" style="display: none;" onchange="loadData(event)">
-    <!-- ... ปุ่มเมนูอื่นๆ ก่อนหน้า ... -->
-    <a href="stock.html" class="btn btn-stock" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าคลังสินค้าไหม?')) return false;">📦 สต็อก</a>
-    
-    <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 4px;"></div>
-    
-    <!-- 🌟 โค้ดเพิ่มใหม่: Dropdown เลือกธีม -->
-    <select class="btn theme-switcher" id="themeSelector" onchange="switchTheme(this.value)">
-        <option value="index.html">🎨 ธีม: คลาสสิก</option>
-        <option value="index-modern.html">🎨 ธีม: โมเดิร์น SaaS</option>
-    </select>
-    
-    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel</button>
-    <!-- ... ปุ่ม Print และ ออกระบบ ... -->
-    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel</button>
-    <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์</button>
-    <button class="btn btn-logout" onclick="logoutSupabase()">🚪 ออกระบบ</button>
+    <a href="dashboard.html" class="btn btn-dashboard" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าแดชบอร์ดไหม?')) return false;">📊 แดชบอร์ด</a>
+    <a href="project.html" class="btn btn-stock" style="background-color: #1e3a8a;">📊 บริหารโครงการ</a>
+    <a href="checklist.html" class="btn btn-stock" style="background-color: #8b5cf6;">🛒 เตรียมของ/สั่งซื้อ</a>
+    <button class="btn btn-search-page" onclick="goToSearchPage()">📁 ค้นหา/ประวัติ</button>
+    <button class="btn btn-new-doc" onclick="createNewDocument()">✨ ทำใบใหม่</button>
+    <button class="btn btn-load" style="background-color: #8b5cf6;" onclick="duplicateDocument()">📋 Copy เอกสาร</button>
+    <button class="btn btn-cloud-save" onclick="saveToSupabase()" id="btnSave">☁️ บันทึกข้อมูล</button>
+    <a href="stock.html" class="btn btn-stock" onclick="if(isDirty && !confirm('มีข้อมูลยังไม่ได้บันทึก ต้องการไปหน้าคลังสินค้าไหม?')) return false;">📦 คลังสินค้า</a>
+    
+    <button class="btn btn-save" onclick="saveData()">💾 เซฟ (JSON)</button>
+    <button class="btn btn-load" onclick="document.getElementById('file-input').click()">📂 เปิดไฟล์</button>
+    <input type="file" id="file-input" accept=".json" style="display: none;" onchange="loadData(event)">
+    <button class="btn btn-excel" onclick="exportToExcel()">📊 Excel</button>
+    <button class="btn btn-print" onclick="window.print()">🖨️ พิมพ์</button>
+    <button class="btn btn-logout" onclick="logoutSupabase()">🚪 ออกระบบ</button>
 </div>
 
 <div class="document-container" id="main-app" style="display: none;">
-    <div class="top-section">
-        <div class="title-area">
-            <select class="doc-title-editable" id="docType" onchange="handleDocTypeChange()">
-                <option value="ใบเสนอราคา">ใบเสนอราคา</option>
-                <option value="ใบส่งงาน">ใบส่งงาน</option>
-                <option value="ใบแจ้งหนี้/ใบส่งสินค้า">ใบแจ้งหนี้/ใบส่งสินค้า</option>
-                <option value="ใบส่งสินค้า">ใบส่งสินค้า</option>
-                <option value="ใบแจ้งหนี้">ใบแจ้งหนี้</option>
-                <option value="ใบเสร็จรับเงิน">ใบเสร็จรับเงิน</option>
-                <option value="CUSTOM_DOC">✏️ กำหนดชื่อเอง...</option>
-            </select><br>
-            <input type="text" id="docSubTitle" style="text-align: left; font-weight: 600; border:none; color:var(--text-muted); font-size: 15px; padding: 0;" value="(QUOTATION)">
-        </div>
-        <div class="meta-area">
-            <table>
-                <tr>
-                    <td>เลขที่เอกสาร (NO.)</td>
-                    <td><input type="text" id="doc-num" value="" style="color: var(--primary-color);"></td>
-                </tr>
-                <tr>
-                    <td>วันที่ (DATE)</td>
-                    <td>
-                        <input type="text" id="doc-date" value="" placeholder="ระบุวันที่">
-                        <label class="toggle-box no-print"><input type="checkbox" id="blank-date" onchange="toggleDate()"> เว้นว่าง</label>
-                    </td>
-                </tr>
-                <tr>
-                    <td>ครบกำหนด (DUE DATE)</td>
-                    <td><input type="text" id="due-date" value="" placeholder="ปล่อยว่างได้"></td>
-                </tr>
-            </table>
-        </div>
-    </div>
+    <div class="top-section">
+        <div class="title-area">
+            <select class="doc-title-editable" id="docType" onchange="handleDocTypeChange()">
+                <option value="ใบเสนอราคา">ใบเสนอราคา</option>
+                <option value="ใบส่งงาน">ใบส่งงาน</option>
+                <option value="ใบแจ้งหนี้/ใบส่งสินค้า">ใบแจ้งหนี้/ใบส่งสินค้า</option>
+                <option value="ใบส่งสินค้า">ใบส่งสินค้า</option>
+                <option value="ใบแจ้งหนี้">ใบแจ้งหนี้</option>
+                <option value="ใบเสร็จรับเงิน">ใบเสร็จรับเงิน</option>
+                <option value="CUSTOM_DOC">✏️ กำหนดชื่อเอง...</option>
+            </select><br>
+            <input type="text" id="docSubTitle" style="text-align: left; font-weight: 600; border:none; color:var(--text-muted); font-size: 15px; padding: 0;" value="(QUOTATION)">
+        </div>
+        <div class="meta-area">
+            <table>
+                <tr>
+                    <td>เลขที่เอกสาร (NO.)</td>
+                    <td><input type="text" id="doc-num" value="" style="color: var(--primary-color);"></td>
+                </tr>
+                <tr>
+                    <td>วันที่ (DATE)</td>
+                    <td>
+                        <input type="text" id="doc-date" value="" placeholder="ระบุวันที่">
+                        <label class="toggle-box no-print"><input type="checkbox" id="blank-date" onchange="toggleDate()"> เว้นว่าง</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>ครบกำหนด (DUE DATE)</td>
+                    <td><input type="text" id="due-date" value="" placeholder="ปล่อยว่างได้"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
-    <div class="address-section">
-        <div class="company-area">
-            <div class="section-label">ผู้ออกเอกสาร (FROM)</div>
-            <img src="logo.png" alt="JN Electric Logo" class="company-logo" onerror="this.style.display='none'">
-            <!-- แยกชื่อบริษัทออกมาทำตัวหนาและเน้นสี -->
-            <input type="text" value="เจเอนอิเล็กทริกแอนด์เทคโนโลยี" style="font-weight: 700; font-size: 16px; color: var(--primary-color); padding-left: 0; margin-bottom: 2px;">
-            <!-- ที่อยู่และเบอร์โทรให้อยู่ใน textarea เหมือนเดิม แต่ลดเหลือ 3 บรรทัด -->
-            <textarea rows="3" style="color: var(--text-muted); padding-left: 0;">101/1 ม.1 ต.หนองนาคำ อ.เมือง&#10;จ.อุดรธานี 41000&#10;โทร: 083-417-5143 | Line: apisit2311</textarea>
-        </div>
-        <div class="customer-area">
-            <div class="section-label">ลูกค้า (BILL TO)</div>
-            <input type="text" id="customer-name" value="บริษัท ลูกค้าองค์กร จำกัด" style="font-weight: 700; font-size: 16px; padding-left: 0;">
-            <textarea id="customer-address" rows="3" style="padding-left: 0; margin-bottom: 0;">ที่อยู่</textarea>
-            <textarea id="customer-extra" rows="2" placeholder="เลขประจำตัวผู้เสียภาษี / สาขา / โครงการ..." style="font-weight: 700; padding-left: 0; border-top: 1px dashed var(--border-color);"></textarea>
-        </div>
-    </div>
+    <div class="address-section">
+        <div class="company-area">
+            <div class="section-label">ผู้ออกเอกสาร (FROM)</div>
+            <img src="logo.png" alt="JN Electric Logo" class="company-logo" onerror="this.style.display='none'">
+            <!-- แยกชื่อบริษัทออกมาทำตัวหนาและเน้นสี -->
+            <input type="text" value="เจเอนอิเล็กทริกแอนด์เทคโนโลยี" style="font-weight: 700; font-size: 16px; color: var(--primary-color); padding-left: 0; margin-bottom: 2px;">
+            <!-- ที่อยู่และเบอร์โทรให้อยู่ใน textarea เหมือนเดิม แต่ลดเหลือ 3 บรรทัด -->
+            <textarea rows="3" style="color: var(--text-muted); padding-left: 0;">101/1 ม.1 ต.หนองนาคำ อ.เมือง&#10;จ.อุดรธานี 41000&#10;โทร: 083-417-5143 | Line: apisit2311</textarea>
+        </div>
+        <div class="customer-area">
+            <div class="section-label">ลูกค้า (BILL TO)</div>
+            <input type="text" id="customer-name" value="บริษัท ลูกค้าองค์กร จำกัด" style="font-weight: 700; font-size: 16px; padding-left: 0;">
+            <textarea id="customer-address" rows="3" style="padding-left: 0; margin-bottom: 0;">ที่อยู่</textarea>
+            <textarea id="customer-extra" rows="2" placeholder="เลขประจำตัวผู้เสียภาษี / สาขา / โครงการ..." style="font-weight: 700; padding-left: 0; border-top: 1px dashed var(--border-color);"></textarea>
+        </div>
+    </div>
 
-    <table class="items-table" id="invoice-table">
-        <thead>
-             <tr>
-                <th class="no-print text-center" style="width: 2%;"></th>
-                <th class="no-print text-center" style="width: 4%;">ลบ</th>
-                <th class="text-center" style="width: 5%;">ลำดับ</th>
-                <th style="width: 49%;">รายการ</th> 
-                <th class="text-center" style="width: 8%;">จำนวน</th>
-                <th class="text-center" style="width: 10%;">หน่วย</th> 
-                <th class="text-right" style="width: 10%;">ราคา/หน่วย</th>
-                <th class="text-right" style="width: 12%;">จำนวนเงิน</th>
-            </tr>
-        </thead>
-        <tbody id="items-body"></tbody>
-    </table>
-    
-    <button class="btn btn-add no-print" onclick="addRow()">+ เพิ่มรายการ</button>
+    <table class="items-table" id="invoice-table">
+        <thead>
+             <tr>
+                <th class="no-print text-center" style="width: 2%;"></th>
+                <th class="no-print text-center" style="width: 4%;">ลบ</th>
+                <th class="text-center" style="width: 5%;">ลำดับ</th>
+                <th style="width: 49%;">รายการ</th> 
+                <th class="text-center" style="width: 8%;">จำนวน</th>
+                <th class="text-center" style="width: 10%;">หน่วย</th> 
+                <th class="text-right" style="width: 10%;">ราคา/หน่วย</th>
+                <th class="text-right" style="width: 12%;">จำนวนเงิน</th>
+            </tr>
+        </thead>
+        <tbody id="items-body"></tbody>
+    </table>
+    
+    <button class="btn btn-add no-print" onclick="addRow()">+ เพิ่มรายการ</button>
 
-    <div class="summary-section" style="flex-direction: column; align-items: flex-end;">
-        <div class="no-print" style="width: 50%; text-align: right;">
-            <button type="button" class="discount-toggle-btn" id="btn-toggle-discount" onclick="toggleDiscountRow()">- ส่วนลด</button>
-        </div>
-        <table class="summary-table">
-            <tr>
-                <td style="color: var(--text-muted);">รวมเป็นเงิน (SUBTOTAL)</td>
-                <td class="text-right" id="subtotal">0.00</td>
-            </tr>
-            <tr id="discount-row" style="display:none;">
-                <td>
-                    <input type="text" id="discount-label" value="ส่วนลด (DISCOUNT)" style="color: var(--text-muted); font-size: 14px; padding:0;">
-                </td>
-                <td class="text-right" style="padding: 2px 4px;">
-                    <input type="number" id="discount-val" value="0" min="0" oninput="calculateTotal()" style="text-align: right; font-weight: 600; color: #ef4444; width: 100%; font-size: 14px;">
-                </td>
-            </tr>
-            <tr class="total">
-                <td>ยอดชำระสุทธิ (TOTAL)</td>
-                <td class="text-right" id="grand-total">0.00</td>
-            </tr>
-        </table>
-    </div>
+    <div class="summary-section" style="flex-direction: column; align-items: flex-end;">
+        <div class="no-print" style="width: 50%; text-align: right;">
+            <button type="button" class="discount-toggle-btn" id="btn-toggle-discount" onclick="toggleDiscountRow()">- ส่วนลด</button>
+        </div>
+        <table class="summary-table">
+            <tr>
+                <td style="color: var(--text-muted);">รวมเป็นเงิน (SUBTOTAL)</td>
+                <td class="text-right" id="subtotal">0.00</td>
+            </tr>
+            <tr id="discount-row" style="display:none;">
+                <td>
+                    <input type="text" id="discount-label" value="ส่วนลด (DISCOUNT)" style="color: var(--text-muted); font-size: 14px; padding:0;">
+                </td>
+                <td class="text-right" style="padding: 2px 4px;">
+                    <input type="number" id="discount-val" value="0" min="0" oninput="calculateTotal()" style="text-align: right; font-weight: 600; color: #ef4444; width: 100%; font-size: 14px;">
+                </td>
+            </tr>
+            <tr class="total">
+                <td>ยอดชำระสุทธิ (TOTAL)</td>
+                <td class="text-right" id="grand-total">0.00</td>
+            </tr>
+        </table>
+    </div>
 
-    <div class="footer-signatures">
-        <div class="signature-box">
-            <div class="signature-line"></div>
-            <input type="text" id="sig-left" value="ผู้อนุมัติสั่งซื้อ" style="text-align: center; font-weight: 600; font-size: 14px;">
-            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 12px;">
-        </div>
-        <div class="signature-box">
-            <div class="signature-line"></div>
-            <input type="text" id="sig-right" value="ผู้เสนอราคา" style="text-align: center; font-weight: 600; font-size: 14px;">
-            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 12px;">
-        </div>
-    </div>
+    <div class="footer-signatures">
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <input type="text" id="sig-left" value="ผู้อนุมัติสั่งซื้อ" style="text-align: center; font-weight: 600; font-size: 14px;">
+            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 12px;">
+        </div>
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <input type="text" id="sig-right" value="ผู้เสนอราคา" style="text-align: center; font-weight: 600; font-size: 14px;">
+            <input type="text" value="วันที่ _____/_____/_____" style="text-align: center; color: var(--text-muted); font-size: 12px;">
+        </div>
+    </div>
 </div>
 
 <script>
-    const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let isDirty = false;
-    let globalProducts = [];
-    let currentDocId = null; 
-    let currentProjectId = null; 
+    let isDirty = false;
+    let globalProducts = [];
+    let currentDocId = null; 
+    let currentProjectId = null; 
 
-    const unitDropdownHTML = `
-        <select class="unit-select text-center" onchange="markDirty(); checkCustomUnit(this)">
-            <option value="ตัว">ตัว</option><option value="ชิ้น">ชิ้น</option><option value="ชุด">ชุด</option>
-            <option value="เครื่อง">เครื่อง</option><option value="ม้วน">ม้วน</option><option value="เมตร">เมตร</option>
-            <option value="งาน">งาน</option><option value="จุด">จุด</option><option value="เหมา">เหมา</option>
-            <option value="CUSTOM_UNIT">++ เพิ่มหน่วยเอง ++</option>
-        </select>
-    `;
+    const unitDropdownHTML = `
+        <select class="unit-select text-center" onchange="markDirty(); checkCustomUnit(this)">
+            <option value="ตัว">ตัว</option><option value="ชิ้น">ชิ้น</option><option value="ชุด">ชุด</option>
+            <option value="เครื่อง">เครื่อง</option><option value="ม้วน">ม้วน</option><option value="เมตร">เมตร</option>
+            <option value="งาน">งาน</option><option value="จุด">จุด</option><option value="เหมา">เหมา</option>
+            <option value="CUSTOM_UNIT">++ เพิ่มหน่วยเอง ++</option>
+        </select>
+    `;
 
-    window.onload = async () => {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-            document.getElementById("login-overlay").style.display = "none";
-            document.getElementById("controls-panel").style.display = "flex";
-            document.getElementById("main-app").style.display = "block";
-            
-            await fetchProducts(); 
-            initializeDoc();
-        }
+    window.onload = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            document.getElementById("login-overlay").style.display = "none";
+            document.getElementById("controls-panel").style.display = "flex";
+            document.getElementById("main-app").style.display = "block";
+            
+            await fetchProducts(); 
+            initializeDoc();
+        }
 
-        document.getElementById("pass-input").addEventListener("keypress", function(e){
-            if(e.key === "Enter") submitSupabaseLogin();
-        });
-    };
+        document.getElementById("pass-input").addEventListener("keypress", function(e){
+            if(e.key === "Enter") submitSupabaseLogin();
+        });
+    };
 
-   function initializeDoc() {
-        // 🌟 1. เช็กข้อมูลที่ส่งมาจากปุ่มสลับธีมหรือคลาวด์ก่อนเป็นอันดับแรกสุด!
-        const pendingDoc = localStorage.getItem("jn_selected_cloud_doc");
-        if (pendingDoc) {
-            try {
-                const cloudData = JSON.parse(pendingDoc);
-                localStorage.removeItem("jn_selected_cloud_doc");
-                loadSelectedDoc(cloudData);
-                isDirty = true; // คงสถานะว่ามีข้อมูลยังไม่ได้เซฟไว้
-                return; // หยุดการทำงานส่วนอื่น เพื่อไม่ให้ค่าเริ่มต้นมาทับข้อมูลเก่า
-            } catch(e) {}
-        }
+    function initializeDoc() {
+        document.getElementById('doc-date').value = getTodayThai();
+        document.getElementById('docType').value = "ใบเสนอราคา";
+        updateDocTypeSync(true); 
+        
+        const pendingDoc = localStorage.getItem("jn_selected_cloud_doc");
+        if (pendingDoc) {
+            try {
+                const cloudData = JSON.parse(pendingDoc);
+                localStorage.removeItem("jn_selected_cloud_doc");
+                loadSelectedDoc(cloudData);
+                return;
+            } catch(e) {}
+        }
+        
+        if(document.getElementById('items-body').children.length === 0) addRow();
+        calculateTotal();
+        isDirty = false;
+        document.getElementById('customer-name').addEventListener('input', markDirty);
+        document.getElementById('customer-address').addEventListener('input', markDirty);
+        document.getElementById('customer-extra').addEventListener('input', markDirty);
+    }
 
-        // 2. ถ้าไม่มีข้อมูลค้างอยู่ ถึงค่อยเริ่มสร้างบิลใหม่ตามปกติ
-        document.getElementById('doc-date').value = getTodayThai();
-        document.getElementById('docType').value = "ใบเสนอราคา";
-        updateDocTypeSync(true); 
-        
-        if(document.getElementById('items-body').children.length === 0) addRow();
-        calculateTotal();
-        isDirty = false;
-        
-        document.getElementById('customer-name').addEventListener('input', markDirty);
-        document.getElementById('customer-address').addEventListener('input', markDirty);
-        document.getElementById('customer-extra').addEventListener('input', markDirty);
-    }
-    async function fetchProducts() {
-        const { data } = await supabaseClient.from('products').select('*');
-        if (data) {
-            globalProducts = data;
-        }
-    }
+    async function fetchProducts() {
+        const { data } = await supabaseClient.from('products').select('*');
+        if (data) {
+            globalProducts = data;
+        }
+    }
 
-    function handleCustomAutocomplete(textarea) {
-        const wrapper = textarea.closest('.autocomplete-wrapper');
-        const listEl = wrapper.querySelector('.autocomplete-list');
-        const row = textarea.closest('tr');
-        
-        const lines = textarea.value.split('\n');
-        const searchWord = lines[0].trim().toLowerCase();
-        
-        if (!searchWord) {
-            listEl.style.display = 'none';
-            row.removeAttribute('data-product-id');
-            return;
-        }
+    function handleCustomAutocomplete(textarea) {
+        const wrapper = textarea.closest('.autocomplete-wrapper');
+        const listEl = wrapper.querySelector('.autocomplete-list');
+        const row = textarea.closest('tr');
+        
+        const lines = textarea.value.split('\n');
+        const searchWord = lines[0].trim().toLowerCase();
+        
+        if (!searchWord) {
+            listEl.style.display = 'none';
+            row.removeAttribute('data-product-id');
+            return;
+        }
 
-        const filtered = globalProducts.filter(p => {
-            const pName = (p.product_name || '').toLowerCase();
-            const pCode = (p.product_code || '').toLowerCase();
-            return pName.includes(searchWord) || pCode.includes(searchWord);
-        });
+        const filtered = globalProducts.filter(p => {
+            const pName = (p.product_name || '').toLowerCase();
+            const pCode = (p.product_code || '').toLowerCase();
+            return pName.includes(searchWord) || pCode.includes(searchWord);
+        });
 
-        const exactMatch = globalProducts.find(p => (p.product_name || '').toLowerCase() === searchWord);
-        if (exactMatch) {
-            row.setAttribute('data-product-id', exactMatch.id);
-        } else {
-            row.removeAttribute('data-product-id');
-        }
+        const exactMatch = globalProducts.find(p => (p.product_name || '').toLowerCase() === searchWord);
+        if (exactMatch) {
+            row.setAttribute('data-product-id', exactMatch.id);
+        } else {
+            row.removeAttribute('data-product-id');
+        }
 
-        if (filtered.length === 0) {
-            listEl.style.display = 'none';
-            return;
-        }
+        if (filtered.length === 0) {
+            listEl.style.display = 'none';
+            return;
+        }
 
-        listEl.innerHTML = '';
-        filtered.forEach(p => {
-            const item = document.createElement('div');
-            item.innerHTML = `<strong style="color:var(--primary-color);">[${p.product_code || '-'}]</strong> ${p.product_name} <span style="color:#10b981; float:right; font-weight:bold;">${p.price || 0}.-</span>`;
-            
-            item.onmousedown = function(e) { 
-                e.preventDefault(); 
-                applySelectedProduct(textarea, p);
-            };
-            listEl.appendChild(item);
-        });
-        listEl.style.display = 'block';
-    }
+        listEl.innerHTML = '';
+        filtered.forEach(p => {
+            const item = document.createElement('div');
+            item.innerHTML = `<strong style="color:var(--primary-color);">[${p.product_code || '-'}]</strong> ${p.product_name} <span style="color:#10b981; float:right; font-weight:bold;">${p.price || 0}.-</span>`;
+            
+            item.onmousedown = function(e) { 
+                e.preventDefault(); 
+                applySelectedProduct(textarea, p);
+            };
+            listEl.appendChild(item);
+        });
+        listEl.style.display = 'block';
+    }
 
-    function closeAutocomplete(textarea) {
-        const wrapper = textarea.closest('.autocomplete-wrapper');
-        if(wrapper) {
-            const listEl = wrapper.querySelector('.autocomplete-list');
-            if(listEl) listEl.style.display = 'none';
-        }
-    }
+    function closeAutocomplete(textarea) {
+        const wrapper = textarea.closest('.autocomplete-wrapper');
+        if(wrapper) {
+            const listEl = wrapper.querySelector('.autocomplete-list');
+            if(listEl) listEl.style.display = 'none';
+        }
+    }
 
-    function applySelectedProduct(textarea, product) {
-        const row = textarea.closest('tr');
-        
-        const lines = textarea.value.split('\n');
-        lines[0] = product.product_name;
-        textarea.value = lines.join('\n');
-        
-        row.querySelector('.price').value = product.price;
-        const unitSelect = row.querySelector('.unit-select');
-        let optionExists = Array.from(unitSelect.options).some(opt => opt.value === product.unit);
-        if(!optionExists) {
-            const newOpt = document.createElement('option');
-            newOpt.value = product.unit; newOpt.innerText = product.unit;
-            unitSelect.insertBefore(newOpt, unitSelect.options[unitSelect.options.length - 1]);
-        }
-        unitSelect.value = product.unit;
-        row.setAttribute('data-product-id', product.id); 
-        
-        autoResizeTextarea(textarea);
-        calculateTotal();
-        markDirty();
-        closeAutocomplete(textarea);
-    }
+    function applySelectedProduct(textarea, product) {
+        const row = textarea.closest('tr');
+        
+        const lines = textarea.value.split('\n');
+        lines[0] = product.product_name;
+        textarea.value = lines.join('\n');
+        
+        row.querySelector('.price').value = product.price;
+        const unitSelect = row.querySelector('.unit-select');
+        let optionExists = Array.from(unitSelect.options).some(opt => opt.value === product.unit);
+        if(!optionExists) {
+            const newOpt = document.createElement('option');
+            newOpt.value = product.unit; newOpt.innerText = product.unit;
+            unitSelect.insertBefore(newOpt, unitSelect.options[unitSelect.options.length - 1]);
+        }
+        unitSelect.value = product.unit;
+        row.setAttribute('data-product-id', product.id); 
+        
+        autoResizeTextarea(textarea);
+        calculateTotal();
+        markDirty();
+        closeAutocomplete(textarea);
+    }
 
-    async function submitSupabaseLogin() {
-        const email = document.getElementById('email-input').value;
-        const pass = document.getElementById('pass-input').value;
-        const btn = document.querySelector('.btn-submit');
-        if(!email || !pass) { alert("กรุณากรอกอีเมลและรหัสผ่านครับ!"); return; }
-        
-        btn.innerText = "กำลังตรวจสอบ...";
-        const { error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
-        if (error) {
-            btn.innerText = "🔓 เข้าสู่ระบบ";
-            alert("❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง");
-        } else {
-            window.location.reload();
-        }
-    }
-    async function logoutSupabase() {
-        if(isDirty && !confirm("มีงานยังไม่ได้บันทึก ต้องการออกจากระบบใช่ไหม?")) return;
-        await supabaseClient.auth.signOut();
-        window.location.reload();
-    }
+    async function submitSupabaseLogin() {
+        const email = document.getElementById('email-input').value;
+        const pass = document.getElementById('pass-input').value;
+        const btn = document.querySelector('.btn-submit');
+        if(!email || !pass) { alert("กรุณากรอกอีเมลและรหัสผ่านครับ!"); return; }
+        
+        btn.innerText = "กำลังตรวจสอบ...";
+        const { error } = await supabaseClient.auth.signInWithPassword({ email: email, password: pass });
+        if (error) {
+            btn.innerText = "🔓 เข้าสู่ระบบ";
+            alert("❌ อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+        } else {
+            window.location.reload();
+        }
+    }
+    async function logoutSupabase() {
+        if(isDirty && !confirm("มีงานยังไม่ได้บันทึก ต้องการออกจากระบบใช่ไหม?")) return;
+        await supabaseClient.auth.signOut();
+        window.location.reload();
+    }
 
-    function markDirty() { isDirty = true; }
-    function goToSearchPage() {
-        if (isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการเปลี่ยนหน้าใช่หรือไม่?")) return;
-        window.location.href = "search.html"; 
-    }
+    function markDirty() { isDirty = true; }
+    function goToSearchPage() {
+        if (isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการเปลี่ยนหน้าใช่หรือไม่?")) return;
+        window.location.href = "search.html"; 
+    }
 
-    function fetchNextDocNumber() {
-        const docText = document.getElementById('docType').value;
-        let prefix = "QUO"; 
-        if (docText.includes("เสนอราคา")) prefix = "QUO"; 
-        else if (docText.includes("ส่งงาน") || docText.includes("ตรวจรับ")) prefix = "JOB"; 
-        else if (docText.includes("รับเงิน") || docText.includes("เสร็จ")) prefix = "REC"; 
-        else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) prefix = "DLV";
-        else prefix = "INV";
+    function fetchNextDocNumber() {
+        const docText = document.getElementById('docType').value;
+        let prefix = "QUO"; 
+        if (docText.includes("เสนอราคา")) prefix = "QUO"; 
+        else if (docText.includes("ส่งงาน") || docText.includes("ตรวจรับ")) prefix = "JOB"; 
+        else if (docText.includes("รับเงิน") || docText.includes("เสร็จ")) prefix = "REC"; 
+        else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) prefix = "DLV";
+        else prefix = "INV";
 
-        const currentNum = document.getElementById('doc-num').value;
-        
-        if (currentNum && currentNum.includes('-')) {
-            const parts = currentNum.split('-');
-            parts[0] = prefix;
-            document.getElementById('doc-num').value = parts.join('-');
-        } else {
-            const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
-            const randomStr = Math.floor(100 + Math.random() * 900); 
-            document.getElementById('doc-num').value = `${prefix}-${dateStr}-${randomStr}`;
-        }
-    }
+        const currentNum = document.getElementById('doc-num').value;
+        
+        if (currentNum && currentNum.includes('-')) {
+            const parts = currentNum.split('-');
+            parts[0] = prefix;
+            document.getElementById('doc-num').value = parts.join('-');
+        } else {
+            const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+            const randomStr = Math.floor(100 + Math.random() * 900); 
+            document.getElementById('doc-num').value = `${prefix}-${dateStr}-${randomStr}`;
+        }
+    }
 
-    function createNewDocument() {
-        if(isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการล้างหน้าจอหรือไม่?")) return;
-        currentDocId = null; 
-        currentProjectId = null; 
-        
-        document.getElementById('customer-name').value = "";
-        document.getElementById('customer-address').value = "";
-        document.getElementById('customer-extra').value = "";
-        document.getElementById('due-date').value = "";
-        document.getElementById('blank-date').checked = false;
-        document.getElementById('doc-date').value = getTodayThai();
-        
-        document.getElementById('discount-val').value = 0;
-        document.getElementById('discount-row').style.display = "none";
-        document.getElementById('btn-toggle-discount').innerText = "+ เพิ่มส่วนลด";
-        
-        document.getElementById('items-body').innerHTML = '';
-        addRow();
-        calculateTotal();
-        isDirty = false;
-        
-        document.getElementById('doc-num').value = "";
-        fetchNextDocNumber();
-    }
+    function createNewDocument() {
+        if(isDirty && !confirm("⚠️ คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการล้างหน้าจอหรือไม่?")) return;
+        currentDocId = null; 
+        currentProjectId = null; 
+        
+        document.getElementById('customer-name').value = "";
+        document.getElementById('customer-address').value = "";
+        document.getElementById('customer-extra').value = "";
+        document.getElementById('due-date').value = "";
+        document.getElementById('blank-date').checked = false;
+        document.getElementById('doc-date').value = getTodayThai();
+        
+        document.getElementById('discount-val').value = 0;
+        document.getElementById('discount-row').style.display = "none";
+        document.getElementById('btn-toggle-discount').innerText = "+ เพิ่มส่วนลด";
+        
+        document.getElementById('items-body').innerHTML = '';
+        addRow();
+        calculateTotal();
+        isDirty = false;
+        
+        document.getElementById('doc-num').value = "";
+        fetchNextDocNumber();
+    }
 
-    function duplicateDocument() {
-        if (!currentDocId) {
-            alert("ตอนนี้คุณกำลังอยู่ในโหมด 'สร้างเอกสารใหม่' อยู่แล้วครับ!\nสามารถเปลี่ยนประเภทเอกสารด้านบนซ้ายได้เลย");
-            return;
-        }
-        
-        if (!confirm("ต้องการนำข้อมูลทั้งหมดนี้ ไปสร้างเป็น 'เอกสารใบใหม่' ใช่หรือไม่?\n(เอกสารใบเก่าจะยังถูกเก็บไว้ในประวัติ ไม่ถูกลบทับ)")) {
-            return;
-        }
-        
-        currentDocId = null; 
-        document.getElementById('doc-date').value = getTodayThai(); 
-        
-        alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
-    }
+    function duplicateDocument() {
+        if (!currentDocId) {
+            alert("ตอนนี้คุณกำลังอยู่ในโหมด 'สร้างเอกสารใหม่' อยู่แล้วครับ!\nสามารถเปลี่ยนประเภทเอกสารด้านบนซ้ายได้เลย");
+            return;
+        }
+        
+        if (!confirm("ต้องการนำข้อมูลทั้งหมดนี้ ไปสร้างเป็น 'เอกสารใบใหม่' ใช่หรือไม่?\n(เอกสารใบเก่าจะยังถูกเก็บไว้ในประวัติ ไม่ถูกลบทับ)")) {
+            return;
+        }
+        
+        currentDocId = null; 
+        document.getElementById('doc-date').value = getTodayThai(); 
+        
+        alert("✅ คัดลอกข้อมูลสำเร็จ!\n\n1. เปลี่ยนประเภทเอกสารด้านซ้ายบน (เช่น เปลี่ยนเป็นใบส่งงาน)\n2. ระบบจะรันเลขบิลใหม่ให้อัตโนมัติ\n3. จัดการแก้ไขรายการสินค้า แล้วกดปุ่มบันทึกลง Supabase ได้เลยครับ!");
+    }
 
-    async function saveToSupabase() {
-        const btnSave = document.getElementById('btnSave');
-        const docNum = document.getElementById('doc-num').value;
-        if(!docNum) { alert("กรุณาระบุเลขที่เอกสารก่อนบันทึกครับ"); return; }
-        
-        btnSave.innerText = "กำลังตรวจสอบสต็อก..."; btnSave.disabled = true;
+    async function saveToSupabase() {
+        const btnSave = document.getElementById('btnSave');
+        const docNum = document.getElementById('doc-num').value;
+        if(!docNum) { alert("กรุณาระบุเลขที่เอกสารก่อนบันทึกครับ"); return; }
+        
+        btnSave.innerText = "กำลังตรวจสอบสต็อก..."; btnSave.disabled = true;
 
-        try {
-            const docType = document.getElementById('docType').value;
-            const docDate = document.getElementById('doc-date').value;
-            const dueDate = document.getElementById('due-date').value;
-            const customerName = document.getElementById('customer-name').value;
-            const customerAddress = document.getElementById('customer-address').value;
-            
-            const subtotal = parseFloat(document.getElementById('subtotal').innerText.replace(/,/g, '')) || 0;
-            const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
-            const discount = isDiscountVisible ? (parseFloat(document.getElementById('discount-val').value) || 0) : 0;
-            const grandTotal = parseFloat(document.getElementById('grand-total').innerText.replace(/,/g, '')) || 0;
+        try {
+            const docType = document.getElementById('docType').value;
+            const docDate = document.getElementById('doc-date').value;
+            const dueDate = document.getElementById('due-date').value;
+            const customerName = document.getElementById('customer-name').value;
+            const customerAddress = document.getElementById('customer-address').value;
+            
+            const subtotal = parseFloat(document.getElementById('subtotal').innerText.replace(/,/g, '')) || 0;
+            const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
+            const discount = isDiscountVisible ? (parseFloat(document.getElementById('discount-val').value) || 0) : 0;
+            const grandTotal = parseFloat(document.getElementById('grand-total').innerText.replace(/,/g, '')) || 0;
 
-            const rows = document.querySelectorAll('#items-body tr');
-            if(rows.length === 0) throw new Error("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ");
+            const rows = document.querySelectorAll('#items-body tr');
+            if(rows.length === 0) throw new Error("กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ");
 
-            const cutStockTypes = ['ใบส่งงาน', 'ใบแจ้งหนี้/ใบส่งสินค้า', 'ใบส่งสินค้า', 'ใบแจ้งหนี้', 'ใบเสร็จรับเงิน'];
-            const shouldCutStock = cutStockTypes.includes(docType);
+            const cutStockTypes = ['ใบส่งงาน', 'ใบแจ้งหนี้/ใบส่งสินค้า', 'ใบส่งสินค้า', 'ใบแจ้งหนี้', 'ใบเสร็จรับเงิน'];
+            const shouldCutStock = cutStockTypes.includes(docType);
 
-            if (shouldCutStock) {
-                for (let row of rows) {
-                    const textarea = row.querySelector('.item-desc');
-                    const desc = textarea ? textarea.value.split('\n')[0].trim() : ''; 
-                    const qtyToSell = parseFloat(row.querySelector('.qty').value) || 0;
-                    
-                    if (desc && qtyToSell > 0) {
-                        let p = globalProducts.find(x => x.product_name === desc);
-                        if (p) {
-                            const { data: liveStock } = await supabaseClient.from('products').select('qty_in_stock, product_name').eq('id', p.id).single();
-                            if (liveStock) {
-                                if (qtyToSell > liveStock.qty_in_stock) {
-                                    const confirmProceed = confirm(`⚠️ คำเตือน: สินค้าในคลังไม่พอ!\n\nสินค้า: "${liveStock.product_name}"\n- ในคลังเหลือ: ${liveStock.qty_in_stock}\n- ที่ต้องการขาย: ${qtyToSell}\n\nต้องการ "ยอมให้สต็อกติดลบ" เพื่อบันทึกต่อใช่หรือไม่?\n(กด Cancel เพื่อยกเลิกไปเช็กสต็อกก่อน)`);
-                                    if (!confirmProceed) {
-                                        btnSave.innerHTML = "☁️ บันทึก / อัปเดตข้อมูล"; btnSave.disabled = false;
-                                        return; 
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            if (shouldCutStock) {
+                for (let row of rows) {
+                    const textarea = row.querySelector('.item-desc');
+                    const desc = textarea ? textarea.value.split('\n')[0].trim() : ''; 
+                    const qtyToSell = parseFloat(row.querySelector('.qty').value) || 0;
+                    
+                    if (desc && qtyToSell > 0) {
+                        let p = globalProducts.find(x => x.product_name === desc);
+                        if (p) {
+                            const { data: liveStock } = await supabaseClient.from('products').select('qty_in_stock, product_name').eq('id', p.id).single();
+                            if (liveStock) {
+                                if (qtyToSell > liveStock.qty_in_stock) {
+                                    const confirmProceed = confirm(`⚠️ คำเตือน: สินค้าในคลังไม่พอ!\n\nสินค้า: "${liveStock.product_name}"\n- ในคลังเหลือ: ${liveStock.qty_in_stock}\n- ที่ต้องการขาย: ${qtyToSell}\n\nต้องการ "ยอมให้สต็อกติดลบ" เพื่อบันทึกต่อใช่หรือไม่?\n(กด Cancel เพื่อยกเลิกไปเช็กสต็อกก่อน)`);
+                                    if (!confirmProceed) {
+                                        btnSave.innerHTML = "☁️ บันทึก / อัปเดตข้อมูล"; btnSave.disabled = false;
+                                        return; 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-            const { data: customerData, error: custErr } = await supabaseClient
-                .from('customers').insert([{ customer_name: customerName, address: customerAddress }]).select();
-            if (custErr) throw custErr;
-            const customerId = customerData[0].id; 
+            const { data: customerData, error: custErr } = await supabaseClient
+                .from('customers').insert([{ customer_name: customerName, address: customerAddress }]).select();
+            if (custErr) throw custErr;
+            const customerId = customerData[0].id; 
 
-            let documentIdToUse = null;
+            let documentIdToUse = null;
 
-            if (currentDocId) {
-                const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
-                const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
+            if (currentDocId) {
+                const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
+                const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
 
-                const { error: updateErr } = await supabaseClient.from('documents').update({
-                    doc_type: docType, doc_date: docDate, due_date: dueDate,
-                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
-                    project_id: currentProjectId || null
-                }).eq('id', currentDocId);
-                if (updateErr) throw updateErr;
+                const { error: updateErr } = await supabaseClient.from('documents').update({
+                    doc_type: docType, doc_date: docDate, due_date: dueDate,
+                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
+                    project_id: currentProjectId || null
+                }).eq('id', currentDocId);
+                if (updateErr) throw updateErr;
 
-                if (oldShouldCutStock) {
-                    const { data: oldItems } = await supabaseClient.from('document_items').select('product_id, qty').eq('document_id', currentDocId);
-                    if (oldItems && oldItems.length > 0) {
-                        for(let old of oldItems) {
-                            if(old.product_id && old.qty > 0) {
-                                const { data: cStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', old.product_id).single();
-                                if(cStock) {
-                                    await supabaseClient.from('products').update({ qty_in_stock: parseFloat(cStock.qty_in_stock) + parseFloat(old.qty) }).eq('id', old.product_id);
-                                }
-                            }
-                        }
-                    }
-                }
+                if (oldShouldCutStock) {
+                    const { data: oldItems } = await supabaseClient.from('document_items').select('product_id, qty').eq('document_id', currentDocId);
+                    if (oldItems && oldItems.length > 0) {
+                        for(let old of oldItems) {
+                            if(old.product_id && old.qty > 0) {
+                                const { data: cStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', old.product_id).single();
+                                if(cStock) {
+                                    await supabaseClient.from('products').update({ qty_in_stock: parseFloat(cStock.qty_in_stock) + parseFloat(old.qty) }).eq('id', old.product_id);
+                                }
+                            }
+                        }
+                    }
+                }
 
-                await supabaseClient.from('document_items').delete().eq('document_id', currentDocId);
-                documentIdToUse = currentDocId; 
-                
-            } else {
-                const { data: docData, error: docErr } = await supabaseClient.from('documents').insert([{ 
-                    doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
-                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
-                    project_id: currentProjectId || null
-                }]).select();
-                
-                if (docErr) {
-                    if(docErr.code === '23505') throw new Error("เลขที่เอกสารซ้ำ! กรุณาเปลี่ยนเลขที่เอกสารครับ");
-                    throw docErr;
-                }
-                documentIdToUse = docData[0].id; 
-                currentDocId = documentIdToUse; 
-            }
+                await supabaseClient.from('document_items').delete().eq('document_id', currentDocId);
+                documentIdToUse = currentDocId; 
+                
+            } else {
+                const { data: docData, error: docErr } = await supabaseClient.from('documents').insert([{ 
+                    doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
+                    customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
+                    project_id: currentProjectId || null
+                }]).select();
+                
+                if (docErr) {
+                    if(docErr.code === '23505') throw new Error("เลขที่เอกสารซ้ำ! กรุณาเปลี่ยนเลขที่เอกสารครับ");
+                    throw docErr;
+                }
+                documentIdToUse = docData[0].id; 
+                currentDocId = documentIdToUse; 
+            }
 
-            const itemsToInsert = [];
-            for(let row of rows) {
-                const textarea = row.querySelector('.item-desc');
-                const fullDesc = textarea ? textarea.value.trim() : '';
-                const searchDesc = fullDesc.split('\n')[0].trim();
-                const sn = row.querySelector('.sn-input').value;
-                const qty = parseFloat(row.querySelector('.qty').value) || 0;
-                const unit = row.querySelector('.unit-select').value;
-                const price = parseFloat(row.querySelector('.price').value) || 0;
-                
-                let productId = row.getAttribute('data-product-id');
-                if (!productId) {
-                    const p = globalProducts.find(x => x.product_name === searchDesc);
-                    if (p) productId = p.id;
-                }
-                
-                if(fullDesc !== "") {
-                    itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: fullDesc, sn: sn, qty: qty, unit: unit, price: price });
-                    
-                    if(productId && qty > 0 && shouldCutStock) {
-                        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
-                        if(currentStock) {
-                            await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
-                        }
-                    }
-                }
-            }
-            
-            if(itemsToInsert.length > 0) {
-                const { error: itemsErr } = await supabaseClient.from('document_items').insert(itemsToInsert);
-                if (itemsErr) throw itemsErr;
-            }
+            const itemsToInsert = [];
+            for(let row of rows) {
+                const textarea = row.querySelector('.item-desc');
+                const fullDesc = textarea ? textarea.value.trim() : '';
+                const searchDesc = fullDesc.split('\n')[0].trim();
+                const sn = row.querySelector('.sn-input').value;
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const unit = row.querySelector('.unit-select').value;
+                const price = parseFloat(row.querySelector('.price').value) || 0;
+                
+                let productId = row.getAttribute('data-product-id');
+                if (!productId) {
+                    const p = globalProducts.find(x => x.product_name === searchDesc);
+                    if (p) productId = p.id;
+                }
+                
+                if(fullDesc !== "") {
+                    itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: fullDesc, sn: sn, qty: qty, unit: unit, price: price });
+                    
+                    if(productId && qty > 0 && shouldCutStock) {
+                        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
+                        if(currentStock) {
+                            await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
+                        }
+                    }
+                }
+            }
+            
+            if(itemsToInsert.length > 0) {
+                const { error: itemsErr } = await supabaseClient.from('document_items').insert(itemsToInsert);
+                if (itemsErr) throw itemsErr;
+            }
 
-            if(shouldCutStock) {
-                alert(`✅ บันทึกข้อมูลและตัดสต็อกเรียบร้อยแล้ว!\n(เลขที่เอกสาร: ${docNum})`);
-            } else {
-                alert(`✅ บันทึกเอกสารเรียบร้อยแล้ว!\n(ข้อมูลบันทึกสำเร็จ และสต็อกยังไม่ถูกตัดครับ)`);
-            }
-            
-            isDirty = false;
-            await fetchProducts(); 
+            if(shouldCutStock) {
+                alert(`✅ บันทึกข้อมูลและตัดสต็อกเรียบร้อยแล้ว!\n(เลขที่เอกสาร: ${docNum})`);
+            } else {
+                alert(`✅ บันทึกเอกสารเรียบร้อยแล้ว!\n(ข้อมูลบันทึกสำเร็จ และสต็อกยังไม่ถูกตัดครับ)`);
+            }
+            
+            isDirty = false;
+            await fetchProducts(); 
 
-        } catch (error) {
-            alert("❌ ข้อผิดพลาด: " + error.message);
-        } finally {
-            btnSave.innerHTML = "☁️ บันทึก / อัปเดตข้อมูล"; btnSave.disabled = false;
-        }
-    }
+        } catch (error) {
+            alert("❌ ข้อผิดพลาด: " + error.message);
+        } finally {
+            btnSave.innerHTML = "☁️ บันทึก / อัปเดตข้อมูล"; btnSave.disabled = false;
+        }
+    }
 
-    function handleDocTypeChange() {
-        markDirty();
-        const selectEl = document.getElementById('docType');
-        if (selectEl.value === "CUSTOM_DOC") {
-            const custom = prompt("กรุณาพิมพ์ชื่อหัวข้อเอกสารที่ต้องการ:");
-            if (custom && custom.trim() !== "") {
-                const cleanValue = custom.trim();
-                let exists = Array.from(selectEl.options).some(opt => opt.value === cleanValue);
-                if (!exists) {
-                    const newOpt = document.createElement("option");
-                    newOpt.value = cleanValue; newOpt.textContent = cleanValue;
-                    selectEl.insertBefore(newOpt, selectEl.options[selectEl.options.length - 1]);
-                }
-                selectEl.value = cleanValue;
-            } else selectEl.value = selectEl.options[0].value;
-        }
-        updateDocTypeSync(true);
-    }
+    function handleDocTypeChange() {
+        markDirty();
+        const selectEl = document.getElementById('docType');
+        if (selectEl.value === "CUSTOM_DOC") {
+            const custom = prompt("กรุณาพิมพ์ชื่อหัวข้อเอกสารที่ต้องการ:");
+            if (custom && custom.trim() !== "") {
+                const cleanValue = custom.trim();
+                let exists = Array.from(selectEl.options).some(opt => opt.value === cleanValue);
+                if (!exists) {
+                    const newOpt = document.createElement("option");
+                    newOpt.value = cleanValue; newOpt.textContent = cleanValue;
+                    selectEl.insertBefore(newOpt, selectEl.options[selectEl.options.length - 1]);
+                }
+                selectEl.value = cleanValue;
+            } else selectEl.value = selectEl.options[0].value;
+        }
+        updateDocTypeSync(true);
+    }
 
-    function updateDocTypeSync(shouldFetchNum = true) {
-        const docText = document.getElementById('docType').value;
-        const subTitle = document.getElementById('docSubTitle');
-        const sigLeft = document.getElementById('sig-left');
-        const sigRight = document.getElementById('sig-right');
-        
-        if (docText.includes("เสนอราคา")) { subTitle.value = "(QUOTATION)"; sigLeft.value = "ผู้อนุมัติสั่งซื้อ"; sigRight.value = "ผู้เสนอราคา"; }
-        else if (docText.includes("ส่งงาน") || docText.includes("ตรวจรับ")) { subTitle.value = "(JOB COMPLETION REPORT)"; sigLeft.value = "ผู้ตรวจรับงาน / ลูกค้า"; sigRight.value = "ผู้ส่งมอบงาน / ช่างผู้ติดตั้ง"; }
-        else if (docText.includes("รับเงิน") || docText.includes("เสร็จ")) { subTitle.value = "(RECEIPT)"; sigLeft.value = "ผู้ชำระเงิน"; sigRight.value = "ผู้รับเงิน"; }
-        else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) { subTitle.value = "(INVOICE / DELIVERY ORDER)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ส่งสินค้า / ผู้ออกเอกสาร"; }
-        else { subTitle.value = "(INVOICE)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ออกเอกสาร"; }
-        
-        if(shouldFetchNum) fetchNextDocNumber(); 
-    }
+    function updateDocTypeSync(shouldFetchNum = true) {
+        const docText = document.getElementById('docType').value;
+        const subTitle = document.getElementById('docSubTitle');
+        const sigLeft = document.getElementById('sig-left');
+        const sigRight = document.getElementById('sig-right');
+        
+        if (docText.includes("เสนอราคา")) { subTitle.value = "(QUOTATION)"; sigLeft.value = "ผู้อนุมัติสั่งซื้อ"; sigRight.value = "ผู้เสนอราคา"; }
+        else if (docText.includes("ส่งงาน") || docText.includes("ตรวจรับ")) { subTitle.value = "(JOB COMPLETION REPORT)"; sigLeft.value = "ผู้ตรวจรับงาน / ลูกค้า"; sigRight.value = "ผู้ส่งมอบงาน / ช่างผู้ติดตั้ง"; }
+        else if (docText.includes("รับเงิน") || docText.includes("เสร็จ")) { subTitle.value = "(RECEIPT)"; sigLeft.value = "ผู้ชำระเงิน"; sigRight.value = "ผู้รับเงิน"; }
+        else if (docText.includes("ส่งสินค้า") || (docText.includes("แจ้งหนี้") && docText.includes("ส่ง"))) { subTitle.value = "(INVOICE / DELIVERY ORDER)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ส่งสินค้า / ผู้ออกเอกสาร"; }
+        else { subTitle.value = "(INVOICE)"; sigLeft.value = "ผู้รับสินค้า / บริการ"; sigRight.value = "ผู้ออกเอกสาร"; }
+        
+        if(shouldFetchNum) fetchNextDocNumber(); 
+    }
 
-    function getTodayThai() {
-        const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const d = new Date(); return d.getDate() + ' ' + m[d.getMonth()] + ' ' + (d.getFullYear() + 543);
-    }
+    function getTodayThai() {
+        const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        const d = new Date(); return d.getDate() + ' ' + m[d.getMonth()] + ' ' + (d.getFullYear() + 543);
+    }
 
-    function toggleDate() {
-        markDirty(); const dateInput = document.getElementById('doc-date');
-        if (document.getElementById('blank-date').checked) { dateInput.dataset.savedDate = dateInput.value; dateInput.value = ""; } 
-        else { dateInput.value = dateInput.dataset.savedDate || getTodayThai(); }
-    }
+    function toggleDate() {
+        markDirty(); const dateInput = document.getElementById('doc-date');
+        if (document.getElementById('blank-date').checked) { dateInput.dataset.savedDate = dateInput.value; dateInput.value = ""; } 
+        else { dateInput.value = dateInput.dataset.savedDate || getTodayThai(); }
+    }
 
-    function toggleDiscountRow() {
-        markDirty();
-        const row = document.getElementById('discount-row');
-        const btn = document.getElementById('btn-toggle-discount');
-        if (row.style.display === "none") { row.style.display = ""; btn.innerText = "- ส่วนลด"; } 
-        else { row.style.display = "none"; document.getElementById('discount-val').value = 0; btn.innerText = "+ เพิ่มส่วนลด"; }
-        calculateTotal();
-    }
+    function toggleDiscountRow() {
+        markDirty();
+        const row = document.getElementById('discount-row');
+        const btn = document.getElementById('btn-toggle-discount');
+        if (row.style.display === "none") { row.style.display = ""; btn.innerText = "- ส่วนลด"; } 
+        else { row.style.display = "none"; document.getElementById('discount-val').value = 0; btn.innerText = "+ เพิ่มส่วนลด"; }
+        calculateTotal();
+    }
 
-    function checkCustomUnit(selectEl) {
-        if (selectEl.value === "CUSTOM_UNIT") {
-            const custom = prompt("กรุณาระบุหน่วยนับที่ต้องการเพิ่ม:");
-            if (custom && custom.trim() !== "") {
-                const cleanValue = custom.trim();
-                let exists = Array.from(selectEl.options).some(opt => opt.value === cleanValue);
-                if (!exists) {
-                    const newOpt = document.createElement("option");
-                    newOpt.value = cleanValue; newOpt.textContent = cleanValue;
-                    selectEl.insertBefore(newOpt, selectEl.options[selectEl.options.length - 1]);
-                }
-                selectEl.value = cleanValue;
-            } else selectEl.value = selectEl.options[0].value;
-        }
-    }
+    function checkCustomUnit(selectEl) {
+        if (selectEl.value === "CUSTOM_UNIT") {
+            const custom = prompt("กรุณาระบุหน่วยนับที่ต้องการเพิ่ม:");
+            if (custom && custom.trim() !== "") {
+                const cleanValue = custom.trim();
+                let exists = Array.from(selectEl.options).some(opt => opt.value === cleanValue);
+                if (!exists) {
+                    const newOpt = document.createElement("option");
+                    newOpt.value = cleanValue; newOpt.textContent = cleanValue;
+                    selectEl.insertBefore(newOpt, selectEl.options[selectEl.options.length - 1]);
+                }
+                selectEl.value = cleanValue;
+            } else selectEl.value = selectEl.options[0].value;
+        }
+    }
 
-    function calculateTotal() {
-        let subtotal = 0;
-        document.querySelectorAll('#items-body tr').forEach(row => {
-            const qty = parseFloat(row.querySelector('.qty').value) || 0;
-            const price = parseFloat(row.querySelector('.price').value) || 0;
-            const total = qty * price;
-            row.querySelector('.row-total').innerText = total.toLocaleString('th-TH', {minimumFractionDigits: 2});
-            subtotal += total;
-        });
-        let discount = 0;
-        if (document.getElementById('discount-row').style.display !== "none") {
-            discount = parseFloat(document.getElementById('discount-val').value) || 0;
-            if (discount > subtotal) { discount = subtotal; document.getElementById('discount-val').value = discount; }
-        }
-        document.getElementById('subtotal').innerText = subtotal.toLocaleString('th-TH', {minimumFractionDigits: 2});
-        document.getElementById('grand-total').innerText = (subtotal - discount).toLocaleString('th-TH', {minimumFractionDigits: 2});
-    }
+    function calculateTotal() {
+        let subtotal = 0;
+        document.querySelectorAll('#items-body tr').forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty').value) || 0;
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            const total = qty * price;
+            row.querySelector('.row-total').innerText = total.toLocaleString('th-TH', {minimumFractionDigits: 2});
+            subtotal += total;
+        });
+        let discount = 0;
+        if (document.getElementById('discount-row').style.display !== "none") {
+            discount = parseFloat(document.getElementById('discount-val').value) || 0;
+            if (discount > subtotal) { discount = subtotal; document.getElementById('discount-val').value = discount; }
+        }
+        document.getElementById('subtotal').innerText = subtotal.toLocaleString('th-TH', {minimumFractionDigits: 2});
+        document.getElementById('grand-total').innerText = (subtotal - discount).toLocaleString('th-TH', {minimumFractionDigits: 2});
+    }
 
-    function addRow(data = null) {
-        if(!data) markDirty();
-        const tbody = document.getElementById('items-body');
-        const tr = document.createElement('tr');
-        tr.className = 'item-row';
-        const desc = data ? (data.desc || data.description || '') : ''; 
-        const qty = data ? data.qty : 1; 
-        const unit = data ? data.unit : 'ตัว'; 
-        const price = data ? data.price : 0; 
-        const sn = data ? (data.sn || '') : '';
-        
-        tr.innerHTML = `
-            <td class="no-print text-center drag-handle" title="คลิกค้างเพื่อลาก">⋮⋮</td>
-            <td class="no-print text-center"><button class="btn btn-del" onclick="deleteRow(this)">ลบ</button></td>
-            <td class="text-center row-number"></td>
-            <td>
-                <div class="autocomplete-wrapper">
-                    <textarea class="item-desc" placeholder="🔍 ค้นหา (รหัส/ชื่อ) หรือพิมพ์ค่าแรง..." rows="1" oninput="markDirty(); autoResizeTextarea(this); handleCustomAutocomplete(this)" onfocus="handleCustomAutocomplete(this)" onblur="closeAutocomplete(this)" style="font-weight: 600; color: var(--primary-color);">${desc}</textarea>
-                    <div class="autocomplete-list"></div>
-                </div>
-                <div class="sn-container no-print">
-                    <span class="sn-label">S/N:</span>
-                    <input type="text" class="sn-input" placeholder="สแกน S/N หรือพิมพ์..." value="${sn}" oninput="markDirty()">
-                    <button class="btn-scan" onclick="openScanner(this)">📷 สแกน</button>
-                </div>
-            </td>
-            <td><input type="number" class="qty text-center" value="${qty}" min="1" oninput="markDirty(); calculateTotal()"></td>
-            <td>${unitDropdownHTML}</td>
-            <td><input type="number" class="price text-right" value="${price}" min="0" oninput="markDirty(); calculateTotal()"></td>
-            <td class="text-right row-total" style="padding-top: 10px;">0.00</td>
-        `;
-        tbody.appendChild(tr);
-        
-        const unitSelect = tr.querySelector('.unit-select');
-        if (data && unit) {
-            let hasUnit = Array.from(unitSelect.options).some(opt => opt.value === unit);
-            if (!hasUnit) {
-                const opt = document.createElement("option"); opt.value = unit; opt.textContent = unit;
-                unitSelect.insertBefore(opt, unitSelect.options[unitSelect.options.length - 1]);
-            }
-        }
-        unitSelect.value = unit;
+    function addRow(data = null) {
+        if(!data) markDirty();
+        const tbody = document.getElementById('items-body');
+        const tr = document.createElement('tr');
+        tr.className = 'item-row';
+        const desc = data ? (data.desc || data.description || '') : ''; 
+        const qty = data ? data.qty : 1; 
+        const unit = data ? data.unit : 'ตัว'; 
+        const price = data ? data.price : 0; 
+        const sn = data ? (data.sn || '') : '';
+        
+        tr.innerHTML = `
+            <td class="no-print text-center drag-handle" title="คลิกค้างเพื่อลาก">⋮⋮</td>
+            <td class="no-print text-center"><button class="btn btn-del" onclick="deleteRow(this)">ลบ</button></td>
+            <td class="text-center row-number"></td>
+            <td>
+                <div class="autocomplete-wrapper">
+                    <textarea class="item-desc" placeholder="🔍 ค้นหา (รหัส/ชื่อ) หรือพิมพ์ค่าแรง..." rows="1" oninput="markDirty(); autoResizeTextarea(this); handleCustomAutocomplete(this)" onfocus="handleCustomAutocomplete(this)" onblur="closeAutocomplete(this)" style="font-weight: 600; color: var(--primary-color);">${desc}</textarea>
+                    <div class="autocomplete-list"></div>
+                </div>
+                <div class="sn-container no-print">
+                    <span class="sn-label">S/N:</span>
+                    <input type="text" class="sn-input" placeholder="สแกน S/N หรือพิมพ์..." value="${sn}" oninput="markDirty()">
+                    <button class="btn-scan" onclick="openScanner(this)">📷 สแกน</button>
+                </div>
+            </td>
+            <td><input type="number" class="qty text-center" value="${qty}" min="1" oninput="markDirty(); calculateTotal()"></td>
+            <td>${unitDropdownHTML}</td>
+            <td><input type="number" class="price text-right" value="${price}" min="0" oninput="markDirty(); calculateTotal()"></td>
+            <td class="text-right row-total" style="padding-top: 10px;">0.00</td>
+        `;
+        tbody.appendChild(tr);
+        
+        const unitSelect = tr.querySelector('.unit-select');
+        if (data && unit) {
+            let hasUnit = Array.from(unitSelect.options).some(opt => opt.value === unit);
+            if (!hasUnit) {
+                const opt = document.createElement("option"); opt.value = unit; opt.textContent = unit;
+                unitSelect.insertBefore(opt, unitSelect.options[unitSelect.options.length - 1]);
+            }
+        }
+        unitSelect.value = unit;
 
-        const textareaEl = tr.querySelector('.item-desc');
-        autoResizeTextarea(textareaEl);
+        const textareaEl = tr.querySelector('.item-desc');
+        autoResizeTextarea(textareaEl);
 
-        attachDragEvents(tr);
-        updateRowNumbers(); calculateTotal();
-        if(!data) textareaEl.focus();
-    }
+        attachDragEvents(tr);
+        updateRowNumbers(); calculateTotal();
+        if(!data) textareaEl.focus();
+    }
 
-    function autoResizeTextarea(el) {
-        el.style.height = 'auto';
-        el.style.height = (el.scrollHeight) + 'px';
-    }
+    function autoResizeTextarea(el) {
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
 
-    function deleteRow(btn) { markDirty(); btn.closest('tr').remove(); updateRowNumbers(); calculateTotal(); }
-    function updateRowNumbers() { document.querySelectorAll('#items-body tr').forEach((row, idx) => { row.querySelector('.row-number').innerText = idx + 1; }); }
+    function deleteRow(btn) { markDirty(); btn.closest('tr').remove(); updateRowNumbers(); calculateTotal(); }
+    function updateRowNumbers() { document.querySelectorAll('#items-body tr').forEach((row, idx) => { row.querySelector('.row-number').innerText = idx + 1; }); }
 
-    let draggedRow = null;
-    function attachDragEvents(tr) {
-        const handle = tr.querySelector('.drag-handle');
-        handle.addEventListener('mouseenter', () => tr.setAttribute('draggable', 'true'));
-        handle.addEventListener('mouseleave', () => tr.removeAttribute('draggable'));
-        tr.addEventListener('dragstart', () => { draggedRow = tr; setTimeout(() => tr.classList.add('dragging'), 0); });
-        tr.addEventListener('dragend', () => { tr.classList.remove('dragging'); draggedRow = null; updateRowNumbers(); markDirty(); });
-    }
-    document.getElementById('items-body').addEventListener('dragover', e => {
-        e.preventDefault(); if (!draggedRow) return;
-        const draggableElements = [...document.getElementById('items-body').querySelectorAll('.item-row:not(.dragging)')];
-        const afterElement = draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect(); const offset = e.clientY - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) return { offset: offset, element: child }; else return closest;
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-        if (afterElement == null) document.getElementById('items-body').appendChild(draggedRow); 
-        else document.getElementById('items-body').insertBefore(draggedRow, afterElement);
-    });
+    let draggedRow = null;
+    function attachDragEvents(tr) {
+        const handle = tr.querySelector('.drag-handle');
+        handle.addEventListener('mouseenter', () => tr.setAttribute('draggable', 'true'));
+        handle.addEventListener('mouseleave', () => tr.removeAttribute('draggable'));
+        tr.addEventListener('dragstart', () => { draggedRow = tr; setTimeout(() => tr.classList.add('dragging'), 0); });
+        tr.addEventListener('dragend', () => { tr.classList.remove('dragging'); draggedRow = null; updateRowNumbers(); markDirty(); });
+    }
+    document.getElementById('items-body').addEventListener('dragover', e => {
+        e.preventDefault(); if (!draggedRow) return;
+        const draggableElements = [...document.getElementById('items-body').querySelectorAll('.item-row:not(.dragging)')];
+        const afterElement = draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect(); const offset = e.clientY - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) return { offset: offset, element: child }; else return closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+        if (afterElement == null) document.getElementById('items-body').appendChild(draggedRow); 
+        else document.getElementById('items-body').insertBefore(draggedRow, afterElement);
+    });
 
-    let html5QrcodeScanner; let targetSnInput = null;
-    function openScanner(btn) {
-        targetSnInput = btn.previousElementSibling; document.getElementById('scanner-modal').style.display = 'flex';
-        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
-        html5QrcodeScanner.render((decodedText) => { targetSnInput.value = decodedText; markDirty(); closeScanner(); }, () => {});
-    }
-    function closeScanner() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
+    let html5QrcodeScanner; let targetSnInput = null;
+    function openScanner(btn) {
+        targetSnInput = btn.previousElementSibling; document.getElementById('scanner-modal').style.display = 'flex';
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+        html5QrcodeScanner.render((decodedText) => { targetSnInput.value = decodedText; markDirty(); closeScanner(); }, () => {});
+    }
+    function closeScanner() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); document.getElementById('scanner-modal').style.display = 'none'; targetSnInput = null; }
 
-    function saveData() {
-        const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
-        const data = {
-            docType: document.getElementById('docType').value, docNum: document.getElementById('doc-num').value,
-            docDate: document.getElementById('doc-date').value, dueDate: document.getElementById('due-date').value,
-            customerName: document.getElementById('customer-name').value, 
-            customerAddress: document.getElementById('customer-address').value,
-            customerExtra: document.getElementById('customer-extra').value,
-            discountLabel: isDiscountVisible ? document.getElementById('discount-label').value : "ส่วนลด (DISCOUNT)",
-            discount: isDiscountVisible ? (parseFloat(document.getElementById('discount-val').value) || 0) : 0, hasDiscount: isDiscountVisible,
-            items: []
-        };
-        document.querySelectorAll('#items-body tr').forEach(tr => {
-            const textarea = tr.querySelector('.item-desc');
-            data.items.push({
-                desc: textarea ? textarea.value : '', sn: tr.querySelector('.sn-input').value,
-                qty: tr.querySelector('.qty').value, unit: tr.querySelector('.unit-select').value, price: tr.querySelector('.price').value
-            });
-        });
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-        const dlAnchorElem = document.createElement('a'); dlAnchorElem.setAttribute("href", dataStr);
-        dlAnchorElem.setAttribute("download", (data.docNum || "Document") + "_SaveData.json");
-        document.body.appendChild(dlAnchorElem); dlAnchorElem.click(); dlAnchorElem.remove();
-        isDirty = false; alert("บันทึกไฟล์งานสำเร็จ!");
-    }
+    function saveData() {
+        const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
+        const data = {
+            docType: document.getElementById('docType').value, docNum: document.getElementById('doc-num').value,
+            docDate: document.getElementById('doc-date').value, dueDate: document.getElementById('due-date').value,
+            customerName: document.getElementById('customer-name').value, 
+            customerAddress: document.getElementById('customer-address').value,
+            customerExtra: document.getElementById('customer-extra').value,
+            discountLabel: isDiscountVisible ? document.getElementById('discount-label').value : "ส่วนลด (DISCOUNT)",
+            discount: isDiscountVisible ? (parseFloat(document.getElementById('discount-val').value) || 0) : 0, hasDiscount: isDiscountVisible,
+            items: []
+        };
+        document.querySelectorAll('#items-body tr').forEach(tr => {
+            const textarea = tr.querySelector('.item-desc');
+            data.items.push({
+                desc: textarea ? textarea.value : '', sn: tr.querySelector('.sn-input').value,
+                qty: tr.querySelector('.qty').value, unit: tr.querySelector('.unit-select').value, price: tr.querySelector('.price').value
+            });
+        });
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+        const dlAnchorElem = document.createElement('a'); dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", (data.docNum || "Document") + "_SaveData.json");
+        document.body.appendChild(dlAnchorElem); dlAnchorElem.click(); dlAnchorElem.remove();
+        isDirty = false; alert("บันทึกไฟล์งานสำเร็จ!");
+    }
 
-    function loadData(event) {
-        const file = event.target.files[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try { const data = JSON.parse(e.target.result); loadSelectedDoc(data); } 
-            catch (err) { alert("ไฟล์ไม่ถูกต้อง หรือเสียหายครับ"); }
-        };
-        reader.readAsText(file); event.target.value = ''; 
-    }
+    function loadData(event) {
+        const file = event.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try { const data = JSON.parse(e.target.result); loadSelectedDoc(data); } 
+            catch (err) { alert("ไฟล์ไม่ถูกต้อง หรือเสียหายครับ"); }
+        };
+        reader.readAsText(file); event.target.value = ''; 
+    }
 
-    function loadSelectedDoc(cloudData) {
-        currentDocId = cloudData.docId || null; 
-        currentProjectId = cloudData.projectId || null; 
-        
-        const selectEl = document.getElementById('docType');
-        const targetType = cloudData.docType || "ใบเสนอราคา";
-        let exists = Array.from(selectEl.options).some(opt => opt.value === targetType);
-        if(!exists){ const newOpt = document.createElement("option"); newOpt.value = targetType; newOpt.textContent = targetType; selectEl.insertBefore(newOpt, selectEl.options[selectEl.options.length - 1]); }
-        selectEl.value = targetType;
+    function loadSelectedDoc(cloudData) {
+        currentDocId = cloudData.docId || null; 
+        currentProjectId = cloudData.projectId || null; 
+        
+        const selectEl = document.getElementById('docType');
+        const targetType = cloudData.docType || "ใบเสนอราคา";
+        let exists = Array.from(selectEl.options).some(opt => opt.value === targetType);
+        if(!exists){ const newOpt = document.createElement("option"); newOpt.value = targetType; newOpt.textContent = targetType; selectEl.insertBefore(newOpt, selectEl.options[selectEl.options.length - 1]); }
+        selectEl.value = targetType;
 
-        document.getElementById('doc-num').value = cloudData.docNum || "";
-        document.getElementById('doc-date').value = cloudData.docDate || "";
-        document.getElementById('due-date').value = cloudData.dueDate || "";
-        document.getElementById('customer-name').value = cloudData.customerName || "";
-        document.getElementById('customer-address').value = cloudData.customerAddress || "";
-        document.getElementById('customer-extra').value = cloudData.customerExtra || "";
+        document.getElementById('doc-num').value = cloudData.docNum || "";
+        document.getElementById('doc-date').value = cloudData.docDate || "";
+        document.getElementById('due-date').value = cloudData.dueDate || "";
+        document.getElementById('customer-name').value = cloudData.customerName || "";
+        document.getElementById('customer-address').value = cloudData.customerAddress || "";
+        document.getElementById('customer-extra').value = cloudData.customerExtra || "";
 
-        const discountRow = document.getElementById('discount-row');
-        const toggleBtn = document.getElementById('btn-toggle-discount');
-        document.getElementById('discount-label').value = cloudData.discountLabel || "ส่วนลด (DISCOUNT)";
-        document.getElementById('discount-val').value = cloudData.discount || 0;
-        
-        if (cloudData.hasDiscount === false || (cloudData.discount == 0 && !cloudData.hasDiscount)) { discountRow.style.display = "none"; toggleBtn.innerText = "+ เพิ่มส่วนลด"; } 
-        else { discountRow.style.display = ""; toggleBtn.innerText = "- ส่วนลด"; }
+        const discountRow = document.getElementById('discount-row');
+        const toggleBtn = document.getElementById('btn-toggle-discount');
+        document.getElementById('discount-label').value = cloudData.discountLabel || "ส่วนลด (DISCOUNT)";
+        document.getElementById('discount-val').value = cloudData.discount || 0;
+        
+        if (cloudData.hasDiscount === false || (cloudData.discount == 0 && !cloudData.hasDiscount)) { discountRow.style.display = "none"; toggleBtn.innerText = "+ เพิ่มส่วนลด"; } 
+        else { discountRow.style.display = ""; toggleBtn.innerText = "- ส่วนลด"; }
 
-        document.getElementById('items-body').innerHTML = '';
-        if(cloudData.items && cloudData.items.length > 0) { cloudData.items.forEach(item => addRow(item)); } else { addRow(); }
-        
-        updateDocTypeSync(false); calculateTotal(); isDirty = false;
-    }
+        document.getElementById('items-body').innerHTML = '';
+        if(cloudData.items && cloudData.items.length > 0) { cloudData.items.forEach(item => addRow(item)); } else { addRow(); }
+        
+        updateDocTypeSync(false); calculateTotal(); isDirty = false;
+    }
 
-    function exportToExcel() {
-        if (typeof XLSX === 'undefined') { alert('กำลังโหลดข้อมูลสำหรับการสร้าง Excel กรุณารอสักครู่แล้วกดใหม่อีกครั้ง'); return; }
-        const docType = document.getElementById('docType').value; const docNum = document.getElementById('doc-num').value;
-        const docDate = document.getElementById('doc-date').value; const dueDate = document.getElementById('due-date').value;
-        const customerName = document.getElementById('customer-name').value; 
-        const customerAddress = document.getElementById('customer-address').value;
-        const customerExtra = document.getElementById('customer-extra').value;
+    function exportToExcel() {
+        if (typeof XLSX === 'undefined') { alert('กำลังโหลดข้อมูลสำหรับการสร้าง Excel กรุณารอสักครู่แล้วกดใหม่อีกครั้ง'); return; }
+        const docType = document.getElementById('docType').value; const docNum = document.getElementById('doc-num').value;
+        const docDate = document.getElementById('doc-date').value; const dueDate = document.getElementById('due-date').value;
+        const customerName = document.getElementById('customer-name').value; 
+        const customerAddress = document.getElementById('customer-address').value;
+        const customerExtra = document.getElementById('customer-extra').value;
 
-        let excelData = [];
-        excelData.push(["JN electric&Technology"]); excelData.push([docType]); excelData.push([]);
-        excelData.push(["ลูกค้า (BILL TO):", customerName]); excelData.push(["ที่อยู่:", customerAddress]);
-        if (customerExtra) excelData.push(["ข้อมูลเพิ่มเติม:", customerExtra]);
-        excelData.push(["เลขที่เอกสาร:", docNum, "วันที่:", docDate]); if(dueDate) excelData.push(["ครบกำหนด:", dueDate]); excelData.push([]);
-        excelData.push(["ลำดับ", "รายการ", "S/N", "จำนวน", "หน่วย", "ราคา/หน่วย", "จำนวนเงิน"]);
+        let excelData = [];
+        excelData.push(["JN electric&Technology"]); excelData.push([docType]); excelData.push([]);
+        excelData.push(["ลูกค้า (BILL TO):", customerName]); excelData.push(["ที่อยู่:", customerAddress]);
+        if (customerExtra) excelData.push(["ข้อมูลเพิ่มเติม:", customerExtra]);
+        excelData.push(["เลขที่เอกสาร:", docNum, "วันที่:", docDate]); if(dueDate) excelData.push(["ครบกำหนด:", dueDate]); excelData.push([]);
+        excelData.push(["ลำดับ", "รายการ", "S/N", "จำนวน", "หน่วย", "ราคา/หน่วย", "จำนวนเงิน"]);
 
-        let index = 1;
-        document.querySelectorAll('#items-body tr').forEach(tr => {
-            const textarea = tr.querySelector('.item-desc');
-            const desc = textarea ? textarea.value : ''; 
-            const sn = tr.querySelector('.sn-input').value;
-            const qty = parseFloat(tr.querySelector('.qty').value) || 0; const unit = tr.querySelector('.unit-select').value;
-            const price = parseFloat(tr.querySelector('.price').value) || 0; const total = qty * price;
-            excelData.push([index++, desc, sn, qty, unit, price, total]);
-        });
+        let index = 1;
+        document.querySelectorAll('#items-body tr').forEach(tr => {
+            const textarea = tr.querySelector('.item-desc');
+            const desc = textarea ? textarea.value : ''; 
+            const sn = tr.querySelector('.sn-input').value;
+            const qty = parseFloat(tr.querySelector('.qty').value) || 0; const unit = tr.querySelector('.unit-select').value;
+            const price = parseFloat(tr.querySelector('.price').value) || 0; const total = qty * price;
+            excelData.push([index++, desc, sn, qty, unit, price, total]);
+        });
 
-        const subtotal = document.getElementById('subtotal').innerText.replace(/,/g, '');
-        const grandTotal = document.getElementById('grand-total').innerText.replace(/,/g, '');
-        const discountVal = parseFloat(document.getElementById('discount-val').value) || 0;
-        const discountLabel = document.getElementById('discount-label').value;
+        const subtotal = document.getElementById('subtotal').innerText.replace(/,/g, '');
+        const grandTotal = document.getElementById('grand-total').innerText.replace(/,/g, '');
+        const discountVal = parseFloat(document.getElementById('discount-val').value) || 0;
+        const discountLabel = document.getElementById('discount-label').value;
 
-        excelData.push([]);
-        if (document.getElementById('discount-row').style.display !== "none" && discountVal > 0) {
-            excelData.push(["", "", "", "", "", "รวมเป็นเงิน (SUBTOTAL)", parseFloat(subtotal)]);
-            excelData.push(["", "", "", "", "", discountLabel, discountVal]);
-        }
-        excelData.push(["", "", "", "", "", "ยอดชำระสุทธิ (TOTAL)", parseFloat(grandTotal)]);
+        excelData.push([]);
+        if (document.getElementById('discount-row').style.display !== "none" && discountVal > 0) {
+            excelData.push(["", "", "", "", "", "รวมเป็นเงิน (SUBTOTAL)", parseFloat(subtotal)]);
+            excelData.push(["", "", "", "", "", discountLabel, discountVal]);
+        }
+        excelData.push(["", "", "", "", "", "ยอดชำระสุทธิ (TOTAL)", parseFloat(grandTotal)]);
 
-        const ws = XLSX.utils.aoa_to_sheet(excelData);
-        ws['!cols'] = [{ wch: 8 }, { wch: 40 }, {wch: 20}, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 15 }];
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Document");
-        XLSX.writeFile(wb, (docNum || "Document") + ".xlsx");
-    }
-  // 🌟 ระบบสลับธีมเอกสาร (แบบข้อมูลไม่หาย 100%)
-    function switchTheme(url) {
-        // ดึงค่าสถานะส่วนลดปัจจุบัน
-        const isDiscountVisible = document.getElementById('discount-row').style.display !== "none";
-        
-        // รวบรวมข้อมูลทั้งหมดบนหน้าจอตอนนี้ (ใช้ชื่อตัวแปรให้ตรงกับระบบโหลดเดิมทุกประการ)
-        const currentDocData = {
-            docId: currentDocId,
-            projectId: currentProjectId,
-            docType: document.getElementById('docType').value,
-            docNum: document.getElementById('doc-num').value,
-            docDate: document.getElementById('doc-date').value,
-            dueDate: document.getElementById('due-date').value,
-            customerName: document.getElementById('customer-name').value,
-            customerAddress: document.getElementById('customer-address').value,
-            customerExtra: document.getElementById('customer-extra').value,
-            discountLabel: isDiscountVisible ? document.getElementById('discount-label').value : "ส่วนลด (DISCOUNT)",
-            discount: isDiscountVisible ? (parseFloat(document.getElementById('discount-val').value) || 0) : 0,
-            hasDiscount: isDiscountVisible,
-            items: []
-        };
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        ws['!cols'] = [{ wch: 8 }, { wch: 40 }, {wch: 20}, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 15 }];
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Document");
+        XLSX.writeFile(wb, (docNum || "Document") + ".xlsx");
+    }
 
-        // วนลูปเก็บข้อมูลสินค้าในตารางทุกบรรทัด
-        document.querySelectorAll('#items-body tr').forEach(tr => {
-            const textarea = tr.querySelector('.item-desc');
-            currentDocData.items.push({
-                desc: textarea ? textarea.value : '',
-                sn: tr.querySelector('.sn-input').value,
-                qty: tr.querySelector('.qty').value,
-                unit: tr.querySelector('.unit-select').value,
-                price: tr.querySelector('.price').value
-            });
-        });
-
-        // บันทึกลง localStorage ด้วยชื่อคีย์เดียวกับระบบโหลดบิลเดิม
-        localStorage.setItem("jn_selected_cloud_doc", JSON.stringify(currentDocData));
-        
-        // ปิดการแจ้งเตือนเตือนทิ้งงาน แล้วเปลี่ยนหน้าทันที
-        isDirty = false;
-        window.location.href = url;
-    }
-        // เก็บข้อมูลในตารางสินค้า
-        document.querySelectorAll('#items-body tr').forEach(tr => {
-            const textarea = tr.querySelector('.item-desc');
-            tempSaveData.items.push({
-                desc: textarea ? textarea.value : '', 
-                sn: tr.querySelector('.sn-input').value,
-                qty: tr.querySelector('.qty').value, 
-                unit: tr.querySelector('.unit-select').value, 
-                price: tr.querySelector('.price').value
-            });
-        });
-
-        // 2. ฝากข้อมูลไว้ในระบบ Cloud Load ของคุณเอง (jn_selected_cloud_doc)
-        localStorage.setItem("jn_selected_cloud_doc", JSON.stringify(tempSaveData));
-        
-        // 3. ปลดล็อกระบบแจ้งเตือนทิ้งงาน แล้วย้ายหน้า
-        isDirty = false; 
-        window.location.href = url;
-    }
-
-    // 🌟 ฟังก์ชันตั้งค่าให้ Dropdown แสดงชื่อธีมตรงกับหน้าปัจจุบันอัตโนมัติ
-    function setCorrectThemeDropdown() {
-        const selector = document.getElementById('themeSelector');
-        if(!selector) return;
-        
-        if (window.location.pathname.includes('index-modern.html')) {
-            selector.value = 'index-modern.html';
-        } else {
-            selector.value = 'index.html';
-        }
-    }
-    
-    // เรียกใช้งานตอนโหลดหน้าเว็บเสร็จ
-    setTimeout(setCorrectThemeDropdown, 100);
-    window.addEventListener("beforeunload", function (e) { if (isDirty) { e.preventDefault(); e.returnValue = "คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการออกจากหน้านี้หรือไม่?"; } });
+    window.addEventListener("beforeunload", function (e) { if (isDirty) { e.preventDefault(); e.returnValue = "คุณมีข้อมูลที่ยังไม่ได้บันทึก ต้องการออกจากหน้านี้หรือไม่?"; } });
 </script>
 </body>
 </html>
