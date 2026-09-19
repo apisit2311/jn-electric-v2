@@ -277,13 +277,13 @@
 
 <div class="modal-overlay" id="modalPayConfirm">
     <div class="modal-box" style="width:360px; text-align:center;">
-        <h2 style="margin-top:0; color:var(--primary); font-size:18px;">ยืนยันการโอนเงิน 💳</h2>
+        <h2 style="margin-top:0; color:var(--primary); font-size:18px;" id="pc-modal-title">ยืนยันรายการ 💳</h2>
         <div style="background: var(--bg); border: 1px solid var(--border); padding: 15px; border-radius: var(--radius-md); margin-bottom: 15px; text-align:left;">
             <div style="font-weight:700; font-size:15px; color:var(--primary-accent);" id="pc-name">ช่าง...</div>
             <div style="font-size:12px; color:var(--text-sub); margin-bottom:8px;" id="pc-desc">-</div>
             <div style="font-size:11.5px; color:var(--text-sub);">บัญชี: <strong id="pc-bank">-</strong></div>
-            <div style="margin-top:10px; text-align:right;"><span style="font-size:22px; font-weight:700; color:var(--amber);" id="pc-amount">0.00 ฿</span></div>
-            <div class="form-item" style="margin-top:10px;"><label style="font-size:11.5px;">แนบสลิปการโอน:</label><input type="file" id="pc-slip" class="clean-input" accept="image/*"></div>
+            <div style="margin-top:10px; text-align:right;"><span style="font-size:22px; font-weight:700;" id="pc-amount">0.00 ฿</span></div>
+            <div class="form-item" style="margin-top:10px;"><label style="font-size:11.5px;">แนบสลิป/หลักฐาน:</label><input type="file" id="pc-slip" class="clean-input" accept="image/*"></div>
         </div>
         <input type="hidden" id="pc-log-id"><input type="hidden" id="pc-exp-id">
         <div style="display: flex; gap: 8px;">
@@ -579,12 +579,13 @@
             let actionsHtml = '';
             if (appMode === 'ADMIN') {
                 let payBtnHtml = l.is_paid 
-                    ? `<span style="font-size:11.5px; color:var(--emerald); font-weight:600; cursor:pointer;" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', false)">เคลียร์แล้ว ✅</span>`
-                    : `<button class="btn btn-sm ${isAdvance ? 'btn-rose' : 'btn-primary'}" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', true, '${l.technicians?.tech_name}', ${amt}, '${l.technicians?.bank_name} ${l.technicians?.bank_account}', '${l.work_details || l.work_type}')">💳 ${isAdvance ? 'ยืนยันหัก' : 'จ่ายเงิน'}</button>`;
+                    ? `<span style="font-size:11.5px; color:var(--emerald); font-weight:600; cursor:pointer;" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', false)">${isAdvance ? 'หักคืนแล้ว ✅' : 'จ่ายแล้ว ✅'}</span>`
+                    : `<button class="btn btn-sm ${isAdvance ? 'btn-rose' : 'btn-primary'}" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', true, '${l.technicians?.tech_name}', ${amt}, '${l.technicians?.bank_name} ${l.technicians?.bank_account}', '${l.work_details || l.work_type}')">💳 ${isAdvance ? 'เคลียร์ยอดเบิก' : 'จ่ายเงิน'}</button>`;
                 
                 actionsHtml = `<div class="item-card-actions">${slipBtn}${payBtnHtml}<button class="btn-icon" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')">🗑️</button></div>`;
             } else {
-                actionsHtml = `<div class="item-card-actions">${slipBtn}<span style="font-size:11.5px; font-weight:600; color:${l.is_paid ? 'var(--emerald)' : 'var(--amber)'};">${l.is_paid ? 'โอนแล้ว ✅' : 'รอโอน ⏳'}</span></div>`;
+                const statusText = l.is_paid ? (isAdvance ? 'หักคืนแล้ว ✅' : 'โอนแล้ว ✅') : (isAdvance ? 'รอหักคืน ⏳' : 'รอโอน ⏳');
+                actionsHtml = `<div class="item-card-actions">${slipBtn}<span style="font-size:11.5px; font-weight:600; color:${l.is_paid ? 'var(--emerald)' : 'var(--amber)'};">${statusText}</span></div>`;
             }
 
             card.innerHTML = `
@@ -595,7 +596,7 @@
                     </div>
                     <div class="item-card-val" style="color:${l.is_paid ? 'var(--emerald)' : (isAdvance ? 'var(--rose)' : 'var(--amber)')};">${amt.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</div>
                 </div>
-                <div style="font-size:12px; margin: 6px 0;">${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : 'เหมา')}</div>
+                <div style="font-size:12px; margin: 6px 0;">${l.work_details || (l.work_type === 'daily' ? `${l.units} วัน` : (isAdvance ? 'เบิกเงินล่วงหน้า' : 'เหมา'))}</div>
                 <div class="item-card-body"><span>🗓️ ${l.work_date || '-'}</span>${actionsHtml}</div>
             `;
             container.appendChild(card);
@@ -707,13 +708,21 @@
 
     function toggleLaborPaidSafe(logId, expId, isCheckingOut, techName, amount, bankInfo, desc) {
         if (!isCheckingOut) {
-            if(confirm(`ต้องการยกเลิกสถานะโอนเงิน?`)) processPaymentStatusChange(logId, expId, false);
+            const isAdvance = Number(amount || 0) < 0;
+            const confirmMsg = isAdvance ? "ต้องการยกเลิกสถานะการหักคืนยอดเบิกนี้ใช่ไหม?" : "ต้องการยกเลิกสถานะโอนเงิน?";
+            if(confirm(confirmMsg)) processPaymentStatusChange(logId, expId, false);
             return;
         }
+
+        const isAdvance = Number(amount || 0) < 0;
+        document.getElementById('pc-modal-title').innerText = isAdvance ? "ยืนยันการเคลียร์ยอดเบิก 💳" : "ยืนยันการโอนเงิน 💳";
         document.getElementById('pc-name').innerText = techName;
-        document.getElementById('pc-desc').innerText = desc || '-';
+        document.getElementById('pc-desc').innerText = desc || (isAdvance ? 'เบิกเงินล่วงหน้า' : '-');
         document.getElementById('pc-bank').innerText = bankInfo || 'ไม่ได้ระบุ';
-        document.getElementById('pc-amount').innerText = `${Math.abs(amount).toLocaleString()} ฿`;
+        document.getElementById('pc-amount').innerText = `${Math.abs(amount).toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
+        document.getElementById('pc-amount').style.color = isAdvance ? 'var(--rose)' : 'var(--amber)';
+        document.getElementById('pc-slip').value = '';
+
         document.getElementById('pc-log-id').value = logId;
         document.getElementById('pc-exp-id').value = expId || '';
         document.getElementById('modalPayConfirm').style.display = 'flex';
@@ -772,7 +781,7 @@
             tbody.innerHTML += `
                 <tr>
                     <td><strong>${g.techName}</strong><br><small>${g.bank}</small></td>
-                    <td class="money" style="color:${g.total<0?'var(--rose)':'var(--amber)'};">${g.total.toLocaleString()}</td>
+                    <td class="money" style="color:${g.total<0?'var(--rose)':'var(--amber)'};">${g.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                     <td style="text-align:center;"><button class="btn btn-sm btn-emerald" onclick="executeGroupPayroll('${g.logs.map(x=>x.id).join(',')}', '${g.logs.map(x=>x.expense_id).join(',')}')">✅ โอนแล้ว</button></td>
                 </tr>
             `;
