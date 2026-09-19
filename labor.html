@@ -146,9 +146,9 @@
     <!-- Mini KPIs -->
     <div class="kpi-grid">
         <div class="kpi-card amber">
-            <div class="kpi-title" id="kpi-title-pending">ยอดค้างจ่ายคนงาน</div>
+            <div class="kpi-title" id="kpi-title-pending">ยอดค้างจ่าย</div>
             <div class="kpi-val" style="color: var(--amber);" id="kpi-pending-labor">0.00 ฿</div>
-            <div class="kpi-sub" id="kpi-pending-count">0 รายการรอจ่าย</div>
+            <div class="kpi-sub" id="kpi-pending-count">0 รายการรอเคลียร์</div>
         </div>
         <div class="kpi-card emerald">
             <div class="kpi-title" id="kpi-title-paid">จ่ายค่าแรงแล้ว</div>
@@ -566,7 +566,7 @@
         });
 
         document.getElementById('kpi-pending-labor').innerText = `${sumPending.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
-        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอจ่าย`;
+        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอเคลียร์`;
         document.getElementById('kpi-paid-labor').innerText = `${sumPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
         document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการจ่ายแล้ว`;
         
