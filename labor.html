@@ -519,14 +519,20 @@
         }
     }
 
-    function renderLaborLogsView() {
-        let sumPending = 0, cntPending = 0, sumPaid = 0, cntPaid = 0;
-
-        laborLogs.forEach(l => {
-            const amt = Number(l.total_amount || 0);
-            if (l.is_paid) { sumPaid += amt; cntPaid++; }
-            else { sumPending += amt; cntPending++; }
-        });
+    laborLogs.forEach(l => {
+        const amt = Number(l.total_amount || 0);
+        if (l.is_paid) { 
+            // นับเฉพาะรายการที่เป็นค่าแรงจริง (amt > 0)
+            if (amt > 0) {
+                sumPaid += amt; 
+                cntPaid++; 
+            }
+        } else { 
+            // ยอดรอจ่ายรวม (หักลบเงินเบิกที่ค้างอยู่จริง)
+            sumPending += amt; 
+            cntPending++; 
+        }
+    });
 
         document.getElementById('kpi-pending-labor').innerText = `${sumPending.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
         document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอเคลียร์`;
