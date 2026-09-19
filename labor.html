@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         :root {
@@ -42,7 +43,7 @@
         .header-logo-icon { width: 38px; height: 38px; background: #e0f2fe; color: #0284c7; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
         .header-title h1 { margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); }
         .header-title p { margin: 1px 0 0 0; font-size: 11.5px; color: var(--text-sub); }
-        .btn-group { display: flex; gap: 6px; align-items: center; }
+        .btn-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
         .btn { padding: 7px 12px; border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid transparent; transition: all 0.15s ease; }
         .btn-primary { background: var(--primary-accent); color: #fff; }
         .btn-white { background: #fff; border-color: var(--border); color: var(--text-main); }
@@ -67,7 +68,7 @@
 
         /* Filter */
         .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
-        .custom-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; outline: none; background: #fff; flex: 1; min-width: 200px; }
+        .custom-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; outline: none; background: #fff; flex: 1; min-width: 160px; }
         .status-pill-group { display: flex; gap: 4px; background: #e2e8f0; padding: 3px; border-radius: 8px; }
         .status-pill { padding: 4px 8px; border: none; background: transparent; font-family: 'Prompt'; font-size: 11.5px; font-weight: 600; color: var(--text-sub); border-radius: 6px; cursor: pointer; }
         .status-pill.active { background: #fff; color: var(--primary); font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
@@ -85,7 +86,7 @@
         .item-card-title { font-size: 13.5px; font-weight: 700; color: var(--text-main); line-height: 1.3; }
         .item-card-val { font-size: 14.5px; font-weight: 700; text-align: right; white-space: nowrap; }
         .item-card-body { font-size: 11.5px; color: var(--text-sub); display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border); padding-top: 6px; margin-top: 6px; }
-        .item-card-actions { display: flex; align-items: center; gap: 8px; }
+        .item-card-actions { display: flex; align-items: center; gap: 6px; }
 
         .btn-icon { border: none; background: none; cursor: pointer; padding: 4px 6px; border-radius: 4px; font-size: 12px; }
 
@@ -110,42 +111,55 @@
         .payroll-table th, .payroll-table td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
         .payroll-table th { background: var(--bg); font-weight: 600; color: var(--text-sub); }
         .payroll-table td.money { text-align: right; font-weight: 600; }
+
+        /* Confirmation & Alert Box */
+        .worker-confirm-card { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 14px; text-align: center; margin-bottom: 14px; }
+        .alert-revoked { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 20px; border-radius: var(--radius-md); text-align: center; margin: 40px auto; max-width: 450px; }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
+<div class="wrapper" id="app-wrapper">
     <!-- Header -->
     <div class="app-header">
         <div class="header-title">
             <div class="header-logo-icon">👷</div>
             <div>
-                <h1>ระบบจัดการค่าแรงคนงาน</h1>
-                <p>JN Electric & Technology</p>
+                <h1 id="header-main-title">ระบบจัดการค่าแรงคนงาน</h1>
+                <p id="header-sub-title">JN Electric & Technology</p>
             </div>
         </div>
-        <div class="btn-group">
-            <a href="project.html" class="btn btn-white">📁 โครงการ</a>
-            <a href="index.html" class="btn btn-white">⬅️ ออกบิล</a>
+        <div class="btn-group" id="header-btn-group">
+            <button class="btn btn-white btn-sm" onclick="openPartnerShareModal()">🔗 แชร์พาร์ทเนอร์</button>
+            <button class="btn btn-white btn-sm" onclick="exportToExcel()">📊 Excel</button>
+            <a href="project.html" class="btn btn-white btn-sm">📁 โครงการ</a>
+            <a href="index.html" class="btn btn-white btn-sm">⬅️ ออกบิล</a>
         </div>
+    </div>
+
+    <!-- ส่วนยืนยันยอดของคนงาน (แสดงเฉพาะ Worker View) -->
+    <div class="worker-confirm-card" id="worker-confirm-section" style="display: none;">
+        <div style="font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 6px;">โปรดตรวจสอบรายการค่าแรงและการเบิกเงินล่วงหน้าของท่าน</div>
+        <button class="btn btn-emerald" id="btn-worker-confirm" onclick="confirmWorkerAll()">✅ ข้อมูลถูกต้องครบถ้วน</button>
+        <div id="msg-worker-confirmed" style="display: none; color: var(--emerald); font-weight: 700; font-size: 13px;">✓ ท่านได้กดยืนยันความถูกต้องของข้อมูลรอบนี้เรียบร้อยแล้ว</div>
     </div>
 
     <!-- Mini KPIs -->
     <div class="kpi-grid">
         <div class="kpi-card amber">
-            <div class="kpi-title">ยอดค้างจ่ายคนงาน</div>
+            <div class="kpi-title" id="kpi-title-pending">ยอดค้างจ่ายคนงาน</div>
             <div class="kpi-val" style="color: var(--amber);" id="kpi-pending-labor">0.00 ฿</div>
             <div class="kpi-sub" id="kpi-pending-count">0 รายการรอโอน</div>
         </div>
         <div class="kpi-card emerald">
-            <div class="kpi-title">จ่ายค่าแรงแล้ว</div>
+            <div class="kpi-title" id="kpi-title-paid">จ่ายค่าแรงแล้ว</div>
             <div class="kpi-val" style="color: var(--emerald);" id="kpi-paid-labor">0.00 ฿</div>
             <div class="kpi-sub" id="kpi-paid-count">0 รายการโอนแล้ว</div>
         </div>
     </div>
 
-    <!-- Segmented Tabs -->
-    <div class="tab-switcher">
+    <!-- Segmented Tabs (ซ่อนอัตโนมัติในมุมมอง Worker/Partner) -->
+    <div class="tab-switcher" id="admin-tabs">
         <button class="tab-btn active" id="tab-btn-logs" onclick="switchLaborTab('logs')">
             🕒 ประวัติค่าแรง (<span id="cnt-logs">0</span>)
         </button>
@@ -156,7 +170,7 @@
 
     <!-- PANE 1: Labor Logs -->
     <div id="pane-logs">
-        <div class="filter-row">
+        <div class="filter-row" id="filter-container">
             <select id="sel-filter-proj" class="custom-select" onchange="loadLaborLogs()">
                 <option value="">-- กรองทุกโครงการ --</option>
             </select>
@@ -165,8 +179,7 @@
                 <button class="status-pill" id="st-pending" onclick="setStatusFilter('pending')">รอโอน</button>
                 <button class="status-pill" id="st-paid" onclick="setStatusFilter('paid')">โอนแล้ว</button>
             </div>
-            <!-- ปุ่มกดดูยอดสรุปรายคน เพื่อง่ายต่อการจ่ายเงิน -->
-            <button class="btn btn-purple btn-sm" onclick="openPayrollModal()">💳 สรุปยอดจ่ายเงิน (ตัดวีค)</button>
+            <button class="btn btn-purple btn-sm" id="btn-payroll" onclick="openPayrollModal()">💳 สรุปยอดจ่ายเงิน (ตัดวีค)</button>
         </div>
         
         <!-- รายการประวัติ -->
@@ -187,8 +200,8 @@
     </div>
 </div>
 
-<!-- Floating Bottom Bar -->
-<div class="bottom-bar">
+<!-- Floating Bottom Bar (แสดงเฉพาะโหมด Admin) -->
+<div class="bottom-bar" id="admin-bottom-bar">
     <div class="bottom-bar-inner">
         <button class="btn-bottom log" onclick="openWorkModal()">👷 ลงค่าแรง</button>
         <button class="btn-bottom advance" onclick="openAdvanceModal()">💸 ให้เบิกเงิน</button>
@@ -197,7 +210,7 @@
 
 <!-- ================= MODALS ================= -->
 
-<!-- 1. Modal: ลงค่าแรงทำงานปกติ (Work) - แก้ให้เรียบง่าย! -->
+<!-- 1. Modal: ลงค่าแรงทำงานปกติ -->
 <div class="modal-overlay" id="modalWork">
     <div class="modal-box">
         <div class="modal-head">
@@ -211,12 +224,10 @@
         </div>
         <div class="form-item">
             <label>เลือกช่าง:</label>
-            <!-- กลับมาใช้ Select เลือกทีละ 1 คน -->
             <select id="work-tech" class="clean-input" onchange="onTechSelectChanged()"></select>
         </div>
         <div class="form-item">
             <label>วันที่ทำงาน:</label>
-            <!-- กลับมาใช้ Date Picker แบบมาตรฐาน เลือกทีละ 1 วัน -->
             <input type="date" id="work-date" class="clean-input">
         </div>
         <div class="form-item">
@@ -233,7 +244,6 @@
             </div>
             <div class="form-item">
                 <label>ค่าแรง/หน่วย (บาท):</label>
-                <!-- ช่องเรทค่าแรง ชัดเจน ไม่ต้องพิมพ์ 0 -->
                 <input type="number" id="work-rate" class="clean-input" min="0" value="0" oninput="calcWorkTotal()">
             </div>
         </div>
@@ -245,8 +255,11 @@
             <label>รายละเอียดงาน (ถ้ามี):</label>
             <input type="text" id="work-details" class="clean-input" placeholder="เช่น เดินท่อ, ติดกล้อง...">
         </div>
+        <div class="form-item">
+            <label>แนบสลิป/รูปหลักฐาน (ถ้ามี):</label>
+            <input type="file" id="work-slip" class="clean-input" accept="image/*">
+        </div>
         
-        <!-- แถบสรุปยอด -->
         <div style="background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-weight: 600; color: var(--text-main); font-size: 13px;">ยอดรวมค่าแรงงวดนี้:</span>
             <strong style="font-size: 18px; color: var(--primary-accent);" id="lbl-work-total">0.00 ฿</strong>
@@ -256,7 +269,7 @@
     </div>
 </div>
 
-<!-- 2. Modal: เบิกเงินล่วงหน้า (Advance) -->
+<!-- 2. Modal: เบิกเงินล่วงหน้า -->
 <div class="modal-overlay" id="modalAdvance">
     <div class="modal-box">
         <div class="modal-head">
@@ -287,12 +300,16 @@
             <label>รายละเอียด (ถ้ามี):</label>
             <input type="text" id="adv-details" class="clean-input" placeholder="เช่น เบิกค่ากิน, เบิกค่าน้ำมัน...">
         </div>
+        <div class="form-item">
+            <label>แนบสลิปโอนเงินเบิก (รูปภาพ):</label>
+            <input type="file" id="adv-slip" class="clean-input" accept="image/*">
+        </div>
         
         <button class="btn btn-rose" id="btn-submit-adv" style="width:100%; justify-content:center; padding:12px; font-size:14px; margin-top:10px;" onclick="submitAdvance()">💾 บันทึกการเบิกเงิน</button>
     </div>
 </div>
 
-<!-- 3. Modal: สรุปจ่ายเงินตัดวีค (Payroll) -->
+<!-- 3. Modal: สรุปจ่ายเงินตัดวีค -->
 <div class="modal-overlay" id="modalPayroll">
     <div class="modal-box modal-lg">
         <div class="modal-head">
@@ -305,20 +322,18 @@
             <thead>
                 <tr>
                     <th style="width:40%;">รายชื่อช่าง / เลขบัญชี</th>
-                    <th style="width:30%;" class="t-right">ยอดโอนสุทธิ (บาท)</th>
-                    <th style="width:30%;" class="t-center">แอคชัน</th>
+                    <th style="width:30%; text-align:right;">ยอดโอนสุทธิ (บาท)</th>
+                    <th style="width:30%; text-align:center;">แอคชัน</th>
                 </tr>
             </thead>
-            <tbody id="tbl-payroll-body">
-                <!-- Data here -->
-            </tbody>
+            <tbody id="tbl-payroll-body"></tbody>
         </table>
 
         <button class="btn btn-white" style="width:100%; justify-content:center; margin-top:10px;" onclick="closeModal('modalPayroll')">ปิดหน้าต่าง</button>
     </div>
 </div>
 
-<!-- 4. Modal: ป้องกันมือลั่นตอนจ่ายเงิน (Pay Confirm) -->
+<!-- 4. Modal: ป้องกันมือลั่นตอนจ่ายเงิน -->
 <div class="modal-overlay" id="modalPayConfirm">
     <div class="modal-box" style="width:360px; text-align:center;">
         <h2 style="margin-top:0; color:var(--primary); font-size:18px;">ยืนยันการทำรายการ 💳</h2>
@@ -337,18 +352,22 @@
                 <span style="font-size:11.5px; color:var(--text-sub);">ยอดที่ต้องโอน:</span>
                 <span style="font-size:22px; font-weight:700; color:var(--amber);" id="pc-amount">0.00 ฿</span>
             </div>
+            <div class="form-item" style="margin-top:10px;">
+                <label style="font-size:11.5px;">แนบสลิปการโอน:</label>
+                <input type="file" id="pc-slip" class="clean-input" accept="image/*">
+            </div>
         </div>
         <input type="hidden" id="pc-log-id">
         <input type="hidden" id="pc-exp-id">
         
         <div style="display: flex; gap: 8px;">
             <button class="btn btn-white" style="flex:1; justify-content:center;" onclick="closeModal('modalPayConfirm')">ยกเลิก</button>
-            <button class="btn btn-emerald font-bold" style="flex:1; justify-content:center;" onclick="executeLaborPaid()">✅ ยืนยัน</button>
+            <button class="btn btn-emerald font-bold" id="btn-confirm-pay" style="flex:1; justify-content:center;" onclick="executeLaborPaid()">✅ ยืนยัน</button>
         </div>
     </div>
 </div>
 
-<!-- Modal: เพิ่มช่างใหม่ -->
+<!-- 5. Modal: เพิ่ม/แก้ไขช่าง -->
 <div class="modal-overlay" id="modalTech">
     <div class="modal-box">
         <div class="modal-head">
@@ -371,6 +390,31 @@
     </div>
 </div>
 
+<!-- 6. Modal: แชร์สิทธิ์พาร์ทเนอร์ (เฉพาะ Admin) -->
+<div class="modal-overlay" id="modalPartner">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h3 style="color:var(--primary-accent);">🔗 สิทธิ์แชร์สำหรับพาร์ทเนอร์</h3>
+            <span style="cursor: pointer; font-size: 18px;" onclick="closeModal('modalPartner')">&times;</span>
+        </div>
+        <div style="font-size:12px; color:var(--text-sub); margin-bottom:12px;">พาร์ทเนอร์จะเห็นเฉพาะโครงการที่ท่านระบุเท่านั้น (สิทธิ์อ่านอย่างเดียว)</div>
+        <div class="form-item">
+            <label>ชื่อพาร์ทเนอร์ / ผู้ร่วมทุน:</label>
+            <input type="text" id="inp-partner-name" class="clean-input" placeholder="เช่น หุ้นส่วนคุณวิชัย">
+        </div>
+        <div class="form-item">
+            <label>อนุญาตให้ดูโครงการ:</label>
+            <select id="sel-partner-proj" class="clean-input"></select>
+        </div>
+        <button class="btn btn-primary" style="width:100%; justify-content:center; margin-bottom:15px;" onclick="createPartnerShare()">➕ สร้างลิงก์พาร์ทเนอร์</button>
+        
+        <div style="border-top:1px solid var(--border); padding-top:10px;">
+            <div style="font-size:12.5px; font-weight:700; margin-bottom:8px;">รายการลิงก์พาร์ทเนอร์:</div>
+            <div id="partner-share-list" style="max-height:180px; overflow-y:auto; font-size:12px; display:flex; flex-direction:column; gap:6px;"></div>
+        </div>
+    </div>
+</div>
+
 <script>
     const SUPABASE_URL = 'https://gqtpqqwipajyiamygrru.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxdHBxcXdpcGFqeWlhbXlncnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTE4NzUsImV4cCI6MjEwMzEyNzg3NX0.upbVr2gm8uUarpYx76UD65_1TO8QcHkVxMx39yEU7dQ';
@@ -382,14 +426,102 @@
     let activeTab = 'logs';
     let statusFilter = 'pending';
 
+    // 🌟 ระบบตรวจสอบสิทธิ์ผ่าน URL
+    let appMode = 'ADMIN'; // ADMIN, PARTNER, WORKER
+    let activeProjectId = null;
+    let activeWorkerId = null;
+
     window.onload = async () => {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) { window.location.href = "index.html"; return; }
+        const params = new URLSearchParams(window.location.search);
+        const partnerToken = params.get('partner');
+        const workerToken = params.get('worker');
+
+        if (partnerToken) {
+            await initPartnerMode(partnerToken);
+        } else if (workerToken) {
+            await initWorkerMode(workerToken);
+        } else {
+            // มุมมองแอดมินปกติ
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = "index.html"; return; }
+            await loadProjects();
+            await loadTechnicians();
+            await loadLaborLogs();
+        }
+    };
+
+    // โหมดพาร์ทเนอร์
+    async function initPartnerMode(token) {
+        appMode = 'PARTNER';
+        const { data: share, error } = await supabaseClient
+            .from('partner_shares')
+            .select('*, projects(project_name)')
+            .eq('share_token', token)
+            .single();
+
+        if (error || !share || !share.token_active) {
+            renderRevokedScreen("ลิงก์สรุปสำหรับพาร์ทเนอร์นี้ ถูกปิดการเข้าถึงหรือหมดอายุแล้วครับ");
+            return;
+        }
+
+        activeProjectId = share.project_id;
+        document.getElementById('header-main-title').innerText = `โครงการ: ${share.projects?.project_name || '-'}`;
+        document.getElementById('header-sub-title').innerText = `มุมมองพาร์ทเนอร์: ${share.partner_name} (อ่านอย่างเดียว)`;
         
+        // ซ่อนปุ่มแอดมิน
+        document.getElementById('header-btn-group').innerHTML = '<button class="btn btn-white btn-sm" onclick="exportToExcel()">📊 ดาวน์โหลด Excel</button>';
+        document.getElementById('admin-tabs').style.display = 'none';
+        document.getElementById('admin-bottom-bar').style.display = 'none';
+        document.getElementById('btn-payroll').style.display = 'none';
+        document.getElementById('sel-filter-proj').style.display = 'none';
+
         await loadProjects();
         await loadTechnicians();
         await loadLaborLogs();
-    };
+    }
+
+    // โหมดคนงาน
+    async function initWorkerMode(token) {
+        appMode = 'WORKER';
+        const { data: tech, error } = await supabaseClient
+            .from('technicians')
+            .select('*')
+            .eq('share_token', token)
+            .single();
+
+        if (error || !tech || !tech.token_active) {
+            renderRevokedScreen("ลิงก์สรุปค่าแรงของท่าน ถูกปิดการเข้าถึงแล้ว โปรดติดต่อแอดมิน");
+            return;
+        }
+
+        activeWorkerId = tech.id;
+        document.getElementById('header-main-title').innerText = `ใบบันทึกค่าแรง: ${tech.tech_name}`;
+        document.getElementById('header-sub-title').innerText = `ธนาคาร: ${tech.bank_name || '-'} ${tech.bank_account || '-'} (อ่านอย่างเดียว)`;
+        
+        // ซ่อนส่วนควบคุมแอดมินทั้งหมด
+        document.getElementById('header-btn-group').style.display = 'none';
+        document.getElementById('admin-tabs').style.display = 'none';
+        document.getElementById('admin-bottom-bar').style.display = 'none';
+        document.getElementById('filter-container').style.display = 'none';
+        document.getElementById('worker-confirm-section').style.display = 'block';
+
+        document.getElementById('kpi-title-pending').innerText = 'ยอดค่าแรงรอรับ';
+        document.getElementById('kpi-title-paid').innerText = 'ยอดรับเงินแล้ว';
+
+        await loadProjects();
+        await loadTechnicians();
+        await loadLaborLogs();
+    }
+
+    function renderRevokedScreen(msg) {
+        document.getElementById('app-wrapper').innerHTML = `
+            <div class="alert-revoked">
+                <h3 style="margin-top:0;">⚠️ การเข้าถึงถูกระงับ</h3>
+                <p style="font-size:13px;">${msg}</p>
+                <a href="index.html" class="btn btn-white" style="margin-top:10px;">กลับสู่หน้าหลัก</a>
+            </div>
+        `;
+    }
 
     function switchLaborTab(tab) {
         activeTab = tab;
@@ -413,18 +545,19 @@
         const selFilter = document.getElementById('sel-filter-proj');
         const workProj = document.getElementById('work-proj');
         const advProj = document.getElementById('adv-proj');
+        const partnerProj = document.getElementById('sel-partner-proj');
         
-        const opts = '<option value="">-- กรองทุกโครงการ --</option>';
-        const reqOpts = '<option value="">-- เลือกโครงการ --</option>';
-        selFilter.innerHTML = opts;
-        workProj.innerHTML = reqOpts;
-        advProj.innerHTML = reqOpts;
+        if (selFilter) selFilter.innerHTML = '<option value="">-- กรองทุกโครงการ --</option>';
+        if (workProj) workProj.innerHTML = '<option value="">-- เลือกโครงการ --</option>';
+        if (advProj) advProj.innerHTML = '<option value="">-- เลือกโครงการ --</option>';
+        if (partnerProj) partnerProj.innerHTML = '<option value="">-- เลือกโครงการ --</option>';
 
         projects.forEach(p => {
             const opt = `<option value="${p.id}">🟢 ${p.project_name}</option>`;
-            selFilter.insertAdjacentHTML('beforeend', opt);
-            workProj.insertAdjacentHTML('beforeend', opt);
-            advProj.insertAdjacentHTML('beforeend', opt);
+            if (selFilter) selFilter.insertAdjacentHTML('beforeend', opt);
+            if (workProj) workProj.insertAdjacentHTML('beforeend', opt);
+            if (advProj) advProj.insertAdjacentHTML('beforeend', opt);
+            if (partnerProj) partnerProj.insertAdjacentHTML('beforeend', opt);
         });
     }
 
@@ -436,54 +569,75 @@
         const workTech = document.getElementById('work-tech');
         const advTech = document.getElementById('adv-tech');
         
-        container.innerHTML = '';
+        if (container) container.innerHTML = '';
+        if (workTech) workTech.innerHTML = '<option value="">-- เลือกช่าง --</option>';
+        if (advTech) advTech.innerHTML = '<option value="">-- เลือกช่าง --</option>';
         
-        // กลับมาใช้ Dropdown เลือก 1 คน ตามปกติ
-        const reqOpts = '<option value="">-- เลือกช่าง --</option>';
-        workTech.innerHTML = reqOpts;
-        advTech.innerHTML = reqOpts;
-        
-        document.getElementById('cnt-techs').innerText = technicians.length;
+        const cntEl = document.getElementById('cnt-techs');
+        if (cntEl) cntEl.innerText = technicians.length;
 
         technicians.forEach(t => {
-            // Render Tech Card
-            const card = document.createElement('div');
-            card.className = 'item-card';
-            card.innerHTML = `
-                <div class="item-card-top">
-                    <div>
-                        <div class="item-card-title">${t.tech_name}</div>
-                        <div style="font-size:11.5px; color:var(--text-sub); margin-top:2px;">
-                            📞 ${t.phone || '-'} • 🏦 ${t.bank_name || ''} <strong>${t.bank_account || ''}</strong>
+            if (container) {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                const shareLink = `${window.location.origin}${window.location.pathname}?worker=${t.share_token}`;
+                card.innerHTML = `
+                    <div class="item-card-top">
+                        <div>
+                            <div class="item-card-title">${t.tech_name}</div>
+                            <div style="font-size:11.5px; color:var(--text-sub); margin-top:2px;">
+                                📞 ${t.phone || '-'} • 🏦 ${t.bank_name || ''} <strong>${t.bank_account || ''}</strong>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px;">
+                            <button class="btn btn-white btn-sm" onclick="copyShareUrl('${shareLink}')" title="คัดลอกลิงก์ให้ช่างคนนี้">🔗 ส่งลิงก์</button>
+                            <button class="btn-icon" onclick="openEditTechModal('${t.id}')">✏️</button>
+                            <button class="btn-icon" onclick="deleteTechnician('${t.id}', '${t.tech_name}')">🗑️</button>
                         </div>
                     </div>
-                    <div>
-                        <button class="btn-icon" onclick="openEditTechModal('${t.id}')">✏️</button>
-                        <button class="btn-icon" onclick="deleteTechnician('${t.id}', '${t.tech_name}')">🗑️</button>
+                    <div class="item-card-body">
+                        <span>เรท: <strong style="color:var(--primary-accent);">${Number(t.default_daily_rate || 500).toLocaleString()} ฿/วัน</strong></span>
+                        <span>
+                            <button class="btn btn-sm ${t.token_active ? 'btn-white' : 'btn-rose'}" style="font-size:10px; padding:2px 6px;" onclick="toggleTechToken('${t.id}', ${t.token_active})">
+                                ${t.token_active ? '● ลิงก์เปิดอยู่' : '● ปิดการเข้าถึง'}
+                            </button>
+                        </span>
                     </div>
-                </div>
-                <div class="item-card-body">
-                    <span>เรท: <strong style="color:var(--primary-accent);">${Number(t.default_daily_rate || 500).toLocaleString()} ฿/วัน</strong></span>
-                    <span>${t.skills || 'ช่างทั่วไป'}</span>
-                </div>
-            `;
-            container.appendChild(card);
+                `;
+                container.appendChild(card);
+            }
 
-            // Populate Dropdowns
             const opt = `<option value="${t.id}">${t.tech_name}</option>`;
-            workTech.insertAdjacentHTML('beforeend', opt);
-            advTech.insertAdjacentHTML('beforeend', opt);
+            if (workTech) workTech.insertAdjacentHTML('beforeend', opt);
+            if (advTech) advTech.insertAdjacentHTML('beforeend', opt);
         });
     }
 
     async function loadLaborLogs() {
-        const filterProj = document.getElementById('sel-filter-proj').value;
-        let query = supabaseClient.from('project_labor_logs').select('*, projects(project_name), technicians(tech_name, phone, bank_name, bank_account, default_daily_rate)').order('work_date', { ascending: false });
-        if (filterProj) query = query.eq('project_id', filterProj);
+        let query = supabaseClient.from('project_labor_logs').select('*, projects(project_name), technicians(tech_name, phone, bank_name, bank_account, default_daily_rate, share_token)').order('work_date', { ascending: false });
+        
+        // กรองตาม Mode
+        if (appMode === 'PARTNER' && activeProjectId) {
+            query = query.eq('project_id', activeProjectId);
+        } else if (appMode === 'WORKER' && activeWorkerId) {
+            query = query.eq('technician_id', activeWorkerId);
+        } else {
+            const filterProj = document.getElementById('sel-filter-proj')?.value;
+            if (filterProj) query = query.eq('project_id', filterProj);
+        }
         
         const { data } = await query;
         laborLogs = data || [];
         renderLaborLogsView();
+
+        // ตรวจสอบสถานะยืนยันของคนงาน
+        if (appMode === 'WORKER') {
+            const unconfirmed = laborLogs.some(l => !l.worker_confirmed);
+            if (!unconfirmed && laborLogs.length > 0) {
+                document.getElementById('btn-worker-confirm').style.display = 'none';
+                document.getElementById('msg-worker-confirmed').style.display = 'block';
+            }
+        }
     }
 
     function renderLaborLogsView() {
@@ -493,7 +647,7 @@
         laborLogs.forEach(l => {
             const amt = Number(l.total_amount || 0);
             if (l.is_paid) { 
-                if (amt > 0) sumPaid += amt; 
+                sumPaid += amt; 
                 cntPaid++; 
             } else { 
                 sumPending += amt; 
@@ -505,7 +659,9 @@
         document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอเคลียร์`;
         document.getElementById('kpi-paid-labor').innerText = `${sumPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
         document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการจ่ายแล้ว`;
-        document.getElementById('cnt-logs').innerText = laborLogs.length;
+        
+        const cntLogsEl = document.getElementById('cnt-logs');
+        if (cntLogsEl) cntLogsEl.innerText = laborLogs.length;
 
         let displayList = laborLogs;
         if (statusFilter === 'pending') displayList = laborLogs.filter(l => !l.is_paid);
@@ -526,19 +682,43 @@
             const card = document.createElement('div');
             card.className = `item-card ${l.is_paid ? 'paid' : (isAdvance ? 'advance' : '')}`;
             
-            let payBtnHtml = '';
-            if(l.is_paid) {
-                payBtnHtml = `<span style="font-size:11.5px; color:var(--emerald); font-weight:600; cursor:pointer;" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', false)">เคลียร์แล้ว ✅</span>`;
+            // ปุ่มและการแสดงผลสลิป
+            const slipBtn = l.slip_url ? `<a href="${l.slip_url}" target="_blank" style="text-decoration:none; font-size:11.5px; margin-right:4px;">📎 ดูสลิป</a>` : '';
+            const confirmedBadge = l.worker_confirmed ? `<span title="ช่างยืนยันแล้ว" style="color:var(--emerald); font-size:11px; margin-left:4px;">✓ ยืนยันแล้ว</span>` : '';
+
+            let actionsHtml = '';
+            if (appMode === 'ADMIN') {
+                let payBtnHtml = '';
+                if(l.is_paid) {
+                    payBtnHtml = `<span style="font-size:11.5px; color:var(--emerald); font-weight:600; cursor:pointer;" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', false)">เคลียร์แล้ว ✅</span>`;
+                } else {
+                    payBtnHtml = `<button class="btn btn-sm ${isAdvance ? 'btn-rose' : 'btn-primary'}" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', true, '${l.technicians?.tech_name}', ${amt}, '${l.technicians?.bank_name} ${l.technicians?.bank_account}', '${l.work_details || l.work_type}')">💳 ${isAdvance ? 'ยืนยันหักยอด' : 'จ่ายเงิน'}</button>`;
+                }
+                actionsHtml = `
+                    <div class="item-card-actions">
+                        ${slipBtn}
+                        ${payBtnHtml}
+                        <button class="btn-icon" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')" title="ลบรายการ">🗑️</button>
+                    </div>
+                `;
             } else {
-                payBtnHtml = `<button class="btn btn-sm ${isAdvance ? 'btn-danger' : 'btn-primary'}" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', true, '${l.technicians?.tech_name}', ${amt}, '${l.technicians?.bank_name} ${l.technicians?.bank_account}', '${l.work_details || l.work_type}')">💳 ${isAdvance ? 'ยืนยันหักยอด' : 'จ่ายเงิน'}</button>`;
+                // มุมมองพาร์ทเนอร์ หรือ คนงาน
+                actionsHtml = `
+                    <div class="item-card-actions">
+                        ${slipBtn}
+                        <span style="font-size:11.5px; font-weight:600; color:${l.is_paid ? 'var(--emerald)' : 'var(--amber)'};">
+                            ${l.is_paid ? 'โอนแล้ว ✅' : 'รอโอน ⏳'}
+                        </span>
+                    </div>
+                `;
             }
 
             card.innerHTML = `
                 <div class="item-card-top">
                     <div>
-                        <div class="item-card-title">${l.technicians?.tech_name || 'คนงาน'} ${isAdvance ? '<span style="color:var(--rose); font-size:11px;">(เบิก)</span>' : ''}</div>
+                        <div class="item-card-title">${l.technicians?.tech_name || 'คนงาน'} ${isAdvance ? '<span style="color:var(--rose); font-size:11px;">(เบิกล่วงหน้า)</span>' : ''} ${confirmedBadge}</div>
                         <div style="font-size:11.5px; color:var(--primary-accent); font-weight:600; margin-top:2px;">
-                            📁 ${l.projects?.project_name || '-'}
+                            📁 ${l.projects?.project_name || 'ไม่ระบุโครงการ'}
                         </div>
                     </div>
                     <div class="item-card-val" style="color:${l.is_paid ? 'var(--emerald)' : (isAdvance ? 'var(--rose)' : 'var(--amber)')};">
@@ -551,10 +731,7 @@
                 </div>
                 <div class="item-card-body">
                     <span>🗓️ ${l.work_date || '-'}</span>
-                    <div class="item-card-actions">
-                        ${payBtnHtml}
-                        <button class="btn-icon" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')" title="ลบรายการ">🗑️</button>
-                    </div>
+                    ${actionsHtml}
                 </div>
             `;
             container.appendChild(card);
@@ -569,11 +746,11 @@
         document.getElementById('work-units').value = '1';
         document.getElementById('work-rate').value = '0';
         document.getElementById('work-ot').value = '0';
+        document.getElementById('work-slip').value = '';
         calcWorkTotal();
         document.getElementById('modalWork').style.display = 'flex';
     }
 
-    // 🌟 ระบบอัตโนมัติ: ดึงเรทของช่างมาใส่ให้เลย ไม่งง
     function onTechSelectChanged() {
         const tId = document.getElementById('work-tech').value;
         const tech = technicians.find(t => t.id === tId);
@@ -600,6 +777,7 @@
         const rate = parseFloat(document.getElementById('work-rate').value) || 0;
         const ot = parseFloat(document.getElementById('work-ot').value) || 0;
         const details = document.getElementById('work-details').value.trim();
+        const slipFile = document.getElementById('work-slip').files[0];
 
         if (!projId || !techId || !date) return alert('⚠️ กรุณาระบุโครงการ, ช่าง และวันที่ให้ครบถ้วน');
 
@@ -607,10 +785,20 @@
         if (total <= 0) return alert('⚠️ ยอดรวมต้องมากกว่า 0 บาท');
 
         const tech = technicians.find(t => t.id === techId);
-        
         setBtnLoading('btn-submit-work', true);
 
         try {
+            let slipUrl = null;
+            if (slipFile) {
+                const ext = slipFile.name.split('.').pop();
+                const fileName = `work_${Date.now()}.${ext}`;
+                const { error: upErr } = await supabaseClient.storage.from('slips').upload(fileName, slipFile);
+                if (!upErr) {
+                    const { data: pubData } = supabaseClient.storage.from('slips').getPublicUrl(fileName);
+                    slipUrl = pubData.publicUrl;
+                }
+            }
+
             const expItemName = `ค่าแรง: ${tech.tech_name} (${details || (type === 'daily' ? `${units} วัน` : `${units} ชิ้น`)})`;
 
             // ขา 1: โยนเข้า Expense ของ Project
@@ -626,7 +814,8 @@
             await supabaseClient.from('project_labor_logs').insert([{
                 project_id: projId, technician_id: techId, expense_id: expData.id,
                 work_date: date, work_type: type, units: units, unit_rate: rate,
-                ot_amount: ot, total_amount: total, work_details: details, is_paid: false
+                ot_amount: ot, total_amount: total, work_details: details, is_paid: false,
+                slip_url: slipUrl
             }]);
 
             alert(`✅ บันทึกค่าแรงให้ ${tech.tech_name} สำเร็จ!`);
@@ -646,27 +835,40 @@
         document.getElementById('adv-tech').value = '';
         document.getElementById('adv-amount').value = '';
         document.getElementById('adv-details').value = '';
+        document.getElementById('adv-slip').value = '';
         document.getElementById('modalAdvance').style.display = 'flex';
     }
 
     async function submitAdvance() {
-        const projId = document.getElementById('adv-proj').value; // โปรเจกต์มีหรือไม่มีก็ได้
+        const projId = document.getElementById('adv-proj').value;
         const techId = document.getElementById('adv-tech').value;
         const date = document.getElementById('adv-date').value;
         const amount = parseFloat(document.getElementById('adv-amount').value) || 0;
         const details = document.getElementById('adv-details').value.trim();
+        const slipFile = document.getElementById('adv-slip').files[0];
 
         if (!techId || !date || amount <= 0) return alert('⚠️ กรุณาระบุช่าง วันที่ และจำนวนเงินเบิกให้ถูกต้อง');
 
         setBtnLoading('btn-submit-adv', true);
-        const tech = technicians.find(t => t.id === techId);
-        const finalTotal = -amount; // ทำให้ยอดติดลบ!
+        const finalTotal = -amount; // ติดลบ
         
         try {
+            let slipUrl = null;
+            if (slipFile) {
+                const ext = slipFile.name.split('.').pop();
+                const fileName = `adv_${Date.now()}.${ext}`;
+                const { error: upErr } = await supabaseClient.storage.from('slips').upload(fileName, slipFile);
+                if (!upErr) {
+                    const { data: pubData } = supabaseClient.storage.from('slips').getPublicUrl(fileName);
+                    slipUrl = pubData.publicUrl;
+                }
+            }
+
             await supabaseClient.from('project_labor_logs').insert([{
                 project_id: projId || null, technician_id: techId, expense_id: null,
                 work_date: date, work_type: 'advance', units: 1, unit_rate: amount,
-                ot_amount: 0, total_amount: finalTotal, work_details: details, is_paid: false
+                ot_amount: 0, total_amount: finalTotal, work_details: details, is_paid: false,
+                slip_url: slipUrl
             }]);
 
             closeModal('modalAdvance');
@@ -690,6 +892,7 @@
         document.getElementById('pc-name').innerText = techName || 'คนงาน';
         document.getElementById('pc-desc').innerText = desc || '-';
         document.getElementById('pc-bank').innerText = bankInfo && bankInfo.trim() !== 'null null' ? bankInfo : 'ไม่ได้ระบุบัญชี';
+        document.getElementById('pc-slip').value = '';
         
         const amtColor = amount < 0 ? 'var(--rose)' : 'var(--amber)';
         document.getElementById('pc-amount').innerText = `${Math.abs(amount).toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
@@ -703,12 +906,33 @@
     async function executeLaborPaid() {
         const logId = document.getElementById('pc-log-id').value;
         const expId = document.getElementById('pc-exp-id').value;
-        await processPaymentStatusChange(logId, expId, true);
-        closeModal('modalPayConfirm');
+        const slipFile = document.getElementById('pc-slip').files[0];
+
+        setBtnLoading('btn-confirm-pay', true);
+        try {
+            let slipUrl = null;
+            if (slipFile) {
+                const ext = slipFile.name.split('.').pop();
+                const fileName = `pay_${Date.now()}.${ext}`;
+                const { error: upErr } = await supabaseClient.storage.from('slips').upload(fileName, slipFile);
+                if (!upErr) {
+                    const { data: pubData } = supabaseClient.storage.from('slips').getPublicUrl(fileName);
+                    slipUrl = pubData.publicUrl;
+                }
+            }
+
+            await processPaymentStatusChange(logId, expId, true, slipUrl);
+            closeModal('modalPayConfirm');
+        } finally {
+            setBtnLoading('btn-confirm-pay', false, '✅ ยืนยัน');
+        }
     }
 
-    async function processPaymentStatusChange(logId, expId, newStatus) {
-        await supabaseClient.from('project_labor_logs').update({ is_paid: newStatus }).eq('id', logId);
+    async function processPaymentStatusChange(logId, expId, newStatus, slipUrl = null) {
+        const updatePayload = { is_paid: newStatus };
+        if (slipUrl) updatePayload.slip_url = slipUrl;
+
+        await supabaseClient.from('project_labor_logs').update(updatePayload).eq('id', logId);
         if (expId && expId !== 'null' && expId !== '') {
             await supabaseClient.from('project_expenses').update({ is_paid: newStatus }).eq('id', expId);
         }
@@ -724,7 +948,6 @@
         await loadLaborLogs();
     }
 
-    // 🌟 ระบบตัดวีค Payroll
     function openPayrollModal() {
         const pendingLogs = laborLogs.filter(l => !l.is_paid);
         if(pendingLogs.length === 0) return alert('ไม่มีรายการค้างจ่ายในขณะนี้ครับ');
@@ -757,7 +980,7 @@
                 <td class="money" style="color:${isNegative ? 'var(--rose)' : 'var(--amber)'}; font-size:16px;">
                     ${g.netTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}
                 </td>
-                <td class="t-center">
+                <td style="text-align:center;">
                     <button class="btn btn-sm btn-emerald" style="width:100%; justify-content:center; padding:8px 0;" onclick="executeGroupPayroll('${g.logs.map(x=>x.id).join(',')}', '${g.logs.map(x=>x.expense_id).join(',')}')">
                         ✅ โอนแล้ว
                     </button>
@@ -780,6 +1003,76 @@
 
         closeModal('modalPayroll');
         await loadLaborLogs();
+    }
+
+    // ================= ฟังก์ชันยืนยันยอดของช่าง =================
+    async function confirmWorkerAll() {
+        if (!confirm("ท่านได้ตรวจสอบยอดค่าแรงและรายการหักเบิกถูกต้องครบถ้วนแล้วใช่หรือไม่?")) return;
+        const unconfirmedIds = laborLogs.filter(l => !l.worker_confirmed).map(l => l.id);
+        if (unconfirmedIds.length === 0) return;
+
+        await supabaseClient
+            .from('project_labor_logs')
+            .update({ worker_confirmed: true, confirmed_at: new Date() })
+            .in('id', unconfirmedIds);
+
+        alert("ขอบคุณครับ! ระบบบันทึกการยืนยันข้อมูลเรียบร้อยแล้ว");
+        await loadLaborLogs();
+    }
+
+    // ================= ฟังก์ชันแชร์พาร์ทเนอร์ & คนงาน =================
+    function openPartnerShareModal() {
+        document.getElementById('inp-partner-name').value = '';
+        document.getElementById('modalPartner').style.display = 'flex';
+        renderPartnerShareList();
+    }
+
+    async function createPartnerShare() {
+        const name = document.getElementById('inp-partner-name').value.trim();
+        const pId = document.getElementById('sel-partner-proj').value;
+        if (!name || !pId) return alert("กรุณาระบุชื่อพาร์ทเนอร์และเลือกโครงการ");
+
+        await supabaseClient.from('partner_shares').insert([{ partner_name: name, project_id: pId }]);
+        document.getElementById('inp-partner-name').value = '';
+        renderPartnerShareList();
+    }
+
+    async function renderPartnerShareList() {
+        const { data } = await supabaseClient.from('partner_shares').select('*, projects(project_name)');
+        const box = document.getElementById('partner-share-list');
+        if (!data || data.length === 0) { box.innerHTML = '<span style="color:var(--text-sub);">ยังไม่มีลิงก์แชร์</span>'; return; }
+
+        box.innerHTML = data.map(item => {
+            const link = `${window.location.origin}${window.location.pathname}?partner=${item.share_token}`;
+            return `
+                <div style="background:var(--bg); border:1px solid var(--border); padding:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong>${item.partner_name}</strong> (${item.projects?.project_name || '-'ready})<br>
+                        <small style="color:${item.token_active ? 'var(--emerald)' : 'var(--rose)'};">${item.token_active ? '● เปิดใช้งาน' : '● ปิดการเข้าถึง'}</small>
+                    </div>
+                    <div style="display:flex; gap:4px;">
+                        <button class="btn btn-white btn-sm" onclick="copyShareUrl('${link}')">คัดลอก</button>
+                        <button class="btn ${item.token_active ? 'btn-rose' : 'btn-white'} btn-sm" onclick="togglePartnerToken('${item.id}', ${item.token_active})">${item.token_active ? 'ปิด' : 'เปิด'}</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function togglePartnerToken(id, currentStatus) {
+        await supabaseClient.from('partner_shares').update({ token_active: !currentStatus }).eq('id', id);
+        renderPartnerShareList();
+    }
+
+    async function toggleTechToken(id, currentStatus) {
+        await supabaseClient.from('technicians').update({ token_active: !currentStatus }).eq('id', id);
+        await loadTechnicians();
+    }
+
+    function copyShareUrl(url) {
+        navigator.clipboard.writeText(url).then(() => {
+            alert("คัดลอกลิงก์สำเร็จแล้ว!\nสามารถส่งให้ช่างหรือพาร์ทเนอร์ทาง LINE ได้ทันทีครับ");
+        });
     }
 
     // ================= TECH DB =================
@@ -828,6 +1121,24 @@
         if (!confirm(`ยืนยันลบคนงาน "${name}" ออกจากระบบ?`)) return;
         await supabaseClient.from('technicians').delete().eq('id', id);
         await loadTechnicians();
+    }
+
+    function exportToExcel() {
+        const wb = XLSX.utils.book_new();
+        const exportData = laborLogs.map((l, idx) => ({
+            "ลำดับ": idx + 1,
+            "วันที่": l.work_date,
+            "ชื่อคนงาน": l.technicians?.tech_name || '',
+            "โครงการ": l.projects?.project_name || '',
+            "รายละเอียด": l.work_details || (l.work_type === 'advance' ? 'เบิกล่วงหน้า' : l.work_type),
+            "จำนวน": l.units,
+            "ยอดเงิน": Number(l.total_amount || 0),
+            "สถานะ": l.is_paid ? 'โอนแล้ว' : 'รอโอน',
+            "ช่างยืนยันแล้ว": l.worker_confirmed ? 'ใช่' : 'ยังไม่ยืนยัน'
+        }));
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        XLSX.utils.book_append_sheet(wb, ws, "สรุปค่าแรง");
+        XLSX.writeFile(wb, `รายงานค่าแรง_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
