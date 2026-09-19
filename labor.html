@@ -342,21 +342,29 @@
     let activeProjectId = null;
     let activeWorkerId = null;
 
-    window.onload = async () => {
-        const params = new URLSearchParams(window.location.search);
-        const partnerToken = params.get('partner');
-        const workerToken = params.get('worker');
+    function generateSafeToken() {
+        return 't_' + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
+    }
 
-        if (partnerToken) {
-            await initPartnerMode(partnerToken);
-        } else if (workerToken) {
-            await initWorkerMode(workerToken);
-        } else {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) { window.location.href = "index.html"; return; }
-            await loadProjects();
-            await loadTechnicians();
-            await loadLaborLogs();
+    window.onload = async () => {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const partnerToken = params.get('partner');
+            const workerToken = params.get('worker');
+
+            if (partnerToken) {
+                await initPartnerMode(partnerToken);
+            } else if (workerToken) {
+                await initWorkerMode(workerToken);
+            } else {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) { window.location.href = "index.html"; return; }
+                await loadProjects();
+                await loadTechnicians();
+                await loadLaborLogs();
+            }
+        } catch (err) {
+            console.error("Window onload error:", err);
         }
     };
 
@@ -451,10 +459,9 @@
         const { data } = await supabaseClient.from('technicians').select('*').order('tech_name');
         technicians = data || [];
         
-        // ตรวจสอบช่างทุกคนว่ามี share_token หรือยัง ถ้ายังให้สร้างอัตโนมัติ
         for(let t of technicians) {
             if (!t.share_token) {
-                const newToken = crypto.randomUUID();
+                const newToken = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : generateSafeToken();
                 await supabaseClient.from('technicians').update({ share_token: newToken }).eq('id', t.id);
                 t.share_token = newToken;
             }
@@ -506,7 +513,12 @@
             if (filterProj) query = query.eq('project_id', filterProj);
         }
         
-        const { data } = await query;
+        const { data, error } = await query;
+        if (error) {
+            console.error("Error loading labor logs:", error);
+            document.getElementById('labor-logs-list').innerHTML = `<div style="text-align:center; padding:30px; color:var(--rose); font-size:12.5px;">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}</div>`;
+            return;
+        }
         laborLogs = data || [];
         renderLaborLogsView();
 
@@ -519,20 +531,23 @@
         }
     }
 
-    laborLogs.forEach(l => {
-        const amt = Number(l.total_amount || 0);
-        if (l.is_paid) { 
-            // นับเฉพาะรายการที่เป็นค่าแรงจริง (amt > 0)
-            if (amt > 0) {
-                sumPaid += amt; 
-                cntPaid++; 
+    function renderLaborLogsView() {
+        let sumPending = 0, cntPending = 0, sumPaid = 0, cntPaid = 0;
+
+        laborLogs.forEach(l => {
+            const amt = Number(l.total_amount || 0);
+            if (l.is_paid) {
+                // นับเฉพาะรายการที่เป็นค่าแรงจริง (ยอดบวก)
+                if (amt > 0) {
+                    sumPaid += amt;
+                    cntPaid++;
+                }
+            } else {
+                // ยอดค้างจ่ายรวม (หักลบเงินเบิกที่ค้างอยู่จริง)
+                sumPending += amt;
+                cntPending++;
             }
-        } else { 
-            // ยอดรอจ่ายรวม (หักลบเงินเบิกที่ค้างอยู่จริง)
-            sumPending += amt; 
-            cntPending++; 
-        }
-    });
+        });
 
         document.getElementById('kpi-pending-labor').innerText = `${sumPending.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
         document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอเคลียร์`;
