@@ -148,12 +148,12 @@
         <div class="kpi-card amber">
             <div class="kpi-title" id="kpi-title-pending">ยอดค้างจ่ายคนงาน</div>
             <div class="kpi-val" style="color: var(--amber);" id="kpi-pending-labor">0.00 ฿</div>
-            <div class="kpi-sub" id="kpi-pending-count">0 รายการรอโอน</div>
+            <div class="kpi-sub" id="kpi-pending-count">0 รายการรอจ่าย</div>
         </div>
         <div class="kpi-card emerald">
             <div class="kpi-title" id="kpi-title-paid">จ่ายค่าแรงแล้ว</div>
             <div class="kpi-val" style="color: var(--emerald);" id="kpi-paid-labor">0.00 ฿</div>
-            <div class="kpi-sub" id="kpi-paid-count">0 รายการโอนแล้ว</div>
+            <div class="kpi-sub" id="kpi-paid-count">0 รายการจ่ายแล้ว</div>
         </div>
     </div>
 
@@ -175,8 +175,8 @@
             </select>
             <div class="status-pill-group">
                 <button class="status-pill active" id="st-all" onclick="setStatusFilter('all')">ทั้งหมด</button>
-                <button class="status-pill" id="st-pending" onclick="setStatusFilter('pending')">รอโอน</button>
-                <button class="status-pill" id="st-paid" onclick="setStatusFilter('paid')">โอนแล้ว</button>
+                <button class="status-pill" id="st-pending" onclick="setStatusFilter('pending')">รอจ่าย</button>
+                <button class="status-pill" id="st-paid" onclick="setStatusFilter('paid')">จ่ายแล้ว</button>
             </div>
             <button class="btn btn-purple btn-sm" id="btn-payroll" onclick="openPayrollModal()">💳 ตัดวีคจ่ายเงิน</button>
         </div>
@@ -336,7 +336,7 @@
     let projects = [];
     let laborLogs = [];
     let activeTab = 'logs';
-    let statusFilter = 'pending'; // ค่าเริ่มต้นของแอดมิน
+    let statusFilter = 'pending';
 
     let appMode = 'ADMIN';
     let activeProjectId = null;
@@ -370,7 +370,7 @@
 
     async function initPartnerMode(token) {
         appMode = 'PARTNER';
-        statusFilter = 'all'; // บังคับให้พาร์ทเนอร์เห็นประวัติครบทั้งหมดทันที
+        statusFilter = 'all';
         
         const { data: share, error } = await supabaseClient.from('partner_shares').select('*, projects(project_name)').eq('share_token', token).single();
         if (error || !share || !share.token_active) { renderRevokedScreen("ลิงก์พาร์ทเนอร์นี้ถูกปิดการเข้าถึงหรือหมดอายุแล้ว"); return; }
@@ -385,7 +385,6 @@
         document.getElementById('btn-payroll').style.display = 'none';
         document.getElementById('sel-filter-proj').style.display = 'none';
 
-        // ปรับปุ่มตัวกรองให้พาร์ทเนอร์เลือกดูสถานะได้
         document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
         document.getElementById('st-all').classList.add('active');
 
@@ -396,7 +395,7 @@
 
     async function initWorkerMode(token) {
         appMode = 'WORKER';
-        statusFilter = 'all'; // บังคับให้คนงานเห็นทั้งยอดค้างและประวัติที่โอนแล้วครบถ้วน
+        statusFilter = 'all';
         
         const { data: tech, error } = await supabaseClient.from('technicians').select('*').eq('share_token', token).single();
         if (error || !tech || !tech.token_active) { renderRevokedScreen("ลิงก์สรุปค่าแรงของท่านถูกปิดการเข้าถึงแล้ว"); return; }
@@ -412,7 +411,6 @@
         document.getElementById('sel-filter-proj').style.display = 'none';
         document.getElementById('worker-confirm-section').style.display = 'block';
 
-        // ปรับปุ่มตัวกรองให้คนงานเลือกดูได้
         document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
         document.getElementById('st-all').classList.add('active');
 
@@ -473,7 +471,6 @@
         const { data } = await supabaseClient.from('technicians').select('*').order('tech_name');
         technicians = data || [];
         
-        // เติม share_token ให้ช่างอัตโนมัติเฉพาะแอดมิน
         if (appMode === 'ADMIN') {
             for(let t of technicians) {
                 if (!t.share_token) {
@@ -569,7 +566,7 @@
         });
 
         document.getElementById('kpi-pending-labor').innerText = `${sumPending.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
-        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอเคลียร์`;
+        document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอจ่าย`;
         document.getElementById('kpi-paid-labor').innerText = `${sumPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
         document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการจ่ายแล้ว`;
         
@@ -605,7 +602,7 @@
                 
                 actionsHtml = `<div class="item-card-actions">${slipBtn}${payBtnHtml}<button class="btn-icon" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')">🗑️</button></div>`;
             } else {
-                const statusText = l.is_paid ? (isAdvance ? 'หักคืนแล้ว ✅' : 'โอนแล้ว ✅') : (isAdvance ? 'รอหักคืน ⏳' : 'รอโอน ⏳');
+                const statusText = l.is_paid ? (isAdvance ? 'หักคืนแล้ว ✅' : 'จ่ายแล้ว ✅') : (isAdvance ? 'รอหักคืน ⏳' : 'รอจ่าย ⏳');
                 actionsHtml = `<div class="item-card-actions">${slipBtn}<span style="font-size:11.5px; font-weight:600; color:${l.is_paid ? 'var(--emerald)' : 'var(--amber)'};">${statusText}</span></div>`;
             }
 
@@ -693,10 +690,6 @@
 
     function openAdvanceModal() {
         document.getElementById('adv-date').valueAsDate = new Date();
-        document.getElementById('adv-tech').value = '';
-        document.getElementById('adv-amount').value = '';
-        document.getElementById('adv-details').value = '';
-        document.getElementById('adv-slip').value = '';
         document.getElementById('modalAdvance').style.display = 'flex';
     }
 
@@ -734,13 +727,13 @@
     function toggleLaborPaidSafe(logId, expId, isCheckingOut, techName, amount, bankInfo, desc) {
         if (!isCheckingOut) {
             const isAdvance = Number(amount || 0) < 0;
-            const confirmMsg = isAdvance ? "ต้องการยกเลิกสถานะการหักคืนยอดเบิกนี้ใช่ไหม?" : "ต้องการยกเลิกสถานะโอนเงิน?";
+            const confirmMsg = isAdvance ? "ต้องการยกเลิกสถานะการหักคืนยอดเบิกนี้ใช่ไหม?" : "ต้องการยกเลิกสถานะจ่ายเงิน?";
             if(confirm(confirmMsg)) processPaymentStatusChange(logId, expId, false);
             return;
         }
 
         const isAdvance = Number(amount || 0) < 0;
-        document.getElementById('pc-modal-title').innerText = isAdvance ? "ยืนยันการเคลียร์ยอดเบิก 💳" : "ยืนยันการโอนเงิน 💳";
+        document.getElementById('pc-modal-title').innerText = isAdvance ? "ยืนยันการเคลียร์ยอดเบิก 💳" : "ยืนยันการจ่ายเงิน 💳";
         document.getElementById('pc-name').innerText = techName;
         document.getElementById('pc-desc').innerText = desc || (isAdvance ? 'เบิกเงินล่วงหน้า' : '-');
         document.getElementById('pc-bank').innerText = bankInfo || 'ไม่ได้ระบุ';
@@ -807,7 +800,7 @@
                 <tr>
                     <td><strong>${g.techName}</strong><br><small>${g.bank}</small></td>
                     <td class="money" style="color:${g.total<0?'var(--rose)':'var(--amber)'};">${g.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                    <td style="text-align:center;"><button class="btn btn-sm btn-emerald" onclick="executeGroupPayroll('${g.logs.map(x=>x.id).join(',')}', '${g.logs.map(x=>x.expense_id).join(',')}')">✅ โอนแล้ว</button></td>
+                    <td style="text-align:center;"><button class="btn btn-sm btn-emerald" onclick="executeGroupPayroll('${g.logs.map(x=>x.id).join(',')}', '${g.logs.map(x=>x.expense_id).join(',')}')">✅ จ่ายแล้ว</button></td>
                 </tr>
             `;
         });
@@ -815,7 +808,7 @@
     }
 
     async function executeGroupPayroll(logIdsStr, expIdsStr) {
-        if(!confirm('ยืนยันโอนยอดสุทธิทั้งหมดของช่างคนนี้?')) return;
+        if(!confirm('ยืนยันบันทึกจ่ายยอดสุทธิทั้งหมดของช่างคนนี้?')) return;
         for(let id of logIdsStr.split(',')) await supabaseClient.from('project_labor_logs').update({ is_paid: true }).eq('id', id);
         for(let eid of expIdsStr.split(',').filter(e=>e && e!=='null')) await supabaseClient.from('project_expenses').update({ is_paid: true }).eq('id', eid);
         closeModal('modalPayroll');
@@ -918,7 +911,7 @@
         const exportData = laborLogs.map((l, idx) => ({
             "ลำดับ": idx + 1, "วันที่": l.work_date, "ช่าง": l.technicians?.tech_name || '',
             "โครงการ": l.projects?.project_name || '', "รายละเอียด": l.work_details || l.work_type,
-            "ยอดเงิน": Number(l.total_amount || 0), "สถานะ": l.is_paid ? 'โอนแล้ว' : 'รอโอน'
+            "ยอดเงิน": Number(l.total_amount || 0), "สถานะ": l.is_paid ? 'จ่ายแล้ว' : 'รอจ่าย'
         }));
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportData), "ค่าแรง");
         XLSX.writeFile(wb, `รายงานค่าแรง_${new Date().toISOString().slice(0,10)}.xlsx`);
