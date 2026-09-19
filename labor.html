@@ -336,7 +336,7 @@
     let projects = [];
     let laborLogs = [];
     let activeTab = 'logs';
-    let statusFilter = 'pending';
+    let statusFilter = 'pending'; // ค่าเริ่มต้นของแอดมิน
 
     let appMode = 'ADMIN';
     let activeProjectId = null;
@@ -370,6 +370,8 @@
 
     async function initPartnerMode(token) {
         appMode = 'PARTNER';
+        statusFilter = 'all'; // บังคับให้พาร์ทเนอร์เห็นประวัติครบทั้งหมดทันที
+        
         const { data: share, error } = await supabaseClient.from('partner_shares').select('*, projects(project_name)').eq('share_token', token).single();
         if (error || !share || !share.token_active) { renderRevokedScreen("ลิงก์พาร์ทเนอร์นี้ถูกปิดการเข้าถึงหรือหมดอายุแล้ว"); return; }
 
@@ -380,7 +382,12 @@
         document.getElementById('header-btn-group').innerHTML = '<button class="btn btn-white btn-sm" onclick="exportToExcel()">📊 Excel</button>';
         document.getElementById('admin-tabs').style.display = 'none';
         document.getElementById('admin-bottom-bar').style.display = 'none';
-        document.getElementById('filter-container').style.display = 'none';
+        document.getElementById('btn-payroll').style.display = 'none';
+        document.getElementById('sel-filter-proj').style.display = 'none';
+
+        // ปรับปุ่มตัวกรองให้พาร์ทเนอร์เลือกดูสถานะได้
+        document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
+        document.getElementById('st-all').classList.add('active');
 
         await loadProjects();
         await loadTechnicians();
@@ -389,6 +396,8 @@
 
     async function initWorkerMode(token) {
         appMode = 'WORKER';
+        statusFilter = 'all'; // บังคับให้คนงานเห็นทั้งยอดค้างและประวัติที่โอนแล้วครบถ้วน
+        
         const { data: tech, error } = await supabaseClient.from('technicians').select('*').eq('share_token', token).single();
         if (error || !tech || !tech.token_active) { renderRevokedScreen("ลิงก์สรุปค่าแรงของท่านถูกปิดการเข้าถึงแล้ว"); return; }
 
@@ -399,8 +408,13 @@
         document.getElementById('header-btn-group').style.display = 'none';
         document.getElementById('admin-tabs').style.display = 'none';
         document.getElementById('admin-bottom-bar').style.display = 'none';
-        document.getElementById('filter-container').style.display = 'none';
+        document.getElementById('btn-payroll').style.display = 'none';
+        document.getElementById('sel-filter-proj').style.display = 'none';
         document.getElementById('worker-confirm-section').style.display = 'block';
+
+        // ปรับปุ่มตัวกรองให้คนงานเลือกดูได้
+        document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
+        document.getElementById('st-all').classList.add('active');
 
         await loadProjects();
         await loadTechnicians();
@@ -459,11 +473,14 @@
         const { data } = await supabaseClient.from('technicians').select('*').order('tech_name');
         technicians = data || [];
         
-        for(let t of technicians) {
-            if (!t.share_token) {
-                const newToken = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : generateSafeToken();
-                await supabaseClient.from('technicians').update({ share_token: newToken }).eq('id', t.id);
-                t.share_token = newToken;
+        // เติม share_token ให้ช่างอัตโนมัติเฉพาะแอดมิน
+        if (appMode === 'ADMIN') {
+            for(let t of technicians) {
+                if (!t.share_token) {
+                    const newToken = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : generateSafeToken();
+                    await supabaseClient.from('technicians').update({ share_token: newToken }).eq('id', t.id);
+                    t.share_token = newToken;
+                }
             }
         }
 
@@ -475,7 +492,8 @@
         if (workTech) workTech.innerHTML = '<option value="">-- เลือกช่าง --</option>';
         if (advTech) advTech.innerHTML = '<option value="">-- เลือกช่าง --</option>';
         
-        document.getElementById('cnt-techs').innerText = technicians.length;
+        const cntEl = document.getElementById('cnt-techs');
+        if (cntEl) cntEl.innerText = technicians.length;
 
         technicians.forEach(t => {
             if (container) {
@@ -527,6 +545,9 @@
             if (!unconfirmed && laborLogs.length > 0) {
                 document.getElementById('btn-worker-confirm').style.display = 'none';
                 document.getElementById('msg-worker-confirmed').style.display = 'block';
+            } else {
+                document.getElementById('btn-worker-confirm').style.display = 'inline-flex';
+                document.getElementById('msg-worker-confirmed').style.display = 'none';
             }
         }
     }
@@ -537,13 +558,11 @@
         laborLogs.forEach(l => {
             const amt = Number(l.total_amount || 0);
             if (l.is_paid) {
-                // นับเฉพาะรายการที่เป็นค่าแรงจริง (ยอดบวก)
                 if (amt > 0) {
                     sumPaid += amt;
                     cntPaid++;
                 }
             } else {
-                // ยอดค้างจ่ายรวม (หักลบเงินเบิกที่ค้างอยู่จริง)
                 sumPending += amt;
                 cntPending++;
             }
@@ -553,7 +572,9 @@
         document.getElementById('kpi-pending-count').innerText = `${cntPending} รายการรอเคลียร์`;
         document.getElementById('kpi-paid-labor').innerText = `${sumPaid.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿`;
         document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการจ่ายแล้ว`;
-        document.getElementById('cnt-logs').innerText = laborLogs.length;
+        
+        const cntEl = document.getElementById('cnt-logs');
+        if (cntEl) cntEl.innerText = laborLogs.length;
 
         let displayList = laborLogs;
         if (statusFilter === 'pending') displayList = laborLogs.filter(l => !l.is_paid);
@@ -579,7 +600,7 @@
             let actionsHtml = '';
             if (appMode === 'ADMIN') {
                 let payBtnHtml = l.is_paid 
-                    ? `<span style="font-size:11.5px; color:var(--emerald); font-weight:600; cursor:pointer;" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', false)">${isAdvance ? 'หักคืนแล้ว ✅' : 'จ่ายแล้ว ✅'}</span>`
+                    ? `<span style="font-size:11.5px; color:var(--emerald); font-weight:600; cursor:pointer;" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', false, '${l.technicians?.tech_name}', ${amt})">${isAdvance ? 'หักคืนแล้ว ✅' : 'จ่ายแล้ว ✅'}</span>`
                     : `<button class="btn btn-sm ${isAdvance ? 'btn-rose' : 'btn-primary'}" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', true, '${l.technicians?.tech_name}', ${amt}, '${l.technicians?.bank_name} ${l.technicians?.bank_account}', '${l.work_details || l.work_type}')">💳 ${isAdvance ? 'เคลียร์ยอดเบิก' : 'จ่ายเงิน'}</button>`;
                 
                 actionsHtml = `<div class="item-card-actions">${slipBtn}${payBtnHtml}<button class="btn-icon" onclick="deleteLaborLog('${l.id}', '${l.expense_id}')">🗑️</button></div>`;
@@ -672,6 +693,10 @@
 
     function openAdvanceModal() {
         document.getElementById('adv-date').valueAsDate = new Date();
+        document.getElementById('adv-tech').value = '';
+        document.getElementById('adv-amount').value = '';
+        document.getElementById('adv-details').value = '';
+        document.getElementById('adv-slip').value = '';
         document.getElementById('modalAdvance').style.display = 'flex';
     }
 
@@ -802,9 +827,13 @@
         const unconfirmedIds = laborLogs.filter(l => !l.worker_confirmed).map(l => l.id);
         if (unconfirmedIds.length === 0) return;
 
-        await supabaseClient.from('project_labor_logs').update({ worker_confirmed: true, confirmed_at: new Date() }).in('id', unconfirmedIds);
-        alert("บันทึกการยืนยันเรียบร้อยแล้ว ขอบคุณครับ");
-        await loadLaborLogs();
+        const { error } = await supabaseClient.from('project_labor_logs').update({ worker_confirmed: true, confirmed_at: new Date() }).in('id', unconfirmedIds);
+        if (error) {
+            alert("ไม่สามารถบันทึกได้: " + error.message);
+        } else {
+            alert("บันทึกการยืนยันเรียบร้อยแล้ว ขอบคุณครับ");
+            await loadLaborLogs();
+        }
     }
 
     function openPartnerShareModal() {
