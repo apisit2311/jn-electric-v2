@@ -483,14 +483,33 @@
     }
 
     // ข้อ 1: โหลดเฉพาะโครงการที่กำลังดำเนินการอยู่ (ไม่ดึงโครงการที่เสร็จสิ้น/ปิดแล้ว)
-    async function loadProjects() {
-        let query = supabaseClient.from('projects').select('*');
-        
-        // กรองเอาเฉพาะโครงการที่ยังไม่ปิดงาน (ตัด 'เสร็จสิ้น' ออกเหมือนหน้า project.html)
-        query = query.not('status', 'in', '("เสร็จสิ้น","ปิดโครงการ","closed","completed")');
-        
-        const { data } = await query.order('created_at', { ascending: false });
-        projects = data || [];
+   async function loadProjects() {
+        // ดึงโครงการทั้งหมดมาก่อน แล้วคัดกรองใน JavaScript โดยตรง (แม่นยำและไม่พึ่งพา syntax ของ query)
+        const { data, error } = await supabaseClient
+            .from('projects')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error("Error loading projects:", error);
+            return;
+        }
+
+        // คัดกรองเฉพาะโครงการที่เปิดอยู่จริง:
+        // 1. ถ้ามีฟิลด์ is_active หรือ active ต้องไม่เป็น false
+        // 2. ถ้ามีฟิลด์ status ต้องไม่ใช่คำที่แปลว่าปิด/เสร็จ/ยกเลิก
+        const closedWords = ['เสร็จสิ้น', 'ปิดโครงการ', 'ปิดแล้ว', 'จบงาน', 'ยกเลิก', 'closed', 'completed', 'cancelled', 'inactive'];
+
+        projects = (data || []).filter(p => {
+            // เช็กฟิลด์ boolean ถ้ามี
+            if (p.is_active === false || p.active === false) return false;
+            
+            // เช็กฟิลด์สถานะข้อความ (status หรือ project_status)
+            const st = String(p.status || p.project_status || '').trim().toLowerCase();
+            if (closedWords.some(word => st === word.toLowerCase())) return false;
+
+            return true;
+        });
         
         const selFilter = document.getElementById('sel-filter-proj');
         const workProj = document.getElementById('work-proj');
@@ -510,7 +529,6 @@
             if (partnerProj) partnerProj.insertAdjacentHTML('beforeend', opt);
         });
     }
-
     // ข้อ 2: โหลดทะเบียนช่าง และสร้างตัวเลือก Checkbox Multi-Select
     async function loadTechnicians() {
         const { data } = await supabaseClient.from('technicians').select('*').order('tech_name');
