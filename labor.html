@@ -66,12 +66,22 @@
         .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 9px; font-family: 'Prompt'; font-size: 13px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 700; }
 
-        /* Filter */
-        .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
-        .custom-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; outline: none; background: #fff; flex: 1; min-width: 160px; }
+        /* Filter Controls */
+        .filter-section { background: var(--surface); padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .filter-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .custom-select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; outline: none; background: #fff; flex: 1; min-width: 160px; }
         .status-pill-group { display: flex; gap: 4px; background: #e2e8f0; padding: 3px; border-radius: 8px; }
         .status-pill { padding: 4px 8px; border: none; background: transparent; font-family: 'Prompt'; font-size: 11.5px; font-weight: 600; color: var(--text-sub); border-radius: 6px; cursor: pointer; }
         .status-pill.active { background: #fff; color: var(--primary); font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        /* Dropdown Multi-Select Checkbox */
+        .multi-select-container { position: relative; flex: 1; min-width: 160px; }
+        .multi-select-btn { width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; font-family: 'Prompt'; font-size: 12.5px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .multi-select-dropdown { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--card-shadow-lg); z-index: 100; max-height: 220px; overflow-y: auto; padding: 6px; }
+        .multi-select-dropdown.show { display: block; }
+        .multi-select-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 12.5px; }
+        .multi-select-item:hover { background: var(--bg); }
+        .multi-select-item input[type="checkbox"] { cursor: pointer; }
 
         /* Cards */
         .card-list { display: flex; flex-direction: column; gap: 8px; }
@@ -87,7 +97,6 @@
         .item-card-val { font-size: 14.5px; font-weight: 700; text-align: right; white-space: nowrap; }
         .item-card-body { font-size: 11.5px; color: var(--text-sub); display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border); padding-top: 6px; margin-top: 6px; }
         .item-card-actions { display: flex; align-items: center; gap: 6px; }
-
         .btn-icon { border: none; background: none; cursor: pointer; padding: 4px 6px; border-radius: 4px; font-size: 12px; }
 
         /* Split Bottom Bar */
@@ -169,16 +178,39 @@
 
     <!-- PANE 1: Labor Logs -->
     <div id="pane-logs">
-        <div class="filter-row" id="filter-container">
-            <select id="sel-filter-proj" class="custom-select" onchange="loadLaborLogs()">
-                <option value="">-- กรองทุกโครงการ --</option>
-            </select>
-            <div class="status-pill-group">
-                <button class="status-pill active" id="st-all" onclick="setStatusFilter('all')">ทั้งหมด</button>
-                <button class="status-pill" id="st-pending" onclick="setStatusFilter('pending')">รอจ่าย</button>
-                <button class="status-pill" id="st-paid" onclick="setStatusFilter('paid')">จ่ายแล้ว</button>
+        <!-- ตัวกรองข้อมูล -->
+        <div class="filter-section" id="filter-container">
+            <!-- แถวที่ 1: กรองโครงการ & ปุ่มตัดวีค -->
+            <div class="filter-row">
+                <select id="sel-filter-proj" class="custom-select" onchange="loadLaborLogs()">
+                    <option value="">-- กรองทุกโครงการที่เปิดอยู่ --</option>
+                </select>
+                <button class="btn btn-purple btn-sm" id="btn-payroll" onclick="openPayrollModal()">💳 ตัดวีคจ่ายเงิน</button>
             </div>
-            <button class="btn btn-purple btn-sm" id="btn-payroll" onclick="openPayrollModal()">💳 ตัดวีคจ่ายเงิน</button>
+            
+            <!-- แถวที่ 2: สถานะ & เลือกดูเฉพาะบุคคล (Dropdown Checkbox) -->
+            <div class="filter-row">
+                <div class="status-pill-group">
+                    <button class="status-pill active" id="st-all" onclick="setStatusFilter('all')">ทั้งหมด</button>
+                    <button class="status-pill" id="st-pending" onclick="setStatusFilter('pending')">รอจ่าย</button>
+                    <button class="status-pill" id="st-paid" onclick="setStatusFilter('paid')">จ่ายแล้ว</button>
+                </div>
+
+                <!-- Dropdown ติ๊กเลือกช่าง -->
+                <div class="multi-select-container" id="worker-filter-box">
+                    <button class="multi-select-btn" type="button" onclick="toggleWorkerDropdown()">
+                        <span id="lbl-selected-workers">👤 ช่างทุกคน</span>
+                        <span style="font-size:10px;">▼</span>
+                    </button>
+                    <div class="multi-select-dropdown" id="worker-dropdown-menu">
+                        <label class="multi-select-item" style="border-bottom:1px dashed var(--border); font-weight:600;">
+                            <input type="checkbox" id="chk-worker-all" checked onchange="toggleSelectAllWorkers(this.checked)">
+                            <span>เลือกคนงานทุกคน</span>
+                        </label>
+                        <div id="worker-checkbox-list"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="card-list" id="labor-logs-list">
@@ -188,7 +220,7 @@
 
     <!-- PANE 2: Technicians -->
     <div id="pane-techs" style="display: none;">
-        <div class="filter-row">
+        <div class="filter-row" style="margin-bottom:10px;">
             <div style="font-size:12.5px; font-weight:600; color:var(--text-sub);">รายชื่อคนงานทั้งหมดในระบบ:</div>
             <button class="btn btn-purple btn-sm" onclick="openNewTechModal()">➕ เพิ่มคนงานใหม่</button>
         </div>
@@ -337,6 +369,7 @@
     let laborLogs = [];
     let activeTab = 'logs';
     let statusFilter = 'pending';
+    let selectedWorkerIds = []; // เก็บรายชื่อช่างที่ถูกเลือก
 
     let appMode = 'ADMIN';
     let activeProjectId = null;
@@ -365,6 +398,14 @@
             }
         } catch (err) {
             console.error("Window onload error:", err);
+        }
+    };
+
+    // ปิด dropdown เมื่อคลิกที่อื่น
+    window.onclick = function(e) {
+        if (!e.target.closest('#worker-filter-box')) {
+            const menu = document.getElementById('worker-dropdown-menu');
+            if (menu) menu.classList.remove('show');
         }
     };
 
@@ -408,11 +449,8 @@
         document.getElementById('admin-tabs').style.display = 'none';
         document.getElementById('admin-bottom-bar').style.display = 'none';
         document.getElementById('btn-payroll').style.display = 'none';
-        document.getElementById('sel-filter-proj').style.display = 'none';
+        document.getElementById('filter-container').style.display = 'none';
         document.getElementById('worker-confirm-section').style.display = 'block';
-
-        document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
-        document.getElementById('st-all').classList.add('active');
 
         await loadProjects();
         await loadTechnicians();
@@ -444,8 +482,14 @@
         renderLaborLogsView();
     }
 
+    // ข้อ 1: โหลดเฉพาะโครงการที่กำลังดำเนินการอยู่ (ไม่ดึงโครงการที่เสร็จสิ้น/ปิดแล้ว)
     async function loadProjects() {
-        const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
+        let query = supabaseClient.from('projects').select('*');
+        
+        // กรองเอาเฉพาะโครงการที่ยังไม่ปิดงาน (ตัด 'เสร็จสิ้น' ออกเหมือนหน้า project.html)
+        query = query.not('status', 'in', '("เสร็จสิ้น","ปิดโครงการ","closed","completed")');
+        
+        const { data } = await query.order('created_at', { ascending: false });
         projects = data || [];
         
         const selFilter = document.getElementById('sel-filter-proj');
@@ -453,7 +497,7 @@
         const advProj = document.getElementById('adv-proj');
         const partnerProj = document.getElementById('sel-partner-proj');
         
-        if (selFilter) selFilter.innerHTML = '<option value="">-- กรองทุกโครงการ --</option>';
+        if (selFilter) selFilter.innerHTML = '<option value="">-- กรองทุกโครงการที่เปิดอยู่ --</option>';
         if (workProj) workProj.innerHTML = '<option value="">-- เลือกโครงการ --</option>';
         if (advProj) advProj.innerHTML = '<option value="">-- เลือกโครงการ --</option>';
         if (partnerProj) partnerProj.innerHTML = '<option value="">-- เลือกโครงการ --</option>';
@@ -467,6 +511,7 @@
         });
     }
 
+    // ข้อ 2: โหลดทะเบียนช่าง และสร้างตัวเลือก Checkbox Multi-Select
     async function loadTechnicians() {
         const { data } = await supabaseClient.from('technicians').select('*').order('tech_name');
         technicians = data || [];
@@ -484,15 +529,18 @@
         const container = document.getElementById('tech-list-container');
         const workTech = document.getElementById('work-tech');
         const advTech = document.getElementById('adv-tech');
+        const chkList = document.getElementById('worker-checkbox-list');
         
         if (container) container.innerHTML = '';
         if (workTech) workTech.innerHTML = '<option value="">-- เลือกช่าง --</option>';
         if (advTech) advTech.innerHTML = '<option value="">-- เลือกช่าง --</option>';
+        if (chkList) chkList.innerHTML = '';
         
         const cntEl = document.getElementById('cnt-techs');
         if (cntEl) cntEl.innerText = technicians.length;
 
         technicians.forEach(t => {
+            // การ์ดในแท็บทะเบียนช่าง
             if (container) {
                 const card = document.createElement('div');
                 card.className = 'item-card';
@@ -512,10 +560,63 @@
                 `;
                 container.appendChild(card);
             }
+
+            // ตัวเลือกใน Form Modal
             const opt = `<option value="${t.id}">${t.tech_name}</option>`;
             if (workTech) workTech.insertAdjacentHTML('beforeend', opt);
             if (advTech) advTech.insertAdjacentHTML('beforeend', opt);
+
+            // แถว Checkbox ใน Dropdown Multi-Select
+            if (chkList) {
+                const item = document.createElement('label');
+                item.className = 'multi-select-item';
+                item.innerHTML = `
+                    <input type="checkbox" class="chk-worker-item" value="${t.id}" onchange="onWorkerItemChecked()">
+                    <span>${t.tech_name}</span>
+                `;
+                chkList.appendChild(item);
+            }
         });
+    }
+
+    // Toggle Dropdown Checkbox
+    function toggleWorkerDropdown() {
+        const menu = document.getElementById('worker-dropdown-menu');
+        if (menu) menu.classList.toggle('show');
+    }
+
+    function toggleSelectAllWorkers(isChecked) {
+        document.querySelectorAll('.chk-worker-item').forEach(chk => {
+            chk.checked = false; // ยกเลิกติ๊กรายคนถ้าเลือกทุกคน
+        });
+        document.getElementById('chk-worker-all').checked = isChecked;
+        updateSelectedWorkersState();
+    }
+
+    function onWorkerItemChecked() {
+        const anyChecked = Array.from(document.querySelectorAll('.chk-worker-item')).some(chk => chk.checked);
+        document.getElementById('chk-worker-all').checked = !anyChecked;
+        updateSelectedWorkersState();
+    }
+
+    function updateSelectedWorkersState() {
+        const isAll = document.getElementById('chk-worker-all').checked;
+        const checkedItems = Array.from(document.querySelectorAll('.chk-worker-item:checked'));
+        
+        if (isAll || checkedItems.length === 0) {
+            selectedWorkerIds = [];
+            document.getElementById('lbl-selected-workers').innerText = '👤 ช่างทุกคน';
+            document.getElementById('chk-worker-all').checked = true;
+        } else {
+            selectedWorkerIds = checkedItems.map(chk => chk.value);
+            if (checkedItems.length === 1) {
+                const name = checkedItems[0].nextElementSibling.innerText;
+                document.getElementById('lbl-selected-workers').innerText = `👤 ${name}`;
+            } else {
+                document.getElementById('lbl-selected-workers').innerText = `👤 เลือกแล้ว (${checkedItems.length} คน)`;
+            }
+        }
+        renderLaborLogsView();
     }
 
     async function loadLaborLogs() {
@@ -550,9 +651,16 @@
     }
 
     function renderLaborLogsView() {
+        // กรองตามคนงานที่ติ๊กเลือก (ถ้าไม่ได้เลือกทุกคน)
+        let filteredLogs = laborLogs;
+        if (selectedWorkerIds.length > 0) {
+            filteredLogs = filteredLogs.filter(l => selectedWorkerIds.includes(l.technician_id));
+        }
+
+        // คำนวณยอด KPI เฉพาะก้อนที่ถูกกรอง
         let sumPending = 0, cntPending = 0, sumPaid = 0, cntPaid = 0;
 
-        laborLogs.forEach(l => {
+        filteredLogs.forEach(l => {
             const amt = Number(l.total_amount || 0);
             if (l.is_paid) {
                 if (amt > 0) {
@@ -571,11 +679,12 @@
         document.getElementById('kpi-paid-count').innerText = `${cntPaid} รายการจ่ายแล้ว`;
         
         const cntEl = document.getElementById('cnt-logs');
-        if (cntEl) cntEl.innerText = laborLogs.length;
+        if (cntEl) cntEl.innerText = filteredLogs.length;
 
-        let displayList = laborLogs;
-        if (statusFilter === 'pending') displayList = laborLogs.filter(l => !l.is_paid);
-        if (statusFilter === 'paid') displayList = laborLogs.filter(l => l.is_paid);
+        // กรองตามแท็บสถานะ (ทั้งหมด / รอจ่าย / จ่ายแล้ว)
+        let displayList = filteredLogs;
+        if (statusFilter === 'pending') displayList = filteredLogs.filter(l => !l.is_paid);
+        if (statusFilter === 'paid') displayList = filteredLogs.filter(l => l.is_paid);
 
         const container = document.getElementById('labor-logs-list');
         container.innerHTML = '';
@@ -690,6 +799,10 @@
 
     function openAdvanceModal() {
         document.getElementById('adv-date').valueAsDate = new Date();
+        document.getElementById('adv-tech').value = '';
+        document.getElementById('adv-amount').value = '';
+        document.getElementById('adv-details').value = '';
+        document.getElementById('adv-slip').value = '';
         document.getElementById('modalAdvance').style.display = 'flex';
     }
 
