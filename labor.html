@@ -736,7 +736,7 @@
             card.innerHTML = `
                 <div class="item-card-top">
                     <div>
-                        <div class="item-card-title">${l.technicians?.tech_name || 'คนงาน'} ${isAdvance ? '<span style="color:var(--rose); font-size:11px;">(เบิก)</span>' : ''} ${confirmedBadge}</div>
+                        <div class="item-card-title">${l.technicians?.tech_name || 'คนงาน'} ${isAdvance ? '<span style="color:var(--rose); font-size:11px;">(เบิกล่วงหน้า)</span>' : ''} ${confirmedBadge}</div>
                         <div style="font-size:11.5px; color:var(--primary-accent); font-weight:600;">📁 ${l.projects?.project_name || 'ไม่ระบุโครงการ'}</div>
                     </div>
                     <div class="item-card-val" style="color:${l.is_paid ? 'var(--emerald)' : (isAdvance ? 'var(--rose)' : 'var(--amber)')};">${amt.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</div>
