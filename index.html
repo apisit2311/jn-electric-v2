@@ -659,11 +659,11 @@
                const chk = row.querySelector('.chk-cut-stock');
 const isCutChecked = chk ? chk.checked : false;
 
-                let productId = isCutChecked ? row.getAttribute('data-product-id') : null;
-                if (isCutChecked && !productId) {
-                const p = globalProducts.find(x => x.product_name === searchDesc);
-                if (p) productId = p.id;
-            }
+let productId = isCutChecked ? row.getAttribute('data-product-id') : null;
+if (isCutChecked && !productId) {
+    const p = globalProducts.find(x => x.product_name === searchDesc);
+    if (p) productId = p.id;
+}
 
 if(fullDesc !== "") {
     itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: fullDesc, sn: sn, qty: qty, unit: unit, price: price });
@@ -675,6 +675,7 @@ if(fullDesc !== "") {
         }
     }
 }
+            }
             
             if(itemsToInsert.length > 0) {
                 const { error: itemsErr } = await supabaseClient.from('document_items').insert(itemsToInsert);
@@ -805,8 +806,8 @@ if(fullDesc !== "") {
                     <textarea class="item-desc" placeholder="🔍 ค้นหา (รหัส/ชื่อ) หรือพิมพ์ค่าแรง..." rows="1" oninput="markDirty(); autoResizeTextarea(this); handleCustomAutocomplete(this)" onfocus="handleCustomAutocomplete(this)" onblur="closeAutocomplete(this)" style="font-weight: 600; color: var(--primary-color);">${desc}</textarea>
                     <div class="autocomplete-list"></div>
                 </div>
-                <div class="no-print" style="margin-top: 3px; display: flex; align-items: center; gap: 4px;">
-                    <INPUT type="checkbox" class="chk-cut-stock" checked style="width: auto; cursor: pointer;">
+                    <div class="no-print" style="margin-top: 3px; display: flex; align-items: center; gap: 4px;">
+                    <input type="checkbox" class="chk-cut-stock" checked style="width: auto; cursor: pointer;">
                     <LABEL style="font-size: 11.5px; color: var(--text-muted); cursor: pointer;" onclick="this.previousElementSibling.click()">ตัดสต็อก (ถ้ามีรหัส)</LABEL>
                 </div>
                 <div class="sn-container no-print">
