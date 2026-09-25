@@ -656,23 +656,25 @@
                 const unit = row.querySelector('.unit-select').value;
                 const price = parseFloat(row.querySelector('.price').value) || 0;
                 
-                let productId = row.getAttribute('data-product-id');
-                if (!productId) {
-                    const p = globalProducts.find(x => x.product_name === searchDesc);
-                    if (p) productId = p.id;
-                }
-                
-                if(fullDesc !== "") {
-                    itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: fullDesc, sn: sn, qty: qty, unit: unit, price: price });
-                    
-                    if(productId && qty > 0 && shouldCutStock) {
-                        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
-                        if(currentStock) {
-                            await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
-                        }
-                    }
-                }
+               const chk = row.querySelector('.chk-cut-stock');
+const isCutChecked = chk ? chk.checked : false;
+
+                let productId = isCutChecked ? row.getAttribute('data-product-id') : null;
+                if (isCutChecked && !productId) {
+                const p = globalProducts.find(x => x.product_name === searchDesc);
+                if (p) productId = p.id;
             }
+
+if(fullDesc !== "") {
+    itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: fullDesc, sn: sn, qty: qty, unit: unit, price: price });
+    
+    if(productId && qty > 0 && shouldCutStock && isCutChecked) {
+        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
+        if(currentStock) {
+            await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
+        }
+    }
+}
             
             if(itemsToInsert.length > 0) {
                 const { error: itemsErr } = await supabaseClient.from('document_items').insert(itemsToInsert);
@@ -802,6 +804,10 @@
                 <div class="autocomplete-wrapper">
                     <textarea class="item-desc" placeholder="🔍 ค้นหา (รหัส/ชื่อ) หรือพิมพ์ค่าแรง..." rows="1" oninput="markDirty(); autoResizeTextarea(this); handleCustomAutocomplete(this)" onfocus="handleCustomAutocomplete(this)" onblur="closeAutocomplete(this)" style="font-weight: 600; color: var(--primary-color);">${desc}</textarea>
                     <div class="autocomplete-list"></div>
+                </div>
+                <div class="no-print" style="margin-top: 3px; display: flex; align-items: center; gap: 4px;">
+                    <INPUT type="checkbox" class="chk-cut-stock" checked style="width: auto; cursor: pointer;">
+                    <LABEL style="font-size: 11.5px; color: var(--text-muted); cursor: pointer;" onclick="this.previousElementSibling.click()">ตัดสต็อก (ถ้ามีรหัส)</LABEL>
                 </div>
                 <div class="sn-container no-print">
                     <span class="sn-label">S/N:</span>
