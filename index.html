@@ -333,9 +333,21 @@
         </select>
     `;
 
+   let currentUserRole = 'staff';
+    let currentUserId = null;
+
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
+            currentUserId = session.user.id;
+            // เช็กว่าคนล็อกอินมียศอะไร
+            const { data: profile } = await supabaseClient
+                .from('user_profiles')
+                .select('role')
+                .eq('email', session.user.email)
+                .single();
+            if(profile) currentUserRole = profile.role;
+
             document.getElementById("login-overlay").style.display = "none";
             document.getElementById("controls-panel").style.display = "flex";
             document.getElementById("main-app").style.display = "block";
@@ -607,13 +619,15 @@
             let documentIdToUse = null;
 
             if (currentDocId) {
-                const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
+               const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
                 const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
 
                 const { error: updateErr } = await supabaseClient.from('documents').update({
                     doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
-                    project_id: currentProjectId || null
+                    project_id: currentProjectId || null,
+                    owner_id: currentUserId, // 👈 เพิ่มบรรทัดนี้
+                    doc_status: currentUserRole === 'admin' ? 'approved' : 'pending' // 👈 เพิ่มบรรทัดนี้
                 }).eq('id', currentDocId);
                 if (updateErr) throw updateErr;
 
@@ -638,7 +652,9 @@
                 const { data: docData, error: docErr } = await supabaseClient.from('documents').insert([{ 
                     doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
-                    project_id: currentProjectId || null
+                    project_id: currentProjectId || null,
+                    owner_id: currentUserId, // 👈 เพิ่มบรรทัดนี้
+                    doc_status: currentUserRole === 'admin' ? 'approved' : 'pending' // 👈 เพิ่มบรรทัดนี้
                 }]).select();
                 
                 if (docErr) {
@@ -916,9 +932,10 @@ if(fullDesc !== "") {
         reader.readAsText(file); event.target.value = ''; 
     }
 
-    function loadSelectedDoc(cloudData) {
+   function loadSelectedDoc(cloudData) {
         currentDocId = cloudData.docId || null; 
         currentProjectId = cloudData.projectId || null; 
+        let docStatus = cloudData.docStatus || 'approved'; // ดึงสถานะเอกสาร
         
         const selectEl = document.getElementById('docType');
         const targetType = cloudData.docType || "ใบเสนอราคา";
@@ -945,8 +962,52 @@ if(fullDesc !== "") {
         if(cloudData.items && cloudData.items.length > 0) { cloudData.items.forEach(item => addRow(item)); } else { addRow(); }
         
         updateDocTypeSync(false); calculateTotal(); isDirty = false;
+
+        // --- ระบบซ่อนปุ่มและโชว์ปุ่มอนุมัติ ---
+        let approveBtn = document.getElementById('btn-approve');
+        if(!approveBtn) {
+            approveBtn = document.createElement('button');
+            approveBtn.id = 'btn-approve';
+            approveBtn.className = 'btn btn-cloud-save';
+            approveBtn.style.backgroundColor = '#10b981';
+            approveBtn.onclick = approveDocument;
+            document.getElementById('controls-panel').insertBefore(approveBtn, document.querySelector('.btn-cloud-save'));
+        }
+
+        if (docStatus === 'pending') {
+            if (currentUserRole === 'admin') {
+                approveBtn.style.display = 'inline-block';
+                approveBtn.innerHTML = '✅ อนุมัติเอกสารใบนี้';
+                document.querySelector('.btn-print').style.display = 'inline-block';
+                document.querySelector('.btn-excel').style.display = 'inline-block';
+            } else {
+                approveBtn.style.display = 'none';
+                document.querySelector('.btn-print').style.display = 'none';
+                document.querySelector('.btn-excel').style.display = 'none';
+                alert('⏳ เอกสารนี้รอผู้บริหารอนุมัติ (ไม่สามารถพิมพ์หรือโหลด Excel ได้)');
+            }
+        } else {
+            approveBtn.style.display = 'none';
+            document.querySelector('.btn-print').style.display = 'inline-block';
+            document.querySelector('.btn-excel').style.display = 'inline-block';
+        }
     }
 
+    // ฟังก์ชันสำหรับกดปุ่มอนุมัติ
+    async function approveDocument() {
+        if(!currentDocId) return;
+        if(!confirm('ยืนยันการอนุมัติเอกสารใบนี้ให้สามารถพิมพ์ได้?')) return;
+        try {
+            const { error } = await supabaseClient.from('documents').update({ doc_status: 'approved' }).eq('id', currentDocId);
+            if (error) throw error;
+            alert('✅ อนุมัติเอกสารเรียบร้อยแล้ว');
+            document.getElementById('btn-approve').style.display = 'none';
+            document.querySelector('.btn-print').style.display = 'inline-block';
+            document.querySelector('.btn-excel').style.display = 'inline-block';
+        } catch (error) {
+            alert("❌ ผิดพลาด: " + error.message);
+        }
+    }
     function exportToExcel() {
         if (typeof XLSX === 'undefined') { alert('กำลังโหลดข้อมูลสำหรับการสร้าง Excel กรุณารอสักครู่แล้วกดใหม่อีกครั้ง'); return; }
         const docType = document.getElementById('docType').value; const docNum = document.getElementById('doc-num').value;
