@@ -38,8 +38,23 @@
         body { font-family: 'Prompt', 'Sarabun', sans-serif; background-color: #f1f5f9; color: var(--slate-900); margin: 0; padding: 16px; }
         .wrapper { max-width: 1420px; margin: 0 auto; }
 
-        /* Header */
-        .app-header { background: #ffffff; padding: 16px 20px; border-radius: 14px; box-shadow: var(--card-shadow); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--slate-200); flex-wrap: wrap; gap: 12px; }
+        /* Header (ล็อกติดบนสุดของหน้าจอคอม) */
+        .app-header { 
+            background: #ffffff; 
+            padding: 12px 18px; 
+            border-radius: 14px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06); 
+            margin-bottom: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border: 1px solid var(--slate-200); 
+            flex-wrap: wrap; 
+            gap: 12px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+        }
         .header-title { display: flex; align-items: center; gap: 12px; }
         .header-logo-icon { width: 44px; height: 44px; background: var(--primary-light); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; flex-shrink: 0; }
         .header-title h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--primary); }
@@ -84,15 +99,36 @@
         .kpi-sub { font-size: 11px; color: var(--slate-600); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .badge-pill { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
 
-        /* Tabs Navigation */
-        .tabs-nav-wrapper { display: flex; align-items: center; gap: 8px; background: #e2e8f0; border-radius: 12px; padding: 6px; margin-bottom: 16px; }
+        /* Tabs Navigation (ล็อกติดใต้ Header) */
+        .tabs-nav-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            background: #e2e8f0; 
+            border-radius: 12px; 
+            padding: 6px; 
+            margin-bottom: 16px; 
+            position: sticky; 
+            top: 74px; 
+            z-index: 90; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
         .pinned-tab-wrap { flex-shrink: 0; display: flex; align-items: center; }
         .tabs-divider-v { width: 2px; height: 24px; background-color: #cbd5e1; flex-shrink: 0; margin: 0 2px; }
         .tabs-nav { display: flex; gap: 4px; overflow-x: auto; align-items: center; flex: 1; min-width: 0; -webkit-overflow-scrolling: touch; }
         .tab-pill { padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; white-space: nowrap; border: none; background: transparent; transition: 0.15s; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .tab-pill:hover { background: rgba(255,255,255,0.6); }
         .tab-pill.active { background: #ffffff; color: var(--primary) !important; font-weight: 700 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
-        .tab-pill.home-btn { font-weight: 600; }
+        .tab-pill.home-btn { 
+            font-weight: 700; 
+            background: #ffffff; 
+            color: var(--primary); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+        }
+        .tab-pill.home-btn.active { 
+            background: var(--primary) !important; 
+            color: #ffffff !important; 
+        }
         .btn-add-tab { flex-shrink: 0; padding: 7px 11px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #ffffff; color: var(--emerald-700); border: 1px dashed var(--emerald-600); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 
         /* Workspace */
@@ -158,10 +194,63 @@
         .form-item { margin-bottom: 10px; }
         .form-item label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--slate-700); }
 
+        /* ปุ่มลอย Scroll ขึ้นบนสุด */
+        .btn-scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            z-index: 999;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .btn-scroll-top:hover {
+            transform: scale(1.1);
+            background-color: #172554;
+        }
+
+        /* Responsive สำหรับมือถือ */
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            .workspace { padding: 14px; }
-            .kpi-dashboard { grid-template-columns: repeat(2, 1fr); }
+            body { padding: 6px; }
+            .workspace { padding: 10px; }
+            .kpi-dashboard { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+
+            /* ปลดล็อก Header บนมือถือให้เลื่อนหลบไปตามการ Scroll */
+            .app-header { 
+                position: static !important; 
+                padding: 10px 12px; 
+                margin-bottom: 8px; 
+                gap: 8px; 
+                border-radius: 10px; 
+            }
+            .header-title h1 { font-size: 15px; }
+            .header-title p { font-size: 11px; }
+            .app-header .btn { padding: 5px 9px; font-size: 11.5px; border-radius: 6px; }
+
+            /* ล็อกเฉพาะแถบแท็บให้ติดขอบบนสุดของจอ (top: 0) */
+            .tabs-nav-wrapper { 
+                position: sticky !important; 
+                top: 0 !important; 
+                z-index: 100 !important; 
+                padding: 5px 6px; 
+                margin-bottom: 10px; 
+                border-radius: 8px; 
+                box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+                background: #cbd5e1;
+            }
+            .tab-pill { padding: 6px 9px; font-size: 12px; }
+            .tab-pill.home-btn { padding: 6px 10px; font-size: 12px; }
+            .btn-add-tab { padding: 5px 8px; font-size: 11.5px; }
         }
 
         @media print {
@@ -310,6 +399,11 @@
         <div id="dynamic-panes-container"></div>
     </div>
 </div>
+
+<!-- ปุ่มเลื่อนขึ้นบนสุด -->
+<button id="btnScrollTop" class="btn-scroll-top no-print" onclick="scrollToTop()" title="ขึ้นบนสุด">
+    ⬆️
+</button>
 
 <!-- ==================== MODAL: DOCUMENT TRAY (แฟ้มเอกสาร) ==================== -->
 <div class="modal-overlay" id="modalDocTray">
@@ -2618,6 +2712,24 @@
             return;
         }
         window.location.href = `checklist.html?id=${encodeURIComponent(currentProject.id)}`;
+    }
+
+    // ==================== ระบบตรวจจับและเลื่อนขึ้นบนสุด ====================
+    window.addEventListener('scroll', () => {
+        const btn = document.getElementById('btnScrollTop');
+        if (!btn) return;
+        if (window.scrollY > 300) {
+            btn.style.display = 'flex';
+        } else {
+            btn.style.display = 'none';
+        }
+    });
+
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     }
 </script>
 </body>
