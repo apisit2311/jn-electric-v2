@@ -354,6 +354,10 @@
             
             await fetchProducts(); 
             initializeDoc();
+            if (currentUserRole !== 'admin') {
+                document.querySelector('.btn-print').style.display = 'none';
+                document.querySelector('.btn-excel').style.display = 'none';
+            }
         }
 
         document.getElementById("pass-input").addEventListener("keypress", function(e){
@@ -540,7 +544,14 @@
         isDirty = false;
         
         document.getElementById('doc-num').value = "";
-        fetchNextDocNumber();
+       fetchNextDocNumber();
+        
+        // เพิ่มโค้ดชุดนี้: เคลียร์หน้าทำใบใหม่ปุ๊บ ซ่อนปุ่มพิมพ์ทันที
+        if (currentUserRole !== 'admin') {
+            document.querySelector('.btn-print').style.display = 'none';
+            document.querySelector('.btn-excel').style.display = 'none';
+        }
+    }
     }
 
     function duplicateDocument() {
@@ -708,7 +719,15 @@ if(fullDesc !== "") {
             }
             
             isDirty = false;
-            await fetchProducts(); 
+           await fetchProducts(); 
+
+            // เพิ่มโค้ดชุดนี้: พอบันทึกเสร็จ ถ้าไม่ใช่แอดมินให้ซ่อนปุ่มพิมพ์
+            if (currentUserRole !== 'admin') {
+                document.querySelector('.btn-print').style.display = 'none';
+                document.querySelector('.btn-excel').style.display = 'none';
+            }
+
+        } catch (error) {
 
         } catch (error) {
             alert("❌ ข้อผิดพลาด: " + error.message);
