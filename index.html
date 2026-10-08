@@ -15,7 +15,6 @@
         :root { --primary-color: #1e3a8a; --accent-color: #3b82f6; --text-main: #0f172a; --text-muted: #475569; --bg-color: #f8fafc; --border-color: #cbd5e1; }
         body { font-family: 'Sarabun', sans-serif; color: var(--text-main); line-height: 1.4; background-color: var(--bg-color); padding: 75px 20px 20px; }
         
-        /* ลดขอบกระดาษลงเพื่อให้กระชับขึ้น */
         .document-container { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 12mm 15mm; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; position: relative; }
         
         input[type="text"], input[type="number"], textarea, select {
@@ -45,14 +44,13 @@
         select.unit-select optgroup { text-align: left; font-weight: bold; background: #eee; }
         select.unit-select option { text-align: left; background: #fff; }
 
-        /* ปรับสัดส่วนซ้าย-ขวาใหม่ */
         .top-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; }
         .title-area { width: 62%; } 
         .doc-title-editable { 
             font-size: 24px !important; 
             font-weight: 700; color: var(--primary-color); text-align: left;
             padding: 8px 8px 8px 1px; 
-            text-indent: 2px; /* 🌟 ดันตัว "ใ" ให้ขยับห่างจากขอบซ้ายไม่ให้โดนบัง */
+            text-indent: 2px; 
             line-height: 1.8; display: inline-block; outline: none; border: 1px dashed transparent;
             letter-spacing: 1.9px; cursor: pointer; width: auto; max-width: 100%; 
             appearance: none; -webkit-appearance: none; -moz-appearance: none;
@@ -68,13 +66,11 @@
         .meta-area td:first-child { font-weight: 600; width: 45%; color: var(--text-muted); text-transform: uppercase; font-size: 12px;}
         .meta-area input { text-align: right; font-weight: 600; font-size: 14px; padding: 2px; }
         
-        /* ปรับ Margin ของที่อยู่ให้แคบลง */
         .address-section { display: flex; justify-content: space-between; margin-bottom: 15px; }
         .company-area, .customer-area { width: 48%; }
         .section-label { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; }
         .company-logo { max-width: 85px; height: auto; margin-bottom: 2px; display: block; }
 
-        /* ปรับตารางให้ชิดขึ้น */
         .items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; border-bottom: 2px solid var(--primary-color); }
         .items-table th { background-color: #fff; color: var(--primary-color); padding: 8px 4px; text-align: left; font-size: 13px; font-weight: 700; border-top: 2px solid var(--primary-color); border-bottom: 2px solid var(--primary-color); }
         .items-table th.text-center, .items-table td.text-center { text-align: center; }
@@ -100,13 +96,11 @@
         .btn-print { background-color: #3b82f6; color: white; }
         .btn-logout { background-color: #475569; color: white; }
 
-        /* ปรับส่วนสรุปด้านล่างให้แคบลง */
         .summary-section { display: flex; justify-content: flex-end; margin-bottom: 20px; margin-top: 5px; position: relative; }
         .summary-table { width: 45%; border-collapse: collapse; }
         .summary-table td { padding: 4px 8px; font-size: 14px; border-bottom: 1px solid var(--border-color); }
         .summary-table tr.total td { font-weight: 700; color: var(--primary-color); font-size: 16px; border-bottom: none; border-top: 2px solid var(--primary-color); background-color: #f8fafc; padding: 6px 8px; }
 
-        /* ขยับลายเซ็นขึ้นมา */
         .footer-signatures { display: flex; justify-content: space-between; margin-top: 25px; text-align: center; }
         .signature-box { width: 35%; }
         .signature-line { border-bottom: 1px solid var(--text-main); margin: 30px auto 6px; width: 100%; }
@@ -333,14 +327,13 @@
         </select>
     `;
 
-   let currentUserRole = 'staff';
+    let currentUserRole = 'staff';
     let currentUserId = null;
 
     window.onload = async () => {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
             currentUserId = session.user.id;
-            // เช็กว่าคนล็อกอินมียศอะไร
             const { data: profile } = await supabaseClient
                 .from('user_profiles')
                 .select('role')
@@ -488,6 +481,7 @@
             window.location.reload();
         }
     }
+
     async function logoutSupabase() {
         if(isDirty && !confirm("มีงานยังไม่ได้บันทึก ต้องการออกจากระบบใช่ไหม?")) return;
         await supabaseClient.auth.signOut();
@@ -544,15 +538,14 @@
         isDirty = false;
         
         document.getElementById('doc-num').value = "";
-       fetchNextDocNumber();
+        fetchNextDocNumber();
         
-        // เพิ่มโค้ดชุดนี้: เคลียร์หน้าทำใบใหม่ปุ๊บ ซ่อนปุ่มพิมพ์ทันที
         if (currentUserRole !== 'admin') {
             document.querySelector('.btn-print').style.display = 'none';
             document.querySelector('.btn-excel').style.display = 'none';
         }
     }
-    
+
     function duplicateDocument() {
         if (!currentDocId) {
             alert("ตอนนี้คุณกำลังอยู่ในโหมด 'สร้างเอกสารใหม่' อยู่แล้วครับ!\nสามารถเปลี่ยนประเภทเอกสารด้านบนซ้ายได้เลย");
@@ -629,15 +622,15 @@
             let documentIdToUse = null;
 
             if (currentDocId) {
-               const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
+                const { data: oldDoc } = await supabaseClient.from('documents').select('doc_type').eq('id', currentDocId).single();
                 const oldShouldCutStock = oldDoc && cutStockTypes.includes(oldDoc.doc_type);
 
                 const { error: updateErr } = await supabaseClient.from('documents').update({
                     doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
                     project_id: currentProjectId || null,
-                    owner_id: currentUserId, // 👈 เพิ่มบรรทัดนี้
-                    doc_status: currentUserRole === 'admin' ? 'approved' : 'pending' // 👈 เพิ่มบรรทัดนี้
+                    owner_id: currentUserId,
+                    doc_status: currentUserRole === 'admin' ? 'approved' : 'pending'
                 }).eq('id', currentDocId);
                 if (updateErr) throw updateErr;
 
@@ -663,8 +656,8 @@
                     doc_num: docNum, doc_type: docType, doc_date: docDate, due_date: dueDate,
                     customer_id: customerId, subtotal: subtotal, discount: discount, grand_total: grandTotal,
                     project_id: currentProjectId || null,
-                    owner_id: currentUserId, // 👈 เพิ่มบรรทัดนี้
-                    doc_status: currentUserRole === 'admin' ? 'approved' : 'pending' // 👈 เพิ่มบรรทัดนี้
+                    owner_id: currentUserId,
+                    doc_status: currentUserRole === 'admin' ? 'approved' : 'pending'
                 }]).select();
                 
                 if (docErr) {
@@ -685,25 +678,25 @@
                 const unit = row.querySelector('.unit-select').value;
                 const price = parseFloat(row.querySelector('.price').value) || 0;
                 
-               const chk = row.querySelector('.chk-cut-stock');
-const isCutChecked = chk ? chk.checked : false;
+                const chk = row.querySelector('.chk-cut-stock');
+                const isCutChecked = chk ? chk.checked : false;
 
-let productId = isCutChecked ? row.getAttribute('data-product-id') : null;
-if (isCutChecked && !productId) {
-    const p = globalProducts.find(x => x.product_name === searchDesc);
-    if (p) productId = p.id;
-}
+                let productId = isCutChecked ? row.getAttribute('data-product-id') : null;
+                if (isCutChecked && !productId) {
+                    const p = globalProducts.find(x => x.product_name === searchDesc);
+                    if (p) productId = p.id;
+                }
 
-if(fullDesc !== "") {
-    itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: fullDesc, sn: sn, qty: qty, unit: unit, price: price });
-    
-    if(productId && qty > 0 && shouldCutStock && isCutChecked) {
-        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
-        if(currentStock) {
-            await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
-        }
-    }
-}
+                if(fullDesc !== "") {
+                    itemsToInsert.push({ document_id: documentIdToUse, product_id: productId || null, description: fullDesc, sn: sn, qty: qty, unit: unit, price: price });
+                    
+                    if(productId && qty > 0 && shouldCutStock && isCutChecked) {
+                        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', productId).single();
+                        if(currentStock) {
+                            await supabaseClient.from('products').update({qty_in_stock: parseFloat(currentStock.qty_in_stock) - qty}).eq('id', productId);
+                        }
+                    }
+                }
             }
             
             if(itemsToInsert.length > 0) {
@@ -718,15 +711,12 @@ if(fullDesc !== "") {
             }
             
             isDirty = false;
-           await fetchProducts(); 
+            await fetchProducts(); 
 
-            // เพิ่มโค้ดชุดนี้: พอบันทึกเสร็จ ถ้าไม่ใช่แอดมินให้ซ่อนปุ่มพิมพ์
             if (currentUserRole !== 'admin') {
                 document.querySelector('.btn-print').style.display = 'none';
                 document.querySelector('.btn-excel').style.display = 'none';
             }
-
-        } catch (error) {
 
         } catch (error) {
             alert("❌ ข้อผิดพลาด: " + error.message);
@@ -832,8 +822,7 @@ if(fullDesc !== "") {
         const qty = data ? data.qty : 1; 
         const unit = data ? data.unit : 'ตัว'; 
         const price = data ? data.price : 0; 
-       const sn = data ? (data.sn || '') : '';
-        const shouldBeChecked = data ? Boolean(data.productId || data.product_id) : true;
+        const sn = data ? (data.sn || '') : '';
         
         tr.innerHTML = `
             <td class="no-print text-center drag-handle" title="คลิกค้างเพื่อลาก">⋮⋮</td>
@@ -950,10 +939,10 @@ if(fullDesc !== "") {
         reader.readAsText(file); event.target.value = ''; 
     }
 
-   function loadSelectedDoc(cloudData) {
+    function loadSelectedDoc(cloudData) {
         currentDocId = cloudData.docId || null; 
         currentProjectId = cloudData.projectId || null; 
-        let docStatus = cloudData.docStatus || 'approved'; // ดึงสถานะเอกสาร
+        let docStatus = cloudData.docStatus || 'approved';
         
         const selectEl = document.getElementById('docType');
         const targetType = cloudData.docType || "ใบเสนอราคา";
@@ -981,7 +970,6 @@ if(fullDesc !== "") {
         
         updateDocTypeSync(false); calculateTotal(); isDirty = false;
 
-        // --- ระบบซ่อนปุ่มและโชว์ปุ่มอนุมัติ ---
         let approveBtn = document.getElementById('btn-approve');
         if(!approveBtn) {
             approveBtn = document.createElement('button');
@@ -1011,7 +999,6 @@ if(fullDesc !== "") {
         }
     }
 
-    // ฟังก์ชันสำหรับกดปุ่มอนุมัติ
     async function approveDocument() {
         if(!currentDocId) return;
         if(!confirm('ยืนยันการอนุมัติเอกสารใบนี้ให้สามารถพิมพ์ได้?')) return;
@@ -1026,6 +1013,7 @@ if(fullDesc !== "") {
             alert("❌ ผิดพลาด: " + error.message);
         }
     }
+
     function exportToExcel() {
         if (typeof XLSX === 'undefined') { alert('กำลังโหลดข้อมูลสำหรับการสร้าง Excel กรุณารอสักครู่แล้วกดใหม่อีกครั้ง'); return; }
         const docType = document.getElementById('docType').value; const docNum = document.getElementById('doc-num').value;
