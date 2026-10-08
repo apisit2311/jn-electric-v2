@@ -801,14 +801,16 @@
     }
 
     async function loadUserProfiles() {
-        const { data } = await supabaseClient.from('user_profiles').select('id, email, role');
+        // ดึงทั้ง id และ user_id มาตรวจสอบ
+        const { data } = await supabaseClient.from('user_profiles').select('*');
         allUserProfiles = data || [];
         const sel = document.getElementById('inp-proj-assigned');
         if (sel) {
             sel.innerHTML = '<option value="">-- ไม่ระบุ (ทุกคน) --</option>';
             allUserProfiles.forEach(u => {
                 const opt = document.createElement('option');
-                opt.value = u.id;
+                // 🌟 ดึง Auth ID ที่แท้จริง (ถ้ามี user_id ให้ใช้ user_id ถ้าไม่มีให้ใช้ id)
+                opt.value = u.user_id || u.id; 
                 opt.textContent = `${u.email} (${u.role})`;
                 sel.appendChild(opt);
             });
@@ -997,9 +999,13 @@
         sel.innerHTML = '<option value="">-- ไม่ระบุ (ทุกคน) --</option>';
         allUserProfiles.forEach(u => {
             const opt = document.createElement('option');
-            opt.value = u.id;
+            // 🌟 ดึง Auth ID ที่แท้จริง
+            const realUserId = u.user_id || u.id;
+            opt.value = realUserId;
             opt.textContent = `${u.email} (${u.role})`;
-            if (currentProject.assigned_to === u.id) opt.selected = true;
+            
+            // เช็กว่าตรงกับคนที่มอบหมายไว้เดิมไหม
+            if (currentProject.assigned_to === realUserId) opt.selected = true;
             sel.appendChild(opt);
         });
 
