@@ -348,9 +348,17 @@
             await fetchProducts(); 
             initializeDoc();
             if (currentUserRole !== 'admin') {
-                document.querySelector('.btn-print').style.display = 'none';
-                document.querySelector('.btn-excel').style.display = 'none';
-            }
+    document.querySelector('.btn-print').style.display = 'none';
+    document.querySelector('.btn-excel').style.display = 'none';
+    
+    // 🔒 เพิ่ม 2 บรรทัดนี้: ซ่อนปุ่ม Dashboard และ Stock สำหรับ Staff
+    const btnDashboard = document.querySelector('.btn-dashboard');
+    if (btnDashboard) btnDashboard.style.display = 'none';
+    
+    // (เลือกได้) ถ้าต้องการซ่อนปุ่มคลังสินค้าด้วย
+    // const btnStock = document.querySelector('a[href="stock.html"]');
+    // if (btnStock) btnStock.style.display = 'none';
+}
         }
 
         document.getElementById("pass-input").addEventListener("keypress", function(e){
