@@ -37,7 +37,6 @@
         body { font-family: 'Prompt', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 14px 14px 80px 14px; line-height: 1.4; }
         .wrapper { max-width: 680px; margin: 0 auto; }
 
-        /* Header */
         .app-header { background: var(--surface); padding: 14px 18px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--card-shadow); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .header-title { display: flex; align-items: center; gap: 10px; }
         .header-logo-icon { width: 38px; height: 38px; background: #e0f2fe; color: #0284c7; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
@@ -52,7 +51,6 @@
         .btn-rose { background: var(--rose); color: #fff; }
         .btn-sm { padding: 4px 8px; font-size: 11.5px; border-radius: 6px; }
 
-        /* KPIs */
         .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
         .kpi-card { background: var(--surface); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border); box-shadow: var(--card-shadow); }
         .kpi-card.amber { border-left: 4px solid var(--amber); }
@@ -61,12 +59,10 @@
         .kpi-val { font-size: 19px; font-weight: 700; }
         .kpi-sub { font-size: 10.5px; color: var(--text-sub); margin-top: 2px; }
 
-        /* Tabs */
         .tab-switcher { display: flex; background: #e2e8f0; padding: 4px; border-radius: 12px; margin-bottom: 14px; }
         .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 9px; font-family: 'Prompt'; font-size: 13px; font-weight: 600; color: var(--text-sub); cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-weight: 700; }
 
-        /* Filter Controls */
         .filter-section { background: var(--surface); padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
         .filter-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
         .custom-select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 12.5px; outline: none; background: #fff; flex: 1; min-width: 160px; }
@@ -74,7 +70,6 @@
         .status-pill { padding: 4px 8px; border: none; background: transparent; font-family: 'Prompt'; font-size: 11.5px; font-weight: 600; color: var(--text-sub); border-radius: 6px; cursor: pointer; }
         .status-pill.active { background: #fff; color: var(--primary); font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
-        /* Dropdown Multi-Select Checkbox */
         .multi-select-container { position: relative; flex: 1; min-width: 160px; }
         .multi-select-btn { width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; font-family: 'Prompt'; font-size: 12.5px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .multi-select-dropdown { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--card-shadow-lg); z-index: 100; max-height: 220px; overflow-y: auto; padding: 6px; }
@@ -83,7 +78,6 @@
         .multi-select-item:hover { background: var(--bg); }
         .multi-select-item input[type="checkbox"] { cursor: pointer; }
 
-        /* Cards */
         .card-list { display: flex; flex-direction: column; gap: 8px; }
         .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; box-shadow: var(--card-shadow); transition: 0.15s; position: relative; overflow: hidden; }
         .item-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary-accent); }
@@ -99,14 +93,12 @@
         .item-card-actions { display: flex; align-items: center; gap: 6px; }
         .btn-icon { border: none; background: none; cursor: pointer; padding: 4px 6px; border-radius: 4px; font-size: 12px; }
 
-        /* Split Bottom Bar */
         .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border-top: 1px solid var(--border); padding: 10px 14px; z-index: 99; }
         .bottom-bar-inner { max-width: 680px; margin: 0 auto; display: flex; gap: 8px; }
         .btn-bottom { flex: 1; border: none; padding: 12px; border-radius: var(--radius-md); font-family: 'Prompt'; font-size: 13.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: white; }
         .btn-bottom.log { background: var(--primary-accent); box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
         .btn-bottom.advance { background: var(--rose); box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.2); }
 
-        /* Form & Modals */
         .clean-input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Prompt'; font-size: 13.5px; outline: none; background: #fff; }
         .clean-input:focus { border-color: var(--primary-accent); box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
         .form-item { margin-bottom: 12px; }
@@ -123,9 +115,17 @@
 
         .worker-confirm-card { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 14px; text-align: center; margin-bottom: 14px; }
         .alert-revoked { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 20px; border-radius: var(--radius-md); text-align: center; margin: 40px auto; max-width: 450px; }
+        
+        #auth-guard { position: fixed; top:0; left:0; width:100%; height:100%; background: #fff; z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
 <body>
+
+<div id="auth-guard">
+    <h2 style="color: var(--primary);">กำลังตรวจสอบสิทธิ์การเข้าถึง...</h2>
+    <p>ระบบกำลังตรวจสอบข้อมูลผู้ใช้งาน</p>
+    <a href="index.html" class="btn btn-primary">กลับไปหน้าออกบิล</a>
+</div>
 
 <div class="wrapper" id="app-wrapper">
     <!-- Header -->
@@ -138,7 +138,7 @@
             </div>
         </div>
         <div class="btn-group" id="header-btn-group">
-            <button class="btn btn-white btn-sm" onclick="openPartnerShareModal()">🔗 พาร์ทเนอร์</button>
+            <button class="btn btn-white btn-sm admin-only-ui" onclick="openPartnerShareModal()">🔗 พาร์ทเนอร์</button>
             <button class="btn btn-white btn-sm" onclick="exportToExcel()">📊 Excel</button>
             <a href="project.html" class="btn btn-white btn-sm">📁 โครงการ</a>
             <a href="index.html" class="btn btn-white btn-sm">⬅️ ออกบิล</a>
@@ -171,7 +171,7 @@
         <button class="tab-btn active" id="tab-btn-logs" onclick="switchLaborTab('logs')">
             🕒 ประวัติค่าแรง (<span id="cnt-logs">0</span>)
         </button>
-        <button class="tab-btn" id="tab-btn-techs" onclick="switchLaborTab('techs')">
+        <button class="tab-btn admin-only-ui" id="tab-btn-techs" onclick="switchLaborTab('techs')">
             👷 ทะเบียนช่าง (<span id="cnt-techs">0</span>)
         </button>
     </div>
@@ -180,15 +180,13 @@
     <div id="pane-logs">
         <!-- ตัวกรองข้อมูล -->
         <div class="filter-section" id="filter-container">
-            <!-- แถวที่ 1: กรองโครงการ & ปุ่มตัดวีค -->
             <div class="filter-row">
                 <select id="sel-filter-proj" class="custom-select" onchange="loadLaborLogs()">
                     <option value="">-- กรองทุกโครงการที่เปิดอยู่ --</option>
                 </select>
-                <button class="btn btn-purple btn-sm" id="btn-payroll" onclick="openPayrollModal()">💳 ตัดวีคจ่ายเงิน</button>
+                <button class="btn btn-purple btn-sm admin-only-ui" id="btn-payroll" onclick="openPayrollModal()">💳 ตัดวีคจ่ายเงิน</button>
             </div>
             
-            <!-- แถวที่ 2: สถานะ & เลือกดูเฉพาะบุคคล (Dropdown Checkbox) -->
             <div class="filter-row">
                 <div class="status-pill-group">
                     <button class="status-pill active" id="st-all" onclick="setStatusFilter('all')">ทั้งหมด</button>
@@ -196,8 +194,8 @@
                     <button class="status-pill" id="st-paid" onclick="setStatusFilter('paid')">จ่ายแล้ว</button>
                 </div>
 
-                <!-- Dropdown ติ๊กเลือกช่าง -->
-                <div class="multi-select-container" id="worker-filter-box">
+                <!-- Dropdown ติ๊กเลือกช่าง (ซ่อนสำหรับ Staff) -->
+                <div class="multi-select-container admin-only-ui" id="worker-filter-box">
                     <button class="multi-select-btn" type="button" onclick="toggleWorkerDropdown()">
                         <span id="lbl-selected-workers">👤 ช่างทุกคน</span>
                         <span style="font-size:10px;">▼</span>
@@ -369,39 +367,65 @@
     let laborLogs = [];
     let activeTab = 'logs';
     let statusFilter = 'pending';
-    let selectedWorkerIds = []; // เก็บรายชื่อช่างที่ถูกเลือก
+    let selectedWorkerIds = [];
 
     let appMode = 'ADMIN';
     let activeProjectId = null;
     let activeWorkerId = null;
 
+    let currentUserRole = 'staff';
+    let currentUserId = null;
+
     function generateSafeToken() {
         return 't_' + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
     }
 
-    window.onload = async () => {
-        try {
+    window.onload = () => {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
             const params = new URLSearchParams(window.location.search);
             const partnerToken = params.get('partner');
             const workerToken = params.get('worker');
 
             if (partnerToken) {
+                document.getElementById('auth-guard').style.display = 'none';
                 await initPartnerMode(partnerToken);
+                return;
             } else if (workerToken) {
+                document.getElementById('auth-guard').style.display = 'none';
                 await initWorkerMode(workerToken);
-            } else {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (!session) { window.location.href = "index.html"; return; }
+                return;
+            }
+
+            if (session) {
+                currentUserId = session.user.id;
+                const { data: profile } = await supabaseClient
+                    .from('user_profiles')
+                    .select('role')
+                    .eq('email', session.user.email)
+                    .single();
+
+                if (profile) currentUserRole = profile.role;
+
+                applyRolePermissions();
+
                 await loadProjects();
                 await loadTechnicians();
                 await loadLaborLogs();
+
+                document.getElementById('auth-guard').style.display = 'none';
+            } else {
+                alert("กรุณาเข้าสู่ระบบก่อนใช้งานครับ");
+                window.location.href = "index.html";
             }
-        } catch (err) {
-            console.error("Window onload error:", err);
-        }
+        });
     };
 
-    // ปิด dropdown เมื่อคลิกที่อื่น
+    function applyRolePermissions() {
+        if (currentUserRole !== 'admin') {
+            document.querySelectorAll('.admin-only-ui').forEach(el => el.style.display = 'none');
+        }
+    }
+
     window.onclick = function(e) {
         if (!e.target.closest('#worker-filter-box')) {
             const menu = document.getElementById('worker-dropdown-menu');
@@ -468,6 +492,11 @@
     }
 
     function switchLaborTab(tab) {
+        if (currentUserRole !== 'admin' && tab === 'techs') {
+            alert("⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์เข้าถึงทะเบียนช่าง");
+            return;
+        }
+
         activeTab = tab;
         document.getElementById('tab-btn-logs').className = `tab-btn ${tab === 'logs' ? 'active' : ''}`;
         document.getElementById('tab-btn-techs').className = `tab-btn ${tab === 'techs' ? 'active' : ''}`;
@@ -482,32 +511,26 @@
         renderLaborLogsView();
     }
 
-    // ข้อ 1: โหลดเฉพาะโครงการที่กำลังดำเนินการอยู่ (ไม่ดึงโครงการที่เสร็จสิ้น/ปิดแล้ว)
-   async function loadProjects() {
-        // ดึงโครงการทั้งหมดมาก่อน แล้วคัดกรองใน JavaScript โดยตรง (แม่นยำและไม่พึ่งพา syntax ของ query)
-        const { data, error } = await supabaseClient
-            .from('projects')
-            .select('*')
-            .order('created_at', { ascending: false });
+    async function loadProjects() {
+        let query = supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
 
+        // 🔒 Staff: กรองเฉพาะโครงการที่ได้รับมอบหมาย
+        if (currentUserRole !== 'admin') {
+            query = query.eq('assigned_to', currentUserId);
+        }
+
+        const { data, error } = await query;
         if (error) {
             console.error("Error loading projects:", error);
             return;
         }
 
-        // คัดกรองเฉพาะโครงการที่เปิดอยู่จริง:
-        // 1. ถ้ามีฟิลด์ is_active หรือ active ต้องไม่เป็น false
-        // 2. ถ้ามีฟิลด์ status ต้องไม่ใช่คำที่แปลว่าปิด/เสร็จ/ยกเลิก
         const closedWords = ['เสร็จสิ้น', 'ปิดโครงการ', 'ปิดแล้ว', 'จบงาน', 'ยกเลิก', 'closed', 'completed', 'cancelled', 'inactive'];
 
         projects = (data || []).filter(p => {
-            // เช็กฟิลด์ boolean ถ้ามี
             if (p.is_active === false || p.active === false) return false;
-            
-            // เช็กฟิลด์สถานะข้อความ (status หรือ project_status)
             const st = String(p.status || p.project_status || '').trim().toLowerCase();
             if (closedWords.some(word => st === word.toLowerCase())) return false;
-
             return true;
         });
         
@@ -529,12 +552,12 @@
             if (partnerProj) partnerProj.insertAdjacentHTML('beforeend', opt);
         });
     }
-    // ข้อ 2: โหลดทะเบียนช่าง และสร้างตัวเลือก Checkbox Multi-Select
+
     async function loadTechnicians() {
         const { data } = await supabaseClient.from('technicians').select('*').order('tech_name');
         technicians = data || [];
         
-        if (appMode === 'ADMIN') {
+        if (appMode === 'ADMIN' && currentUserRole === 'admin') {
             for(let t of technicians) {
                 if (!t.share_token) {
                     const newToken = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : generateSafeToken();
@@ -558,8 +581,7 @@
         if (cntEl) cntEl.innerText = technicians.length;
 
         technicians.forEach(t => {
-            // การ์ดในแท็บทะเบียนช่าง
-            if (container) {
+            if (container && currentUserRole === 'admin') {
                 const card = document.createElement('div');
                 card.className = 'item-card';
                 const shareLink = `${window.location.origin}${window.location.pathname}?worker=${t.share_token}`;
@@ -579,12 +601,10 @@
                 container.appendChild(card);
             }
 
-            // ตัวเลือกใน Form Modal
             const opt = `<option value="${t.id}">${t.tech_name}</option>`;
             if (workTech) workTech.insertAdjacentHTML('beforeend', opt);
             if (advTech) advTech.insertAdjacentHTML('beforeend', opt);
 
-            // แถว Checkbox ใน Dropdown Multi-Select
             if (chkList) {
                 const item = document.createElement('label');
                 item.className = 'multi-select-item';
@@ -597,7 +617,6 @@
         });
     }
 
-    // Toggle Dropdown Checkbox
     function toggleWorkerDropdown() {
         const menu = document.getElementById('worker-dropdown-menu');
         if (menu) menu.classList.toggle('show');
@@ -605,7 +624,7 @@
 
     function toggleSelectAllWorkers(isChecked) {
         document.querySelectorAll('.chk-worker-item').forEach(chk => {
-            chk.checked = false; // ยกเลิกติ๊กรายคนถ้าเลือกทุกคน
+            chk.checked = false;
         });
         document.getElementById('chk-worker-all').checked = isChecked;
         updateSelectedWorkersState();
@@ -638,13 +657,17 @@
     }
 
     async function loadLaborLogs() {
-        let query = supabaseClient.from('project_labor_logs').select('*, projects(project_name), technicians(tech_name, phone, bank_name, bank_account, share_token)').order('work_date', { ascending: false });
+        let query = supabaseClient.from('project_labor_logs').select('*, projects(project_name, assigned_to), technicians(tech_name, phone, bank_name, bank_account, share_token)').order('work_date', { ascending: false });
         
-        if (appMode === 'PARTNER' && activeProjectId) query = query.eq('project_id', activeProjectId);
-        else if (appMode === 'WORKER' && activeWorkerId) query = query.eq('technician_id', activeWorkerId);
-        else {
+        if (appMode === 'PARTNER' && activeProjectId) {
+            query = query.eq('project_id', activeProjectId);
+        } else if (appMode === 'WORKER' && activeWorkerId) {
+            query = query.eq('technician_id', activeWorkerId);
+        } else {
             const filterProj = document.getElementById('sel-filter-proj')?.value;
-            if (filterProj) query = query.eq('project_id', filterProj);
+            if (filterProj) {
+                query = query.eq('project_id', filterProj);
+            }
         }
         
         const { data, error } = await query;
@@ -653,7 +676,15 @@
             document.getElementById('labor-logs-list').innerHTML = `<div style="text-align:center; padding:30px; color:var(--rose); font-size:12.5px;">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}</div>`;
             return;
         }
-        laborLogs = data || [];
+
+        let allLogs = data || [];
+
+        // 🔒 Staff: กรองแสดงเฉพาะประวัติในโครงการที่ตนเองรับผิดชอบ
+        if (currentUserRole !== 'admin') {
+            allLogs = allLogs.filter(l => l.projects && l.projects.assigned_to === currentUserId);
+        }
+
+        laborLogs = allLogs;
         renderLaborLogsView();
 
         if (appMode === 'WORKER') {
@@ -669,13 +700,11 @@
     }
 
     function renderLaborLogsView() {
-        // กรองตามคนงานที่ติ๊กเลือก (ถ้าไม่ได้เลือกทุกคน)
         let filteredLogs = laborLogs;
         if (selectedWorkerIds.length > 0) {
             filteredLogs = filteredLogs.filter(l => selectedWorkerIds.includes(l.technician_id));
         }
 
-        // คำนวณยอด KPI เฉพาะก้อนที่ถูกกรอง
         let sumPending = 0, cntPending = 0, sumPaid = 0, cntPaid = 0;
 
         filteredLogs.forEach(l => {
@@ -699,7 +728,6 @@
         const cntEl = document.getElementById('cnt-logs');
         if (cntEl) cntEl.innerText = filteredLogs.length;
 
-        // กรองตามแท็บสถานะ (ทั้งหมด / รอจ่าย / จ่ายแล้ว)
         let displayList = filteredLogs;
         if (statusFilter === 'pending') displayList = filteredLogs.filter(l => !l.is_paid);
         if (statusFilter === 'paid') displayList = filteredLogs.filter(l => l.is_paid);
@@ -722,7 +750,7 @@
             const confirmedBadge = l.worker_confirmed ? `<span style="color:var(--emerald); font-size:11px; margin-left:4px;">✓ ยืนยันแล้ว</span>` : '';
 
             let actionsHtml = '';
-            if (appMode === 'ADMIN') {
+            if (currentUserRole === 'admin') {
                 let payBtnHtml = l.is_paid 
                     ? `<span style="font-size:11.5px; color:var(--emerald); font-weight:600; cursor:pointer;" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', false, '${l.technicians?.tech_name}', ${amt})">${isAdvance ? 'หักคืนแล้ว ✅' : 'จ่ายแล้ว ✅'}</span>`
                     : `<button class="btn btn-sm ${isAdvance ? 'btn-rose' : 'btn-primary'}" onclick="toggleLaborPaidSafe('${l.id}', '${l.expense_id}', true, '${l.technicians?.tech_name}', ${amt}, '${l.technicians?.bank_name} ${l.technicians?.bank_account}', '${l.work_details || l.work_type}')">💳 ${isAdvance ? 'เคลียร์ยอดเบิก' : 'จ่ายเงิน'}</button>`;
@@ -785,6 +813,13 @@
         const slipFile = document.getElementById('work-slip').files[0];
 
         if (!projId || !techId || !date) return alert('⚠️ กรุณาระบุข้อมูลให้ครบถ้วน');
+        
+        // 🔒 ตรวจสอบสิทธิ์ Staff ข้ามโครงการ
+        const selectedProj = projects.find(p => p.id === projId);
+        if (currentUserRole !== 'admin' && selectedProj && selectedProj.assigned_to !== currentUserId) {
+            return alert('⚠️ คุณไม่มีสิทธิ์ลงค่าแรงในโครงการนี้');
+        }
+
         const total = (units * rate) + ot;
         const tech = technicians.find(t => t.id === techId);
 
@@ -833,6 +868,15 @@
         const slipFile = document.getElementById('adv-slip').files[0];
 
         if (!techId || !date || amount <= 0) return alert('⚠️ กรุณากรอกข้อมูลให้ถูกต้อง');
+        
+        // 🔒 ตรวจสอบสิทธิ์ Staff ข้ามโครงการ
+        if (projId && currentUserRole !== 'admin') {
+            const selectedProj = projects.find(p => p.id === projId);
+            if (selectedProj && selectedProj.assigned_to !== currentUserId) {
+                return alert('⚠️ คุณไม่มีสิทธิ์เบิกเงินในโครงการนี้');
+            }
+        }
+
         setBtnLoading('btn-submit-adv', true);
 
         try {
@@ -856,6 +900,11 @@
     }
 
     function toggleLaborPaidSafe(logId, expId, isCheckingOut, techName, amount, bankInfo, desc) {
+        if (currentUserRole !== 'admin') {
+            alert("⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์ทำรายการจ่ายเงิน");
+            return;
+        }
+
         if (!isCheckingOut) {
             const isAdvance = Number(amount || 0) < 0;
             const confirmMsg = isAdvance ? "ต้องการยกเลิกสถานะการหักคืนยอดเบิกนี้ใช่ไหม?" : "ต้องการยกเลิกสถานะจ่ายเงิน?";
@@ -878,6 +927,8 @@
     }
 
     async function executeLaborPaid() {
+        if (currentUserRole !== 'admin') return;
+
         const logId = document.getElementById('pc-log-id').value;
         const expId = document.getElementById('pc-exp-id').value;
         const slipFile = document.getElementById('pc-slip').files[0];
@@ -894,6 +945,8 @@
     }
 
     async function processPaymentStatusChange(logId, expId, newStatus, slipUrl = null) {
+        if (currentUserRole !== 'admin') return;
+
         const payload = { is_paid: newStatus };
         if (slipUrl) payload.slip_url = slipUrl;
 
@@ -905,6 +958,11 @@
     }
 
     async function deleteLaborLog(logId, expenseId) {
+        if (currentUserRole !== 'admin') {
+            alert("⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์ลบรายการค่าแรง");
+            return;
+        }
+
         if (!confirm('ยืนยันลบรายการนี้?')) return;
         await supabaseClient.from('project_labor_logs').delete().eq('id', logId);
         if (expenseId && expenseId !== 'null') await supabaseClient.from('project_expenses').delete().eq('id', expenseId);
@@ -912,6 +970,11 @@
     }
 
     function openPayrollModal() {
+        if (currentUserRole !== 'admin') {
+            alert("⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์ตัดวีคจ่ายเงิน");
+            return;
+        }
+
         const pending = laborLogs.filter(l => !l.is_paid);
         if(pending.length === 0) return alert('ไม่มีรายการค้างจ่ายครับ');
 
@@ -939,6 +1002,8 @@
     }
 
     async function executeGroupPayroll(logIdsStr, expIdsStr) {
+        if (currentUserRole !== 'admin') return;
+
         if(!confirm('ยืนยันบันทึกจ่ายยอดสุทธิทั้งหมดของช่างคนนี้?')) return;
         for(let id of logIdsStr.split(',')) await supabaseClient.from('project_labor_logs').update({ is_paid: true }).eq('id', id);
         for(let eid of expIdsStr.split(',').filter(e=>e && e!=='null')) await supabaseClient.from('project_expenses').update({ is_paid: true }).eq('id', eid);
@@ -961,11 +1026,13 @@
     }
 
     function openPartnerShareModal() {
+        if (currentUserRole !== 'admin') return;
         document.getElementById('modalPartner').style.display = 'flex';
         renderPartnerList();
     }
 
     async function createPartnerShare() {
+        if (currentUserRole !== 'admin') return;
         const name = document.getElementById('inp-partner-name').value.trim();
         const pId = document.getElementById('sel-partner-proj').value;
         if (!name || !pId) return alert("กรุณากรอกชื่อและเลือกโครงการ");
@@ -991,6 +1058,7 @@
     }
 
     function openEditTechModal(id) {
+        if (currentUserRole !== 'admin') return;
         const t = technicians.find(x => x.id === id);
         if (!t) return;
         document.getElementById('modal-tech-title').innerText = '✏️ แก้ไขข้อมูลคนงาน';
@@ -1004,6 +1072,7 @@
     }
 
     function openNewTechModal() {
+        if (currentUserRole !== 'admin') return;
         document.getElementById('modal-tech-title').innerText = '➕ เพิ่มคนงานใหม่';
         document.getElementById('inp-tech-id').value = '';
         document.getElementById('inp-tech-name').value = '';
@@ -1015,6 +1084,7 @@
     }
 
     async function submitTechnician() {
+        if (currentUserRole !== 'admin') return;
         const id = document.getElementById('inp-tech-id').value;
         const name = document.getElementById('inp-tech-name').value.trim();
         if (!name) return alert('กรุณากรอกชื่อ');
@@ -1032,6 +1102,7 @@
     }
 
     async function deleteTechnician(id, name) {
+        if (currentUserRole !== 'admin') return;
         if (!confirm(`ยืนยันลบ ${name}?`)) return;
         await supabaseClient.from('technicians').delete().eq('id', id);
         await loadTechnicians();
