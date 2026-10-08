@@ -619,7 +619,7 @@
             </table>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-            <button class="btn btn-white btn-sm" onclick="addBatchExpenseRow(catInfo.defaultUnit)">➕ เพิ่มแถว</button>
+            <button class="btn btn-white btn-sm" onclick="addBatchExpenseRow()">➕ เพิ่มแถว</button>
             <div class="btn-group">
                 <button class="btn btn-white" onclick="closeModalSafe('modalBatchExpense')">ยกเลิก</button>
                 <button class="btn btn-emerald font-bold" id="btn-submit-batch-exp" onclick="submitBatchExpense()">💾 บันทึกทั้งหมด</button>
@@ -779,7 +779,6 @@
                 applyRolePermissions();
                 updateModeButtonText();
                 
-                // โหลดรายชื่อผู้ใช้สำหรับใส่ใน Dropdown มอบหมายงาน
                 if (currentUserRole === 'admin') {
                     await loadUserProfiles();
                 }
@@ -830,22 +829,28 @@
         }
     }
 
-   async function loadProjectLauncherList() {
+    async function loadProjectLauncherList() {
         let query = supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
 
-        // 🔒 Staff: ดึงเฉพาะโครงการที่ได้รับมอบหมาย (รองรับทั้งจับคู่ด้วย ID หรือ Email)
+        // 🔒 Staff: กรองเฉพาะโครงการที่ได้รับมอบหมายด้วย UUID ที่ถูกต้อง
         if (currentUserRole !== 'admin') {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const userEmail = session?.user?.email || '';
-            
-            // กรองหาทั้งจาก user id และ email เผื่อฐานข้อมูลเก็บเป็น email
-            query = query.or(`assigned_to.eq.${currentUserId},assigned_to.eq.${userEmail}`);
+            query = query.eq('assigned_to', currentUserId);
         }
 
         const { data, error } = await query;
         if (error) console.error("Error loading projects:", error);
 
-        projects = (data || []).map(p => ({ ...p, status: p.status || 'active' }));
+        // ปรับการอ่านค่าสถานะให้ยืดหยุ่นขึ้น (ถ้าว่าง หรือไม่ใช่ closed/archived ให้ถือว่า active)
+        const closedWords = ['เสร็จสิ้น', 'ปิดโครงการ', 'ปิดแล้ว', 'จบงาน', 'ยกเลิก', 'closed', 'completed', 'cancelled', 'archived', 'inactive'];
+
+        projects = (data || []).map(p => {
+            const st = String(p.status || '').trim().toLowerCase();
+            const isClosed = closedWords.includes(st);
+            return {
+                ...p,
+                status: isClosed ? 'archived' : 'active'
+            };
+        });
 
         const activeProjects = projects.filter(p => p.status === 'active');
         const lastSavedId = localStorage.getItem('erp_last_selected_project');
@@ -978,7 +983,6 @@
         await selectProjectFromLauncher(currentProject.id);
     }
 
-    // ==================== ฟังก์ชันแก้ไขโครงการ (เพิ่มใหม่) ====================
     function openEditProjectModal() {
         if (!currentProject || currentUserRole !== 'admin') {
             alert("⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์แก้ไขข้อมูลโครงการ");
@@ -1338,7 +1342,6 @@
             container.appendChild(tab);
         });
 
-        // 🔒 แท็บทะเบียนเงินทุน: ให้เฉพาะ Admin เห็น
         if (currentUserRole === 'admin') {
             const fundTab = document.createElement('button');
             fundTab.className = `tab-pill ${activeSheetKey === 'funding' ? 'active' : ''}`;
@@ -1407,7 +1410,6 @@
         await supabaseClient.from('project_expenses').update({ is_paid: newStatus }).eq('id', id);
     }
 
-    // ==================== RENDER MASTER SUMMARY ====================
     function renderMasterSummary() {
         let sumSelling = 0;
         let sumBomCost = 0;
@@ -1456,7 +1458,6 @@
             return { item, idx, subs, unitCost, sellingTotal, costTotal, grossProfit, itemPaidTotal, paymentClass, paymentBadge };
         });
 
-        // 🔒 ตรวจสอบว่าต้องโชว์คอลัมน์กำไรไหม
         const showProfitCol = currentUserRole === 'admin';
 
         if (currentViewMode === 'table') {
@@ -1672,7 +1673,6 @@
         document.getElementById('kpi-total-cost').innerText = totalProjectCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-cost-sub').innerText = `อุปกรณ์: ${sumBomCost.toLocaleString()} | หน้างาน: ${totalSiteExpenses.toLocaleString()}`;
 
-        // อัปเดตตัวเลขการเงินเฉพาะ Admin
         if (currentUserRole === 'admin') {
             document.getElementById('kpi-net-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById('kpi-margin-badge').innerText = `อัตรากำไร: ${marginPct}%`;
@@ -1731,7 +1731,6 @@
         }
     }
 
-    // ==================== RENDER BOM SHEET ====================
     function renderBomSheet(mainItemId) {
         const item = mainItems.find(m => m.id === mainItemId);
         if (!item) return;
@@ -1865,7 +1864,6 @@
         `;
     }
 
-    // ==================== RENDER EXPENSE SHEET ====================
     function renderExpenseSheet(catKey) {
         const allExpenseCats = getProjectExpenseCategories();
         const catInfo = allExpenseCats.find(c => c.key === catKey) || { 
@@ -2018,7 +2016,6 @@
         if (lbl) lbl.innerText = total.toLocaleString('en-US', {minimumFractionDigits: 2});
     }
 
-    // ==================== RENDER FUNDING SHEET ====================
     function renderFundingSheet() {
         if (currentUserRole !== 'admin') return;
 
@@ -2181,7 +2178,6 @@
         `;
     }
 
-    // ==================== SAFETY CRUD & VALIDATIONS ====================
     function closeModalSafe(modalId) {
         document.getElementById(modalId).style.display = 'none';
     }
