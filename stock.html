@@ -80,7 +80,8 @@
 </div>
 
 <div class="container">
-    <div class="form-box">
+    <!-- ฝั่งซ้าย: ฟอร์มจัดการสินค้า (จะถูกซ่อนถ้าเป็น Staff) -->
+    <div class="form-box" id="stock-form-box">
         <h3 id="form-title">➕ เพิ่ม/รับเข้า สินค้า</h3>
         <input type="hidden" id="edit-product-id"> 
 
@@ -152,7 +153,8 @@
         </div>
     </div>
 
-    <div class="table-box">
+    <!-- ฝั่งขวา: ตารางสินค้า -->
+    <div class="table-box" id="stock-table-box">
         <h3 style="margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">📋 รายการสินค้าทั้งหมด</h3>
         
         <div class="search-bar-container">
@@ -163,10 +165,10 @@
             <thead>
                 <tr>
                     <th>รหัส / ชื่อสินค้า</th>
-                    <th>ราคาทุน / ราคาขาย</th>
+                    <th id="th-price-column">ราคาขาย</th>
                     <th>แหล่งที่ซื้อ / อ้างอิง</th>
                     <th>คงเหลือ</th>
-                    <th style="text-align: center;">จัดการ</th>
+                    <th style="text-align: center;" id="th-action-column">จัดการ</th>
                 </tr>
             </thead>
             <tbody id="stock-tbody">
@@ -182,14 +184,51 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     let globalProducts = [];
+    let currentUserRole = 'staff';
+    let currentUserId = null;
 
-    window.onload = async () => {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-            document.getElementById("auth-guard").style.display = "none";
-            loadStock(); 
-        }
+    window.onload = () => {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (session) {
+                currentUserId = session.user.id;
+                const { data: profile } = await supabaseClient
+                    .from('user_profiles')
+                    .select('role')
+                    .eq('email', session.user.email)
+                    .single();
+
+                if (profile) currentUserRole = profile.role;
+
+                // ตรวจสอบและตั้งค่า UI ตาม Role
+                applyRolePermissions();
+
+                document.getElementById("auth-guard").style.display = "none";
+                loadStock(); 
+            } else {
+                alert("กรุณาเข้าสู่ระบบก่อนใช้งานครับ");
+                window.location.href = "index.html";
+            }
+        });
     };
+
+    function applyRolePermissions() {
+        if (currentUserRole !== 'admin') {
+            // ถ้าเป็น Staff: ซ่อนฟอร์มรับเข้าสินค้าทางซ้าย แล้วขยายตารางเต็มจอ
+            const formBox = document.getElementById("stock-form-box");
+            if (formBox) formBox.style.display = "none";
+            
+            const tableBox = document.getElementById("stock-table-box");
+            if (tableBox) tableBox.style.flex = "1";
+
+            // ซ่อนหัวตารางช่องจัดการ
+            const thAction = document.getElementById("th-action-column");
+            if (thAction) thAction.style.display = "none";
+
+            document.getElementById("th-price-column").innerText = "ราคาขาย";
+        } else {
+            document.getElementById("th-price-column").innerText = "ราคาทุน / ราคาขาย";
+        }
+    }
 
     let html5QrcodeScanner; let targetSnInput = null;
     function openScanner(btn) {
@@ -212,7 +251,8 @@
             codeDatalist.innerHTML = '';
             supplierDatalist.innerHTML = '';
             
-            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">ยังไม่มีสินค้าในคลัง</td></tr>'; return; }
+            const colSpanCount = currentUserRole === 'admin' ? 5 : 4;
+            if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="${colSpanCount}" style="text-align: center; color: #94a3b8;">ยังไม่มีสินค้าในคลัง</td></tr>`; return; }
 
             const suppliersSet = new Set();
             data.forEach(item => {
@@ -235,16 +275,18 @@
 
             renderTable(data);
         } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">โหลดข้อมูลล้มเหลว</td></tr>';
+            const colSpanCount = currentUserRole === 'admin' ? 5 : 4;
+            tbody.innerHTML = `<tr><td colspan="${colSpanCount}" style="text-align: center; color: red;">โหลดข้อมูลล้มเหลว</td></tr>`;
         }
     }
 
     function renderTable(products) {
         const tbody = document.getElementById('stock-tbody');
         tbody.innerHTML = '';
+        const colSpanCount = currentUserRole === 'admin' ? 5 : 4;
         
         if (products.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">ไม่พบสินค้าที่ค้นหา</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="${colSpanCount}" style="text-align: center; color: #94a3b8;">ไม่พบสินค้าที่ค้นหา</td></tr>`;
             return;
         }
 
@@ -254,6 +296,28 @@
             const orderRefText = item.order_ref ? `<div style="font-size:12px; color:#64748b;">บิล: ${item.order_ref}</div>` : '';
             const linkBtn = item.product_url ? `<div style="margin-top:3px;"><a href="${item.product_url}" target="_blank" class="btn-link">🔗 เปิดลิงก์</a></div>` : '';
 
+            // แสดงราคาทุนเฉพาะ Admin
+            let priceDisplay = '';
+            if (currentUserRole === 'admin') {
+                priceDisplay = `
+                    <div style="font-size:13px; color:#64748b;">ทุน: ${parseFloat(item.cost_price || 0).toLocaleString()}.-</div>
+                    <div style="font-size:15px; font-weight:bold; color:#10b981;">ขาย: ${parseFloat(item.price || 0).toLocaleString()}.-</div>
+                `;
+            } else {
+                priceDisplay = `<div style="font-size:15px; font-weight:bold; color:#10b981;">ขาย: ${parseFloat(item.price || 0).toLocaleString()}.-</div>`;
+            }
+
+            // แสดงปุ่มจัดการเฉพาะ Admin
+            let actionTd = '';
+            if (currentUserRole === 'admin') {
+                actionTd = `
+                    <td style="text-align: center; white-space: nowrap;">
+                        <button class="btn btn-edit" onclick="editProduct('${item.id}')">✏️ แก้ไข</button>
+                        <button class="btn btn-del" onclick="deleteProduct('${item.id}', '${item.product_name}')">🗑️ ลบ</button>
+                    </td>
+                `;
+            }
+
             tbody.innerHTML += `
                 <tr>
                     <td>
@@ -261,8 +325,7 @@
                         <div style="font-size:15px; font-weight:600;">${item.product_name}</div>
                     </td>
                     <td>
-                        <div style="font-size:13px; color:#64748b;">ทุน: ${parseFloat(item.cost_price || 0).toLocaleString()}.-</div>
-                        <div style="font-size:15px; font-weight:bold; color:#10b981;">ขาย: ${parseFloat(item.price || 0).toLocaleString()}.-</div>
+                        ${priceDisplay}
                     </td>
                     <td>
                         ${supplierText}
@@ -270,10 +333,7 @@
                         ${linkBtn}
                     </td>
                     <td><span class="qty-badge ${isLow ? 'qty-low' : ''}">${item.qty_in_stock} ${item.unit}</span></td>
-                    <td style="text-align: center; white-space: nowrap;">
-                        <button class="btn btn-edit" onclick="editProduct('${item.id}')">✏️ แก้ไข</button>
-                        <button class="btn btn-del" onclick="deleteProduct('${item.id}', '${item.product_name}')">🗑️ ลบ</button>
-                    </td>
+                    ${actionTd}
                 </tr>
             `;
         });
@@ -297,6 +357,8 @@
     }
 
     function checkProductCode() {
+        if (currentUserRole !== 'admin') return;
+
         const code = document.getElementById('p-code').value.trim();
         const snModeSelect = document.getElementById('p-sn-mode');
         const modeWarning = document.getElementById('mode-warning');
@@ -333,6 +395,11 @@
     }
 
     function editProduct(id) {
+        if (currentUserRole !== 'admin') {
+            alert("⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์แก้ไขข้อมูลสินค้า");
+            return;
+        }
+
         const p = globalProducts.find(x => x.id === id);
         if (!p) { alert("ไม่พบข้อมูลสินค้าที่ต้องการแก้ไข"); return; }
 
@@ -375,6 +442,11 @@
     }
 
     async function deleteProduct(id, name) {
+        if (currentUserRole !== 'admin') {
+            alert("⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์ลบสินค้า");
+            return;
+        }
+
         if (!confirm(`⚠️ ต้องการลบสินค้า "${name}" ออกจากคลังใช่หรือไม่?`)) return;
         try {
             const { error } = await supabaseClient.from('products').delete().eq('id', id);
@@ -387,6 +459,8 @@
     }
 
     function renderSnInputs() {
+        if (currentUserRole !== 'admin') return;
+
         const mode = document.getElementById('p-sn-mode').value;
         const qty = parseInt(document.getElementById('p-qty').value) || 1;
         const snArea = document.getElementById('sn-area');
@@ -423,6 +497,11 @@
     }
 
     async function saveProduct() {
+        if (currentUserRole !== 'admin') {
+            alert("⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์เพิ่ม/รับเข้าสินค้า");
+            return;
+        }
+
         const btnSave = document.getElementById('btn-save-stock');
         const editId = document.getElementById('edit-product-id').value;
         const code = document.getElementById('p-code').value.trim();
