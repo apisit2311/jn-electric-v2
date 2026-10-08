@@ -240,4 +240,41 @@
             return;
         }
 
-        if(!confirm(`⚠️ คุณแน่ใจ
+        if(!confirm(`⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบเอกสารเลขที่ ${docNum} ?\n\n💡 ระบบจะทำการ "คืนจำนวนสินค้า" กลับเข้าสต็อกให้อัตโนมัติครับ`)) return;
+
+        try {
+            const { data: itemsToRestock } = await supabaseClient
+                .from('document_items')
+                .select('product_id, qty')
+                .eq('document_id', docId);
+            
+            if (itemsToRestock && itemsToRestock.length > 0) {
+                for (let item of itemsToRestock) {
+                    if (item.product_id && item.qty > 0) {
+                        const { data: currentStock } = await supabaseClient.from('products').select('qty_in_stock').eq('id', item.product_id).single();
+                        if (currentStock) {
+                            const newQty = parseFloat(currentStock.qty_in_stock) + parseFloat(item.qty);
+                            await supabaseClient.from('products').update({ qty_in_stock: newQty }).eq('id', item.product_id);
+                        }
+                    }
+                }
+            }
+
+            const { error: deleteError } = await supabaseClient
+                .from('documents')
+                .delete()
+                .eq('id', docId);
+            
+            if (deleteError) throw deleteError;
+            
+            alert(`✅ ลบเอกสาร ${docNum} และคืนสต็อกเรียบร้อยแล้วครับ!`);
+            loadHistory(); 
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ ไม่สามารถลบเอกสารได้: " + error.message);
+        }
+    }
+</script>
+</body>
+</html>
