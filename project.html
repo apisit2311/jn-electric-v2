@@ -38,7 +38,6 @@
         body { font-family: 'Prompt', 'Sarabun', sans-serif; background-color: #f1f5f9; color: var(--slate-900); margin: 0; padding: 16px; }
         .wrapper { max-width: 1420px; margin: 0 auto; }
 
-        /* Header (ล็อกติดบนสุดของหน้าจอคอม) */
         .app-header { 
             background: #ffffff; 
             padding: 12px 18px; 
@@ -56,7 +55,6 @@
             z-index: 100; 
         }
         .header-title { display: flex; align-items: center; gap: 12px; }
-        .header-logo-icon { width: 44px; height: 44px; background: var(--primary-light); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; flex-shrink: 0; }
         .header-title h1 { margin: 0; font-size: 18px; font-weight: 700; color: var(--primary); }
         .header-title p { margin: 2px 0 0 0; font-size: 12px; color: var(--slate-600); }
         .btn-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
@@ -78,11 +76,9 @@
         .btn-mode-toggle { background: #0f172a; color: #f8fafc; font-weight: 600; border-radius: 9px; }
         .btn-mode-toggle:hover { background: #334155; }
 
-        /* Project Select Bar */
         .project-bar { background: #ffffff; padding: 12px 18px; border-radius: 14px; box-shadow: var(--card-shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid var(--slate-200); flex-wrap: wrap; }
         .current-proj-pill { background: var(--primary-light); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 600; border: 1px solid #bfdbfe; display: inline-flex; align-items: center; gap: 6px; }
 
-        /* Dashboard Top KPIs */
         .kpi-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-bottom: 16px; }
         .kpi-card { background: #ffffff; padding: 15px 16px; border-radius: 14px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); position: relative; overflow: hidden; }
         .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
@@ -99,7 +95,6 @@
         .kpi-sub { font-size: 11px; color: var(--slate-600); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .badge-pill { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
 
-        /* Tabs Navigation (ล็อกติดใต้ Header) */
         .tabs-nav-wrapper { 
             display: flex; 
             align-items: center; 
@@ -131,14 +126,12 @@
         }
         .btn-add-tab { flex-shrink: 0; padding: 7px 11px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #ffffff; color: var(--emerald-700); border: 1px dashed var(--emerald-600); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 
-        /* Workspace */
         .workspace { background: #ffffff; border-radius: 14px; padding: 20px; box-shadow: var(--card-shadow); border: 1px solid var(--slate-200); }
         .sheet-pane { display: none; }
         .sheet-pane.active { display: block !important; }
         .pane-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--slate-200); flex-wrap: wrap; gap: 8px; }
         .pane-head h2 { margin: 0; font-size: 16px; font-weight: 700; color: var(--primary); }
 
-        /* Desktop Table View */
         .table-wrap { overflow-x: auto; border: 1px solid var(--slate-200); border-radius: 10px; margin-bottom: 20px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
         th { background: var(--slate-50); color: #475569; font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--slate-200); }
@@ -169,7 +162,6 @@
         .btn-icon.edit { color: var(--primary); background: var(--primary-light); }
         .btn-icon.del { color: var(--rose-600); background: var(--rose-50); }
 
-        /* Mobile Card View */
         .mobile-card-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
         .m-item-card { background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 10px; padding: 12px; transition: 0.15s; }
         .m-item-card.paid { background: #f0fdf4; border-color: #bbf7d0; }
@@ -179,13 +171,11 @@
         .m-card-body { font-size: 12px; color: var(--slate-600); }
         .m-card-actions { display: flex; align-items: center; gap: 8px; }
 
-        /* Project Launcher Hub Modal */
         .launcher-card { background: #ffffff; border: 1px solid var(--slate-200); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: all 0.15s ease; cursor: pointer; }
         .launcher-card:hover { border-color: var(--primary); transform: translateY(-1px); box-shadow: var(--card-shadow); background: var(--primary-light); }
         .launcher-title { font-size: 14.5px; font-weight: 700; color: var(--primary); margin-bottom: 3px; }
         .launcher-meta { font-size: 12px; color: var(--slate-600); }
 
-        /* Modals */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; }
         .modal-box { background: #fff; width: 500px; max-width: 92%; border-radius: 14px; padding: 20px; box-shadow: var(--card-shadow-lg); max-height: 90vh; overflow-y: auto; }
         .modal-box.modal-lg { width: 940px; max-width: 95vw; }
@@ -194,7 +184,6 @@
         .form-item { margin-bottom: 10px; }
         .form-item label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--slate-700); }
 
-        /* ปุ่มลอย Scroll ขึ้นบนสุด */
         .btn-scroll-top {
             position: fixed;
             bottom: 20px;
@@ -219,13 +208,13 @@
             background-color: #172554;
         }
 
-        /* Responsive สำหรับมือถือ */
+        #auth-guard { position: fixed; top:0; left:0; width:100%; height:100%; background: #fff; z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+
         @media (max-width: 768px) {
             body { padding: 6px; }
             .workspace { padding: 10px; }
             .kpi-dashboard { grid-template-columns: repeat(2, 1fr); gap: 6px; }
 
-            /* ปลดล็อก Header บนมือถือให้เลื่อนหลบไปตามการ Scroll */
             .app-header { 
                 position: static !important; 
                 padding: 10px 12px; 
@@ -237,7 +226,6 @@
             .header-title p { font-size: 11px; }
             .app-header .btn { padding: 5px 9px; font-size: 11.5px; border-radius: 6px; }
 
-            /* ล็อกเฉพาะแถบแท็บให้ติดขอบบนสุดของจอ (top: 0) */
             .tabs-nav-wrapper { 
                 position: sticky !important; 
                 top: 0 !important; 
@@ -245,7 +233,7 @@
                 padding: 5px 6px; 
                 margin-bottom: 10px; 
                 border-radius: 8px; 
-                box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+                box-shadow: 0 3px 10px rgba(0,0,0,0.12); 
                 background: #cbd5e1;
             }
             .tab-pill { padding: 6px 9px; font-size: 12px; }
@@ -263,6 +251,12 @@
 </head>
 <body>
 
+<div id="auth-guard">
+    <h2 style="color: var(--primary);">กำลังตรวจสอบสิทธิ์การเข้าถึง...</h2>
+    <p>ระบบกำลังตรวจสอบข้อมูลผู้ใช้งาน</p>
+    <a href="index.html" class="btn btn-primary">กลับไปหน้าออกบิล</a>
+</div>
+
 <div class="wrapper">
     <!-- Header -->
     <div class="app-header">
@@ -274,9 +268,9 @@
         </div>
         <div class="btn-group no-print">
             <button class="btn btn-mode-toggle" id="btn-view-mode" onclick="toggleViewMode()">📱 โหมดการ์ดมือถือ</button>
-            <a href="labor.html" class="btn btn-purple">👷 จัดการค่าแรง</a>
+            <a href="labor.html" class="btn btn-purple admin-only-ui">👷 จัดการค่าแรง</a>
             <button class="btn btn-white" onclick="openChecklistForCurrentProject()">🛒 เช็คของ</button>
-            <button class="btn btn-white" onclick="shareExecutiveLink()">🔗 แชร์รายงาน</button>
+            <button class="btn btn-white admin-only-ui" onclick="shareExecutiveLink()">🔗 แชร์รายงาน</button>
             <button class="btn btn-white" onclick="window.print()">🖨️ พิมพ์</button>
             <a href="index.html" class="btn btn-primary">⬅️ไปหน้าออกบิล</a>
         </div>
@@ -288,16 +282,15 @@
             <span style="font-size: 13px; font-weight: 600; color: var(--slate-700);">ชื่อโครงการ:</span>
             <div class="current-proj-pill" id="lbl-current-project-name">⚡ กำลังโหลด...</div>
             <button class="btn btn-white btn-sm" onclick="openProjectLauncherModal()">📂 สลับโครงการ</button>
-            <button class="btn btn-sm" id="btn-toggle-status" style="background:#f1f5f9; border:1px solid var(--slate-300);" onclick="toggleCurrentProjectStatus()">📁 ปิดโครงการนี้</button>
+            <button class="btn btn-sm admin-only-ui" id="btn-toggle-status" style="background:#f1f5f9; border:1px solid var(--slate-300);" onclick="toggleCurrentProjectStatus()">📁 ปิดโครงการนี้</button>
             
-            <!-- 🌟 ปุ่มเปิดแฟ้มเอกสารโครงการ -->
             <button class="btn btn-primary btn-sm" id="btn-quote-action" onclick="openDocTrayModal()" style="background:#2563eb; color:#fff; font-weight:600;">
                 📁 แฟ้มเอกสารโครงการ (0)
             </button>
         </div>
         <div class="btn-group">
-            <button class="btn btn-emerald" onclick="openNewProjectModal()">➕ สร้างโครงการใหม่</button>
-            <button class="btn btn-danger" onclick="deleteCurrentProject()">🗑️ ลบโครงการนี้</button>
+            <button class="btn btn-emerald admin-only-ui" onclick="openNewProjectModal()">➕ สร้างโครงการใหม่</button>
+            <button class="btn btn-danger admin-only-ui" onclick="deleteCurrentProject()">🗑️ ลบโครงการนี้</button>
         </div>
     </div>
 
@@ -321,7 +314,8 @@
             <div class="kpi-sub" id="kpi-cost-sub">ทุนอุปกรณ์ + ค่าใช้จ่ายหน้างาน</div>
         </div>
 
-        <div class="kpi-card emerald">
+        <!-- การ์ดการเงินละเอียดอ่อน (ซ่อนสำหรับ Staff) -->
+        <div class="kpi-card emerald admin-only-ui">
             <div class="kpi-header-row">
                 <div class="kpi-title" style="color: var(--emerald-700);">กำไรสุทธิโครงการ</div>
                 <div class="kpi-icon-badge" style="background: var(--emerald-50); color: var(--emerald-700);">💰</div>
@@ -332,7 +326,7 @@
             </div>
         </div>
 
-        <div class="kpi-card purple">
+        <div class="kpi-card purple admin-only-ui">
             <div class="kpi-header-row">
                 <div class="kpi-title" style="color: var(--purple-600);">รวมเงินทุนที่รับเข้า</div>
                 <div class="kpi-icon-badge" style="background: var(--purple-50); color: var(--purple-600);">📥</div>
@@ -341,7 +335,7 @@
             <div class="kpi-sub" id="kpi-fund-count">0 แหล่งเงินทุน</div>
         </div>
 
-        <div class="kpi-card" id="card-fund-balance">
+        <div class="kpi-card admin-only-ui" id="card-fund-balance">
             <div class="kpi-header-row">
                 <div class="kpi-title" id="lbl-fund-balance-title">เงินทุนคงเหลือในมือจริง</div>
                 <div class="kpi-icon-badge" id="badge-fund-icon">💳</div>
@@ -350,7 +344,7 @@
             <div class="kpi-sub" id="kpi-fund-balance-status">จ่ายจริงแล้ว 0.00 | มัดจำ 0.00</div>
         </div>
 
-        <div class="kpi-card" id="card-need-fund">
+        <div class="kpi-card admin-only-ui" id="card-need-fund">
             <div class="kpi-header-row">
                 <div class="kpi-title" id="lbl-need-fund-title">เงินที่ต้องเพิ่มเข้าโครงการ</div>
                 <div class="kpi-icon-badge" id="badge-need-fund-icon">🪙</div>
@@ -376,7 +370,7 @@
     <div class="workspace">
         <div class="sheet-pane active" id="pane-main-summary">
             <div class="pane-head">
-                <h2>📊 หน้าหลัก: ตารางสรุปรายรับ ต้นทุน และกำไรโครงการ</h2>
+                <h2>📊 หน้าหลัก: ตารางสรุปรายละเอียดโครงการ</h2>
                 <div style="font-size: 13px; color: #64748b;">ผู้ว่าจ้าง: <strong id="lbl-customer" style="color:#0f172a;">-</strong></div>
             </div>
 
@@ -400,12 +394,11 @@
     </div>
 </div>
 
-<!-- ปุ่มเลื่อนขึ้นบนสุด -->
 <button id="btnScrollTop" class="btn-scroll-top no-print" onclick="scrollToTop()" title="ขึ้นบนสุด">
     ⬆️
 </button>
 
-<!-- ==================== MODAL: DOCUMENT TRAY (แฟ้มเอกสาร) ==================== -->
+<!-- ==================== MODALS ==================== -->
 <div class="modal-overlay" id="modalDocTray">
     <div class="modal-box modal-lg" style="width: 700px;">
         <div class="modal-head">
@@ -431,15 +424,12 @@
                         <th style="width: 15%;" class="t-center">จัดการ</th>
                     </tr>
                 </thead>
-                <tbody id="tbl-doc-tray-body">
-                    <!-- Data will be injected here -->
-                </tbody>
+                <tbody id="tbl-doc-tray-body"></tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- ==================== MODAL: PROJECT LAUNCHER (อัปเดตเพิ่มที่อยู่และเลขผู้เสียภาษี) ==================== -->
 <div class="modal-overlay" id="modalLauncher">
     <div class="modal-box" style="width: 600px;">
         <div class="modal-head">
@@ -459,12 +449,11 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--slate-200); padding-top: 12px;">
             <a href="index.html" class="btn btn-white">⬅️ กลับหน้าออกบิล</a>
-            <button class="btn btn-emerald font-bold" onclick="openNewProjectModal()">➕ สร้างโครงการใหม่</button>
+            <button class="btn btn-emerald font-bold admin-only-ui" onclick="openNewProjectModal()">➕ สร้างโครงการใหม่</button>
         </div>
     </div>
 </div>
 
-<!-- ==================== OTHER MODALS ==================== -->
 <div class="modal-overlay" id="modalNewProject">
     <div class="modal-box">
         <div class="modal-head"><h3>➕ สร้างโครงการใหม่</h3><span style="cursor: pointer; font-size: 18px;" onclick="closeModalSafe('modalNewProject')">&times;</span></div>
@@ -480,11 +469,10 @@
         <div style="background: var(--slate-50); padding: 12px; border-radius: 8px; border: 1px dashed var(--slate-300); margin-bottom: 12px;">
             <div class="form-item"><label>ชื่อโครงการ:</label><input type="text" id="inp-proj-name" class="clean-input" placeholder="เช่น โครงการติดตั้งตู้คอนโทรล..."></div>
             <div class="form-item"><label>ชื่อลูกค้า / ผู้ว่าจ้าง:</label><input type="text" id="inp-proj-cust" class="clean-input"></div>
-            <!-- 🌟 ช่องที่เพิ่มมาใหม่ -->
             <div class="form-item"><label>ที่อยู่ลูกค้า:</label><textarea id="inp-proj-cust-addr" class="clean-input" rows="2" placeholder="บ้านเลขที่, ตำบล, อำเภอ, จังหวัด..."></textarea></div>
             <div class="form-item"><label>เลขประจำตัวผู้เสียภาษี / สาขา:</label><input type="text" id="inp-proj-cust-tax" class="clean-input" placeholder="เช่น 01055xxxxxxxx (สำนักงานใหญ่)"></div>
-            <!-- ================= -->
-            <div class="form-item" style="margin-bottom:0;"><label>ยอดสัญญารวม:</label><input type="number" id="inp-proj-amt" class="clean-input" min="0" value="0"></div>
+            <div class="form-item"><label>ยอดสัญญารวม:</label><input type="number" id="inp-proj-amt" class="clean-input" min="0" value="0"></div>
+            <div class="form-item" style="margin-bottom:0;"><label>👤 มอบหมายให้พนักงาน (ผู้รับผิดชอบ):</label><select id="inp-proj-assigned" class="clean-input"></select></div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
@@ -723,9 +711,11 @@
     let fundings = [];
     let deposits = [];
     let quotes = [];
-    
-    // 🌟 ตัวแปรเก็บเอกสารทั้งหมดของโครงการ (Document Lineage)
     let projectDocs = []; 
+    let allUserProfiles = [];
+
+    let currentUserRole = 'staff';
+    let currentUserId = null;
     
     let activeSheetKey = 'main-summary';
     let launcherFilter = 'active';
@@ -740,15 +730,57 @@
         { key: 'labor', name: 'ยอดเบิกค่าแรง', tabLabel: '👷 ค่าแรง', defaultUnit: 'วัน', placeholder: 'เช่น ค่าแรง...' }
     ];
 
-    window.onload = async () => {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) { window.location.href = "index.html"; return; }
-        updateModeButtonText();
-        await loadProjectLauncherList();
-        
-        // 🌟 ดึงข้อมูลลูกค้าจาก documents มาเก็บไว้ใช้ตอนเลือกจาก List
-        await loadQuotesForModal();
+    window.onload = () => {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (session) {
+                currentUserId = session.user.id;
+                
+                const { data: profile } = await supabaseClient
+                    .from('user_profiles')
+                    .select('role')
+                    .eq('email', session.user.email)
+                    .single();
+                if (profile) currentUserRole = profile.role;
+
+                applyRolePermissions();
+                updateModeButtonText();
+                
+                // โหลดรายชื่อผู้ใช้สำหรับใส่ใน Dropdown มอบหมายงาน
+                if (currentUserRole === 'admin') {
+                    await loadUserProfiles();
+                }
+
+                await loadProjectLauncherList();
+                await loadQuotesForModal();
+
+                document.getElementById('auth-guard').style.display = 'none';
+            } else {
+                alert("กรุณาเข้าสู่ระบบก่อนใช้งานครับ");
+                window.location.href = "index.html";
+            }
+        });
     };
+
+    function applyRolePermissions() {
+        if (currentUserRole !== 'admin') {
+            document.querySelectorAll('.admin-only-ui').forEach(el => el.style.display = 'none');
+        }
+    }
+
+    async function loadUserProfiles() {
+        const { data } = await supabaseClient.from('user_profiles').select('id, email, role');
+        allUserProfiles = data || [];
+        const sel = document.getElementById('inp-proj-assigned');
+        if (sel) {
+            sel.innerHTML = '<option value="">-- ไม่ระบุ (ทุกคน) --</option>';
+            allUserProfiles.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.id;
+                opt.textContent = `${u.email} (${u.role})`;
+                sel.appendChild(opt);
+            });
+        }
+    }
 
     function toggleViewMode() {
         currentViewMode = currentViewMode === 'table' ? 'card' : 'table';
@@ -764,9 +796,15 @@
         }
     }
 
-    // ==================== SMART AUTO-LOAD & LAUNCHER HUB ====================
     async function loadProjectLauncherList() {
-        const { data } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
+        let query = supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
+
+        // 🔒 Staff เห็นเฉพาะโครงการที่ตนเองได้รับมอบหมาย
+        if (currentUserRole !== 'admin') {
+            query = query.eq('assigned_to', currentUserId);
+        }
+
+        const { data } = await query;
         projects = (data || []).map(p => ({ ...p, status: p.status || 'active' }));
 
         const activeProjects = projects.filter(p => p.status === 'active');
@@ -836,7 +874,7 @@
             container.innerHTML = `
                 <div style="text-align: center; padding: 30px; background: #f8fafc; border-radius: 12px; border: 1px dashed var(--slate-300);">
                     <div style="font-size: 24px; margin-bottom: 4px;">📂</div>
-                    <div style="font-weight: 600; color: var(--slate-700); font-size: 13px;">ไม่มีโครงการในหมวดนี้</div>
+                    <div style="font-weight: 600; color: var(--slate-700); font-size: 13px;">${currentUserRole === 'admin' ? 'ไม่มีโครงการในหมวดนี้' : 'ยังไม่มีโครงการที่ได้รับมอบหมาย'}</div>
                 </div>
             `;
             return;
@@ -866,12 +904,14 @@
         document.getElementById('lbl-current-project-name').innerText = `${currentProject.status === 'active' ? '🟢' : '📁'} ${currentProject.project_name}`;
         
         const btnToggleStatus = document.getElementById('btn-toggle-status');
-        if (currentProject.status === 'active') {
-            btnToggleStatus.innerText = '📁 ย้ายเข้าคลังประวัติ';
-            btnToggleStatus.title = 'ปิดและซ่อนโครงการนี้ออกจากหน้าหลัก';
-        } else {
-            btnToggleStatus.innerText = '🟢 กู้คืนเป็นโครงการหลัก';
-            btnToggleStatus.title = 'เปิดกลับมาเป็นโครงการที่กำลังทำอยู่';
+        if (btnToggleStatus) {
+            if (currentProject.status === 'active') {
+                btnToggleStatus.innerText = '📁 ย้ายเข้าคลังประวัติ';
+                btnToggleStatus.title = 'ปิดและซ่อนโครงการนี้ออกจากหน้าหลัก';
+            } else {
+                btnToggleStatus.innerText = '🟢 กู้คืนเป็นโครงการหลัก';
+                btnToggleStatus.title = 'เปิดกลับมาเป็นโครงการที่กำลังทำอยู่';
+            }
         }
 
         document.getElementById('modalLauncher').style.display = 'none';
@@ -879,7 +919,7 @@
     }
 
     async function toggleCurrentProjectStatus() {
-        if (!currentProject) return;
+        if (!currentProject || currentUserRole !== 'admin') return;
         const newStatus = currentProject.status === 'active' ? 'archived' : 'active';
         const msg = newStatus === 'archived' ? `ยืนยันปิดและย้ายโครงการ "${currentProject.project_name}" เข้าคลังประวัติ?` : `ยืนยันกู้คืนโครงการ "${currentProject.project_name}" กลับมาเป็นโครงการปัจจุบัน?`;
         
@@ -957,7 +997,6 @@
             amount: f.amount || 0
         }));
 
-        // 🌟 โหลดแฟ้มเอกสารที่ผูกกับโครงการนี้ทั้งหมด 
         projectDocs = [];
         let queryStr = `project_id.eq.${currentProject.id}`;
         if (currentProject.document_id) {
@@ -972,7 +1011,6 @@
         renderActiveSheet();
     }
 
-    // 🌟 ระบบแฟ้มเอกสาร (Document Tray) 
     function updateQuoteActionButton() {
         const btn = document.getElementById('btn-quote-action');
         if (!btn) return;
@@ -1028,7 +1066,6 @@
         const { data: custData } = await supabaseClient.from('customers').select('*').eq('id', targetDoc.customer_id).single();
         const { data: itmData } = await supabaseClient.from('document_items').select('*').eq('document_id', docId).order('id');
         
-        // 🌟 ดึงข้อมูลที่อยู่และผู้เสียภาษีไปด้วย
         const custAddress = custData?.address || currentProject.customer_address || '';
         const custExtra = currentProject.customer_tax 
                         ? `เลขประจำตัวผู้เสียภาษี: ${currentProject.customer_tax}\nโครงการ: ${currentProject.project_name}`
@@ -1108,7 +1145,6 @@
             if (custErr) throw custErr;
             customerId = custData[0].id;
 
-            // 🌟 Insert พร้อมผูก project_id
             const { data: docData, error: docErr } = await supabaseClient
                 .from('documents')
                 .insert([{
@@ -1142,7 +1178,6 @@
                 currentProject.document_id = newDocId;
             }
 
-            // 🌟 ส่งข้อมูลที่อยู่และรหัสผู้เสียภาษีไปด้วย
             const custExtra = currentProject.customer_tax 
                             ? `เลขประจำตัวผู้เสียภาษี: ${currentProject.customer_tax}\nโครงการ: ${currentProject.project_name}`
                             : `โครงการ: ${currentProject.project_name}`;
@@ -1198,14 +1233,23 @@
             container.appendChild(tab);
         });
 
-        const fundTab = document.createElement('button');
-        fundTab.className = `tab-pill ${activeSheetKey === 'funding' ? 'active' : ''}`;
-        fundTab.innerHTML = '💰 ทะเบียนเงินทุน';
-        fundTab.onclick = () => switchSheet('funding');
-        container.appendChild(fundTab);
+        // 🔒 แท็บทะเบียนเงินทุน: ให้เฉพาะ Admin เห็น
+        if (currentUserRole === 'admin') {
+            const fundTab = document.createElement('button');
+            fundTab.className = `tab-pill ${activeSheetKey === 'funding' ? 'active' : ''}`;
+            fundTab.innerHTML = '💰 ทะเบียนเงินทุน';
+            fundTab.onclick = () => switchSheet('funding');
+            container.appendChild(fundTab);
+        }
     }
 
     function switchSheet(key) {
+        // บล็อก Staff ไม่ให้เข้าชีตการเงิน
+        if (currentUserRole !== 'admin' && key === 'funding') {
+            alert("⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์เข้าถึงทะเบียนเงินทุน");
+            return;
+        }
+
         activeSheetKey = key;
         renderTabs();
         renderActiveSheet();
@@ -1308,6 +1352,9 @@
             return { item, idx, subs, unitCost, sellingTotal, costTotal, grossProfit, itemPaidTotal, paymentClass, paymentBadge };
         });
 
+        // 🔒 ตรวจสอบว่าต้องโชว์คอลัมน์กำไรไหม
+        const showProfitCol = currentUserRole === 'admin';
+
         if (currentViewMode === 'table') {
             containerMain.innerHTML = `
                 <div class="table-wrap">
@@ -1322,7 +1369,7 @@
                                 <th style="width: 10%;" class="t-right">จำนวนเงิน</th>
                                 <th style="width: 10%;" class="t-right text-amber">ราคาทุนรวมงบ</th>
                                 <th style="width: 12%;" class="t-right text-emerald">จ่ายจริงแล้ว</th>
-                                <th style="width: 10%;" class="t-right text-primary">กำไรขั้นต้น</th>
+                                ${showProfitCol ? '<th style="width: 10%;" class="t-right text-primary">กำไรขั้นต้น</th>' : ''}
                                 <th style="width: 5%;" class="t-center no-print">จัดการ</th>
                             </tr>
                         </thead>
@@ -1340,7 +1387,7 @@
                                         <div class="font-bold ${paymentClass}">${itemPaidTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
                                         <div style="margin-top:3px;">${paymentBadge}</div>
                                     </td>
-                                    <td class="t-right font-bold text-emerald">${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                    ${showProfitCol ? `<td class="t-right font-bold text-emerald">${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>` : ''}
                                     <td class="t-center no-print">
                                         <div class="action-btns">
                                             <button class="btn-icon edit" onclick="openEditMainTabModal('${item.id}')" title="แก้ไข">✏️</button>
@@ -1356,7 +1403,7 @@
                                 <td class="t-right text-primary font-bold">${sumSelling.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td class="t-right text-amber font-bold">${sumBomCost.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td class="t-right text-emerald font-bold">${paidBomTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                                <td class="t-right text-emerald font-bold">${sumGrossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                                ${showProfitCol ? `<td class="t-right text-emerald font-bold">${sumGrossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>` : ''}
                                 <td class="no-print"></td>
                             </tr>
                         </tfoot>
@@ -1385,7 +1432,7 @@
                                     </div>
                                 </div>
                                 <div class="m-card-actions" style="justify-content:space-between; border-top:1px dashed var(--slate-200); padding-top:6px;">
-                                    <strong class="text-emerald">กำไร: +${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</strong>
+                                    ${showProfitCol ? `<strong class="text-emerald">กำไร: +${grossProfit.toLocaleString('en-US', {minimumFractionDigits: 2})} ฿</strong>` : '<span></span>'}
                                     <div>
                                         <button class="btn-icon edit" onclick="openEditMainTabModal('${item.id}')">✏️</button>
                                         <button class="btn-icon del" onclick="deleteMainItem('${item.id}', '${item.item_name}')">🗑️</button>
@@ -1460,11 +1507,13 @@
                                 <td class="t-right font-bold text-emerald">${paidSiteExpenses.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                                 <td class="no-print"></td>
                             </tr>
+                            ${currentUserRole === 'admin' ? `
                             <tr class="profit-final-row">
                                 <td colspan="2" class="t-center font-bold">💰 กำไรสุทธิคงเหลือจริงทั้งโครงการ (Net Profit)</td>
                                 <td class="t-right font-bold" colspan="2">${netProfit.toLocaleString('en-US', {minimumFractionDigits: 2})} บาท (กำไร ${marginPct}%)</td>
                                 <td class="no-print"></td>
                             </tr>
+                            ` : ''}
                         </tfoot>
                     </table>
                 </div>
@@ -1490,6 +1539,7 @@
                             </div>
                         </div>
                     `).join('')}
+                    ${currentUserRole === 'admin' ? `
                     <div style="background:var(--emerald-50); border:1px solid #bbf7d0; border-radius:12px; padding:12px 16px; margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <div style="font-size:11px; font-weight:600; color:var(--emerald-700);">กำไรสุทธิคงเหลือ (Net Profit)</div>
@@ -1497,6 +1547,7 @@
                         </div>
                         <span class="badge-pill" style="background:#dcfce7; color:var(--emerald-700);">${marginPct}% Margin</span>
                     </div>
+                    ` : ''}
                 </div>
             `;
         }
@@ -1517,59 +1568,62 @@
         document.getElementById('kpi-total-cost').innerText = totalProjectCost.toLocaleString('en-US', {minimumFractionDigits: 2});
         document.getElementById('kpi-cost-sub').innerText = `อุปกรณ์: ${sumBomCost.toLocaleString()} | หน้างาน: ${totalSiteExpenses.toLocaleString()}`;
 
-        document.getElementById('kpi-net-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('kpi-margin-badge').innerText = `อัตรากำไร: ${marginPct}%`;
+        // อัปเดตตัวเลขการเงินเฉพาะ Admin
+        if (currentUserRole === 'admin') {
+            document.getElementById('kpi-net-profit').innerText = netProfit.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('kpi-margin-badge').innerText = `อัตรากำไร: ${marginPct}%`;
 
-        document.getElementById('kpi-fund-in').innerText = totalFundIn.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('kpi-fund-count').innerText = `${fundings.length} แหล่งเงินทุนที่เติมเข้ามา`;
+            document.getElementById('kpi-fund-in').innerText = totalFundIn.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('kpi-fund-count').innerText = `${fundings.length} แหล่งเงินทุนที่เติมเข้ามา`;
 
-        const cardFund = document.getElementById('card-fund-balance');
-        const valFund = document.getElementById('kpi-fund-balance');
-        const statusFund = document.getElementById('kpi-fund-balance-status');
-        const badgeFund = document.getElementById('badge-fund-icon');
+            const cardFund = document.getElementById('card-fund-balance');
+            const valFund = document.getElementById('kpi-fund-balance');
+            const statusFund = document.getElementById('kpi-fund-balance-status');
+            const badgeFund = document.getElementById('badge-fund-icon');
 
-        valFund.innerText = cashBalanceInHand.toLocaleString('en-US', {minimumFractionDigits: 2});
-        statusFund.innerHTML = `จ่ายจริงแล้ว ${actualPaidTotal.toLocaleString()} | มัดจำ ${totalDepositsOut.toLocaleString()}`;
+            valFund.innerText = cashBalanceInHand.toLocaleString('en-US', {minimumFractionDigits: 2});
+            statusFund.innerHTML = `จ่ายจริงแล้ว ${actualPaidTotal.toLocaleString()} | มัดจำ ${totalDepositsOut.toLocaleString()}`;
 
-        if (cashBalanceInHand < 0) {
-            cardFund.className = 'kpi-card rose';
-            cardFund.style.background = '#fff1f2';
-            cardFund.style.borderColor = '#fecdd3';
-            valFund.className = 'kpi-val text-rose';
-            badgeFund.style.background = '#ffe4e6';
-            badgeFund.style.color = '#e11d48';
-        } else {
-            cardFund.className = 'kpi-card emerald';
-            cardFund.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)';
-            cardFund.style.borderColor = '#bbf7d0';
-            valFund.className = 'kpi-val text-emerald';
-            badgeFund.style.background = '#ecfdf5';
-            badgeFund.style.color = '#047857';
-        }
+            if (cashBalanceInHand < 0) {
+                cardFund.className = 'kpi-card rose';
+                cardFund.style.background = '#fff1f2';
+                cardFund.style.borderColor = '#fecdd3';
+                valFund.className = 'kpi-val text-rose';
+                badgeFund.style.background = '#ffe4e6';
+                badgeFund.style.color = '#e11d48';
+            } else {
+                cardFund.className = 'kpi-card emerald';
+                cardFund.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)';
+                cardFund.style.borderColor = '#bbf7d0';
+                valFund.className = 'kpi-val text-emerald';
+                badgeFund.style.background = '#ecfdf5';
+                badgeFund.style.color = '#047857';
+            }
 
-        const cardNeedFund = document.getElementById('card-need-fund');
-        const valNeedFund = document.getElementById('kpi-need-fund');
-        const statusNeedFund = document.getElementById('kpi-need-fund-status');
-        const badgeNeedFund = document.getElementById('badge-need-fund-icon');
+            const cardNeedFund = document.getElementById('card-need-fund');
+            const valNeedFund = document.getElementById('kpi-need-fund');
+            const statusNeedFund = document.getElementById('kpi-need-fund-status');
+            const badgeNeedFund = document.getElementById('badge-need-fund-icon');
 
-        valNeedFund.innerText = neededFund.toLocaleString('en-US', {minimumFractionDigits: 2});
+            valNeedFund.innerText = neededFund.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-        if (neededFund > 0) {
-            cardNeedFund.className = 'kpi-card amber';
-            cardNeedFund.style.background = '#fffbeb';
-            cardNeedFund.style.borderColor = '#fde68a';
-            valNeedFund.className = 'kpi-val text-amber';
-            badgeNeedFund.style.background = '#fef3c7';
-            badgeNeedFund.style.color = '#d97706';
-            statusNeedFund.innerHTML = `<span style="color:var(--amber-600);font-weight:600;">⚠️ ต้องเตรียมเติมเงินทุนเพิ่มอีก</span>`;
-        } else {
-            cardNeedFund.className = 'kpi-card emerald';
-            cardNeedFund.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)';
-            cardNeedFund.style.borderColor = '#bbf7d0';
-            valNeedFund.className = 'kpi-val text-emerald';
-            badgeNeedFund.style.background = '#ecfdf5';
-            badgeNeedFund.style.color = '#047857';
-            statusNeedFund.innerHTML = `<span style="color:var(--emerald-700);font-weight:600;">🟢 เงินทุนเพียงพอครอบคลุมทั้งโครงการ</span>`;
+            if (neededFund > 0) {
+                cardNeedFund.className = 'kpi-card amber';
+                cardNeedFund.style.background = '#fffbeb';
+                cardNeedFund.style.borderColor = '#fde68a';
+                valNeedFund.className = 'kpi-val text-amber';
+                badgeNeedFund.style.background = '#fef3c7';
+                badgeNeedFund.style.color = '#d97706';
+                statusNeedFund.innerHTML = `<span style="color:var(--amber-600);font-weight:600;">⚠️ ต้องเตรียมเติมเงินทุนเพิ่มอีก</span>`;
+            } else {
+                cardNeedFund.className = 'kpi-card emerald';
+                cardNeedFund.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)';
+                cardNeedFund.style.borderColor = '#bbf7d0';
+                valNeedFund.className = 'kpi-val text-emerald';
+                badgeNeedFund.style.background = '#ecfdf5';
+                badgeNeedFund.style.color = '#047857';
+                statusNeedFund.innerHTML = `<span style="color:var(--emerald-700);font-weight:600;">🟢 เงินทุนเพียงพอครอบคลุมทั้งโครงการ</span>`;
+            }
         }
     }
 
@@ -1862,6 +1916,8 @@
 
     // ==================== RENDER FUNDING SHEET ====================
     function renderFundingSheet() {
+        if (currentUserRole !== 'admin') return;
+
         const totalFundIn = fundings.reduce((s, f) => s + Number(f.amount || 0), 0);
         const totalDepositsOut = deposits.reduce((s, d) => s + Number(d.amount || 0), 0);
 
@@ -2040,6 +2096,10 @@
     }
 
     function openNewProjectModal() { 
+        if (currentUserRole !== 'admin') {
+            alert('⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์สร้างโครงการใหม่');
+            return;
+        }
         document.getElementById('modalNewProject').style.display = 'flex'; 
     }
 
@@ -2072,10 +2132,15 @@
     }
 
     async function submitCreateProject() {
+        if (currentUserRole !== 'admin') return;
+
         const type = document.getElementById('sel-create-type').value;
         const name = document.getElementById('inp-proj-name').value.trim();
         const cust = document.getElementById('inp-proj-cust').value.trim();
+        const addr = document.getElementById('inp-proj-cust-addr').value.trim();
+        const tax = document.getElementById('inp-proj-cust-tax').value.trim();
         const amt = parseFloat(document.getElementById('inp-proj-amt').value) || 0;
+        const assignedTo = document.getElementById('inp-proj-assigned').value || null;
         const quoteId = type === 'quote' ? document.getElementById('sel-quote-doc').value : null;
 
         if (!name) return alert('⚠️ กรุณากรอกชื่อโครงการ');
@@ -2084,11 +2149,19 @@
         setBtnLoading('btn-submit-create-proj', true);
 
         try {
-            const { data: newProj, error: pErr } = await supabaseClient.from('projects').insert([{ project_name: name, customer_name: cust, contract_amount: amt, document_id: quoteId, status: 'active' }]).select().single();
+            const { data: newProj, error: pErr } = await supabaseClient.from('projects').insert([{ 
+                project_name: name, 
+                customer_name: cust, 
+                customer_address: addr,
+                customer_tax: tax,
+                contract_amount: amt, 
+                document_id: quoteId, 
+                status: 'active',
+                assigned_to: assignedTo 
+            }]).select().single();
             if (pErr) throw pErr;
 
             if (quoteId) {
-                // อัปเดต project_id เข้าไปที่เอกสารเดิมด้วย
                 await supabaseClient.from('documents').update({ project_id: newProj.id }).eq('id', quoteId);
 
                 const { data: docItems } = await supabaseClient.from('document_items').select('*').eq('document_id', quoteId);
@@ -2137,7 +2210,11 @@
     }
 
     async function deleteCurrentProject() {
-        if (!currentProject) return;
+        if (!currentProject || currentUserRole !== 'admin') {
+            alert('⚠️ เฉพาะแอดมินเท่านั้นที่มีสิทธิ์ลบโครงการ');
+            return;
+        }
+
         const confirmName = prompt(`⚠️ คำเตือนระดับสูงสุด!\nหากลบโครงการนี้ ข้อมูลอุปกรณ์ (BOM), ค่าใช้จ่ายหน้างาน, และเงินทุนทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้\n\nพิมพ์ชื่อโครงการ "${currentProject.project_name}" เพื่อยืนยันการลบ:`);
         if (confirmName !== currentProject.project_name) {
             if (confirmName !== null) alert('❌ ชื่อโครงการไม่ตรงกัน ยกเลิกการลบ');
@@ -2524,6 +2601,8 @@
     }
 
     function openFundingModal(id = null) {
+        if (currentUserRole !== 'admin') return;
+
         if (id) {
             const f = fundings.find(x => x.id === id);
             if (!f) return;
@@ -2545,6 +2624,8 @@
     }
 
     async function submitFunding() {
+        if (currentUserRole !== 'admin') return;
+
         const id = document.getElementById('fund-edit-id').value;
         const date = document.getElementById('fund-date').value;
         const source = document.getElementById('fund-source').value.trim();
@@ -2565,12 +2646,14 @@
     }
 
     async function deleteFunding(id, source = '') {
+        if (currentUserRole !== 'admin') return;
         if (!confirm(`ยืนยันลบแหล่งเงินทุน "${source}"?`)) return;
         await supabaseClient.from('project_cashflow').delete().eq('id', id);
         await loadFullProjectData();
     }
 
     function openBatchFundingModal() {
+        if (currentUserRole !== 'admin') return;
         const tbody = document.getElementById('tbl-batch-fund-body');
         tbody.innerHTML = '';
         for (let i = 0; i < 4; i++) addBatchFundingRow();
@@ -2594,7 +2677,7 @@
     }
 
     async function submitBatchFunding() {
-        if (!currentProject) return;
+        if (!currentProject || currentUserRole !== 'admin') return;
         const rows = document.querySelectorAll('#tbl-batch-fund-body tr');
         const inserts = [];
         rows.forEach(r => {
@@ -2615,6 +2698,8 @@
     }
 
     function openDepositModal(id = null) {
+        if (currentUserRole !== 'admin') return;
+
         if (id) {
             const d = deposits.find(x => x.id === id);
             if (!d) return;
@@ -2636,6 +2721,8 @@
     }
 
     async function submitDeposit() {
+        if (currentUserRole !== 'admin') return;
+
         const id = document.getElementById('deposit-edit-id').value;
         const date = document.getElementById('deposit-date').value;
         const source = document.getElementById('deposit-source').value.trim();
@@ -2654,12 +2741,14 @@
     }
 
     async function deleteDeposit(id, name = '') {
+        if (currentUserRole !== 'admin') return;
         if (!confirm(`ยืนยันลบรายการมัดจำ "${name}"?`)) return;
         await supabaseClient.from('project_cashflow').delete().eq('id', id);
         await loadFullProjectData();
     }
 
     function openBatchDepositModal() {
+        if (currentUserRole !== 'admin') return;
         const tbody = document.getElementById('tbl-batch-deposit-body');
         tbody.innerHTML = '';
         for (let i = 0; i < 4; i++) addBatchDepositRow();
@@ -2683,7 +2772,7 @@
     }
 
     async function submitBatchDeposit() {
-        if (!currentProject) return;
+        if (!currentProject || currentUserRole !== 'admin') return;
         const rows = document.querySelectorAll('#tbl-batch-deposit-body tr');
         const inserts = [];
         rows.forEach(r => {
@@ -2714,7 +2803,6 @@
         window.location.href = `checklist.html?id=${encodeURIComponent(currentProject.id)}`;
     }
 
-    // ==================== ระบบตรวจจับและเลื่อนขึ้นบนสุด ====================
     window.addEventListener('scroll', () => {
         const btn = document.getElementById('btnScrollTop');
         if (!btn) return;
