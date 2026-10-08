@@ -124,7 +124,7 @@
 
     <div id="error-view" style="display: none;">
         <h3 style="color: var(--rose); margin: 0 0 6px 0;">ไม่พบข้อมูลโครงการ</h3>
-        <p style="font-size: 13px; color: var(--text-sub); margin: 0;">กรุณาเลือกโครงการที่ต้องการตรวจนับอุปกรณ์</p>
+        <p style="font-size: 13px; color: var(--text-sub); margin: 0;" id="lbl-error-msg">กรุณาเลือกโครงการที่ต้องการตรวจนับอุปกรณ์</p>
         <div style="margin-top: 15px; display: flex; gap: 8px; justify-content: center;">
             <button onclick="openProjectChooserModal()" style="background: var(--primary-accent); color:#fff; border:none; padding:8px 14px; border-radius:8px; font-family:'Prompt'; cursor:pointer;">📂 เลือกโครงการ</button>
             <a href="project.html" style="background: var(--surface); border:1px solid var(--border); color:var(--text-main); padding:8px 14px; border-radius:8px; font-family:'Prompt'; text-decoration:none;">⬅️ หน้าโครงการ</a>
@@ -234,24 +234,42 @@
     let currentFilter = 'all';
     let currentCategory = 'all';
 
-    window.onload = async () => {
-        // 🔒 ตรวจสอบการเข้าสู่ระบบ: ถ้าไม่มี Session ให้เด้งกลับ index.html ทันที
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-            window.location.href = "index.html";
-            return;
-        }
+    let currentUserRole = 'staff';
+    let currentUserId = null;
 
+    window.onload = () => {
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (session) {
+                currentUserId = session.user.id;
+                
+                const { data: profile } = await supabaseClient
+                    .from('user_profiles')
+                    .select('role')
+                    .eq('email', session.user.email)
+                    .single();
+                if (profile) currentUserRole = profile.role;
+
+                await initializeChecklistPage();
+            } else {
+                alert("กรุณาเข้าสู่ระบบก่อนใช้งานครับ");
+                window.location.href = "index.html";
+            }
+        });
+    };
+
+    async function initializeChecklistPage() {
         const urlParams = new URLSearchParams(window.location.search);
         projectId = urlParams.get('id');
 
         if (!projectId) {
-            const { data } = await supabaseClient
-                .from('projects')
-                .select('*')
-                .eq('status', 'active')
-                .order('created_at', { ascending: false });
+            let query = supabaseClient.from('projects').select('*').eq('status', 'active').order('created_at', { ascending: false });
+            
+            // 🔒 Staff: ดึงเฉพาะโครงการที่ได้รับมอบหมาย
+            if (currentUserRole !== 'admin') {
+                query = query.eq('assigned_to', currentUserId);
+            }
 
+            const { data } = await query;
             const activeList = data || [];
             const lastSavedId = localStorage.getItem('erp_last_selected_project');
 
@@ -269,21 +287,27 @@
 
         document.getElementById('btn-back-proj').href = `project.html`;
         await loadChecklistData();
-    };
+    }
 
     async function loadChooserProjects() {
-        const { data } = await supabaseClient
+        let query = supabaseClient
             .from('projects')
             .select('*')
             .eq('status', 'active')
             .order('created_at', { ascending: false });
 
+        // 🔒 Staff: กรองแสดงเฉพาะโครงการที่ได้รับมอบหมาย
+        if (currentUserRole !== 'admin') {
+            query = query.eq('assigned_to', currentUserId);
+        }
+
+        const { data } = await query;
         const list = data || [];
         const container = document.getElementById('chooser-list');
         container.innerHTML = '';
 
         if (list.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">ไม่มีโครงการที่กำลังดำเนินงาน (Active)</div>`;
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">${currentUserRole === 'admin' ? 'ไม่มีโครงการที่กำลังดำเนินงาน (Active)' : 'ไม่มีโครงการที่คุณได้รับมอบหมายในขณะนี้'}</div>`;
             return;
         }
 
@@ -313,6 +337,16 @@
         try {
             const { data: pData, error: pErr } = await supabaseClient.from('projects').select('*').eq('id', projectId).single();
             if (pErr || !pData) throw new Error("Project not found");
+
+            // 🔒 ตรวจสอบความปลอดภัยระดับ Record: ป้องกันการเจาะเข้าดูข้ามโครงการ
+            if (currentUserRole !== 'admin' && pData.assigned_to !== currentUserId) {
+                alert("⚠️ คุณไม่มีสิทธิ์เข้าถึงเช็คลิสต์ของโครงการนี้ (เฉพาะพนักงานที่ได้รับมอบหมายเท่านั้น)");
+                document.getElementById('loading-view').style.display = 'none';
+                document.getElementById('lbl-error-msg').innerText = "คุณไม่มีสิทธิ์เข้าถึงเช็คลิสต์ของโครงการนี้";
+                document.getElementById('error-view').style.display = 'block';
+                return;
+            }
+
             project = pData;
 
             const { data: mainItems } = await supabaseClient.from('project_main_items').select('*').eq('project_id', projectId);
