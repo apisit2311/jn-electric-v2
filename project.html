@@ -830,15 +830,21 @@
         }
     }
 
-    async function loadProjectLauncherList() {
+   async function loadProjectLauncherList() {
         let query = supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
 
-        // 🔒 Staff เห็นเฉพาะโครงการที่ตนเองได้รับมอบหมาย
+        // 🔒 Staff: ดึงเฉพาะโครงการที่ได้รับมอบหมาย (รองรับทั้งจับคู่ด้วย ID หรือ Email)
         if (currentUserRole !== 'admin') {
-            query = query.eq('assigned_to', currentUserId);
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const userEmail = session?.user?.email || '';
+            
+            // กรองหาทั้งจาก user id และ email เผื่อฐานข้อมูลเก็บเป็น email
+            query = query.or(`assigned_to.eq.${currentUserId},assigned_to.eq.${userEmail}`);
         }
 
-        const { data } = await query;
+        const { data, error } = await query;
+        if (error) console.error("Error loading projects:", error);
+
         projects = (data || []).map(p => ({ ...p, status: p.status || 'active' }));
 
         const activeProjects = projects.filter(p => p.status === 'active');
